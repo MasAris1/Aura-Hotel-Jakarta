@@ -46,7 +46,7 @@ export function ButlerChat() {
 
             const data = await response.json();
             setMessages(prev => [...prev, { role: "butler", content: data.reply }]);
-        } catch (error) {
+        } catch {
             setMessages(prev => [...prev, { role: "butler", content: "I apologize, but I am currently experiencing technical difficulties. Please contact the front desk directly." }]);
         } finally {
             setIsLoading(false);

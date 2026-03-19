@@ -4,10 +4,18 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useTransition, Suspense } from "react";
 import { ArrowLeft, ArrowRight, Calendar, CheckCircle2, ChevronRight, CreditCard, Info, Loader2, Sparkles, User, UserCheck } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import roomsData from "@/data/rooms.json";
 import { createClient } from "@/utils/supabase/client";
 
 type Step = 1 | 2 | 3;
+
+type AuthUser = {
+    email?: string;
+    user_metadata?: {
+        full_name?: string;
+    };
+};
 
 function BookingForm() {
     const searchParams = useSearchParams();
@@ -16,7 +24,7 @@ function BookingForm() {
     const [step, setStep] = useState<Step>(1);
     const [isPending, startTransition] = useTransition();
     const [bookingSuccess, setBookingSuccess] = useState(false);
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<AuthUser | null>(null);
     const [loading, setLoading] = useState(true);
 
     const [checkIn, setCheckIn] = useState("");
@@ -94,15 +102,14 @@ function BookingForm() {
                 }
 
                 if (data.token) {
-                    // @ts-ignore
-                    window.snap.pay(data.token, {
-                        onSuccess: (result: any) => {
+                    window.snap?.pay(data.token, {
+                        onSuccess: () => {
                             setBookingSuccess(true);
                         },
-                        onPending: (result: any) => {
+                        onPending: () => {
                             router.push("/dashboard");
                         },
-                        onError: (result: any) => {
+                        onError: () => {
                             alert("Pembayaran gagal. Silakan coba lagi.");
                         },
                         onClose: () => {
@@ -294,7 +301,15 @@ function BookingForm() {
                     {/* Room Summary */}
                     <div className="bg-background border border-border overflow-hidden">
                         <div className="aspect-[16/9] overflow-hidden grayscale-[0.5] hover:grayscale-0 transition-all duration-700">
-                            <img src={room.images[0]} alt={room.name} className="w-full h-full object-cover" />
+                            <div className="relative h-full w-full">
+                                <Image
+                                    src={room.images[0]}
+                                    alt={room.name}
+                                    fill
+                                    sizes="(min-width: 1024px) 33vw, 100vw"
+                                    className="object-cover"
+                                />
+                            </div>
                         </div>
                         <div className="p-8">
                             <span className="text-primary font-sans text-[10px] tracking-[0.3em] uppercase mb-2 block">{room.type}</span>

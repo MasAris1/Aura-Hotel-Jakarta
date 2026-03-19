@@ -3,6 +3,13 @@ import { z } from "zod";
 import { createClient } from "@/utils/supabase/server";
 import { snap } from "@/lib/midtrans";
 import roomsData from "@/data/rooms.json";
+import type { Database } from "@/types/supabase";
+
+function getErrorMessage(error: unknown) {
+    return error instanceof Error ? error.message : "Unknown server error";
+}
+
+type BookingRow = Database["public"]["Tables"]["bookings"]["Row"];
 
 const checkoutSchema = z.object({
     roomId: z.string().min(1, "Room ID is required"),
@@ -52,7 +59,7 @@ export async function POST(req: Request) {
         const totalPrice = Math.round(subtotal * (1 + taxRate));
 
         // Coba insert Booking dengan Supabase
-        const { data: booking, error: insertError } = await supabase.from('bookings').insert({
+        const { data: bookingData, error: insertError } = await supabase.from('bookings').insert({
             user_id: user.id,
             room_id: data.roomId,
             first_name: data.firstName,
@@ -64,15 +71,16 @@ export async function POST(req: Request) {
             total_price: totalPrice,
             status: 'UNPAID'
         }).select().single();
+        const booking = bookingData as BookingRow | null;
 
-        if (insertError) {
+        if (insertError || !booking) {
             console.error("Booking Error:", insertError);
 
             // PostgreSQL Exclusion Violation (Overlapping Dates - Double Booking / Race condition)
-            if (insertError.code === '23P01') {
+            if (insertError?.code === '23P01') {
                 return NextResponse.json({ error: "Gagal Booking: Kamar sudah dipesan di tanggal tersebut. Silakan pilih tanggal lain." }, { status: 409 });
             }
-            return NextResponse.json({ error: "Gagal membuat pesanan: " + insertError.message }, { status: 500 });
+            return NextResponse.json({ error: "Gagal membuat pesanan: " + (insertError?.message || "Unknown booking error") }, { status: 500 });
         }
 
         try {
@@ -106,8 +114,8 @@ export async function POST(req: Request) {
 
             return NextResponse.json({ success: true, bookingId: booking.id, token, totalPrice }, { status: 201 });
 
-        } catch (midtransError: any) {
-            console.error("Midtrans Error:", midtransError);
+        } catch (midtransError: unknown) {
+            console.error("Midtrans Error:", getErrorMessage(midtransError));
 
             // Failsafe: Graceful Degradation. Jika midtrans down, hapus/batalkan pesanan yang berstatus UNPAID
             // agar kamar kembali Available tanpa menunggu cron block 1 jam
@@ -118,9 +126,8 @@ export async function POST(req: Request) {
             }, { status: 503 });
         }
 
-    } catch (e: any) {
-        console.error("Checkout Exception:", e);
+    } catch (error: unknown) {
+        console.error("Checkout Exception:", getErrorMessage(error));
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
-

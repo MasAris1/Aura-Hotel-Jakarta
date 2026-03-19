@@ -7,24 +7,76 @@ import Image from "next/image";
 import { createClient } from "@/utils/supabase/client";
 import roomsData from "@/data/rooms.json";
 
+type RoomData = (typeof roomsData)[number];
+type RoomInfo = Pick<RoomData, "name" | "type" | "images" | "price">;
+
+type BookingStatus =
+    | "UNPAID"
+    | "PAID"
+    | "CHECKED_IN"
+    | "CHECKED_OUT"
+    | "EXPIRED"
+    | "REFUNDED";
+
+type UserProfile = {
+    first_name?: string | null;
+    last_name?: string | null;
+    role?: string | null;
+};
+
+type BookingRoomRelation = {
+    name?: string | null;
+    type?: string | null;
+    images?: string[] | null;
+    base_price?: number | null;
+} | null;
+
+type BookingRecord = {
+    id: string;
+    user_id: string;
+    room_id: string;
+    first_name: string;
+    last_name: string;
+    check_in: string;
+    check_out: string;
+    total_price: number | string;
+    status: BookingStatus;
+    email?: string;
+    rooms?: BookingRoomRelation;
+    roomInfo?: RoomInfo;
+};
+
+type RealtimeBookingPayload = {
+    new: Partial<BookingRecord> & { id: string };
+};
+
 // Helper: Enrich bookings dengan data dari rooms.json
-function enrichBookingWithRoomData(booking: any) {
+function enrichBookingWithRoomData(booking: BookingRecord): BookingRecord {
     const staticRoom = roomsData.find(r => r.id === booking.room_id);
-    return {
-        ...booking,
-        roomInfo: staticRoom || {
+    const roomInfo: RoomInfo = staticRoom
+        ? {
+            name: staticRoom.name,
+            type: staticRoom.type,
+            images: staticRoom.images,
+            price: staticRoom.price,
+        }
+        : {
             name: booking.rooms?.name || 'Unknown Room',
             type: booking.rooms?.type || 'Room',
             images: booking.rooms?.images || [],
             price: booking.rooms?.base_price || 0,
-        }
+        };
+
+    return {
+        ...booking,
+        roomInfo,
     };
 }
 
 export default function DashboardPage() {
-    const [reservations, setReservations] = useState<any[]>([]);
+    const [reservations, setReservations] = useState<BookingRecord[]>([]);
     const [loading, setLoading] = useState(true);
-    const [userProfile, setUserProfile] = useState<any>(null);
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const [payingBookingId, setPayingBookingId] = useState<string | null>(null);
 
     const fetchData = useCallback(async () => {
@@ -33,7 +85,12 @@ export default function DashboardPage() {
 
         if (user) {
             // Fetch Profile
-            const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('first_name, last_name, role')
+                .eq('id', user.id)
+                .single();
+
             setUserProfile(profile || { first_name: user?.email?.split('@')[0] });
 
             // Fetch Bookings
@@ -50,7 +107,7 @@ export default function DashboardPage() {
 
             if (bookings) {
                 // Enrich setiap booking dengan data statis dari rooms.json
-                setReservations(bookings.map(enrichBookingWithRoomData));
+                setReservations((bookings as BookingRecord[]).map(enrichBookingWithRoomData));
             }
             setLoading(false);
 
@@ -61,7 +118,7 @@ export default function DashboardPage() {
                 .on(
                     'postgres_changes',
                     { event: 'UPDATE', schema: 'public', table: 'bookings', filter: userFilter ? userFilter : undefined },
-                    (payload) => {
+                    (payload: RealtimeBookingPayload) => {
                         console.log('Realtime Update Received:', payload);
                         setReservations((prev) =>
                             prev.map((res) => res.id === payload.new.id
@@ -83,8 +140,25 @@ export default function DashboardPage() {
 
     useEffect(() => {
         let cleanup: (() => void) | undefined;
-        fetchData().then(fn => { cleanup = fn; });
-        return () => { cleanup?.(); };
+        let isMounted = true;
+
+        const loadDashboard = async () => {
+            const unsubscribe = await fetchData();
+
+            if (!isMounted) {
+                unsubscribe?.();
+                return;
+            }
+
+            cleanup = unsubscribe;
+        };
+
+        void loadDashboard();
+
+        return () => {
+            isMounted = false;
+            cleanup?.();
+        };
     }, [fetchData]);
 
     const handleAction = async (bookingId: string, action: 'check_in' | 'check_out' | 'refund') => {
@@ -107,7 +181,7 @@ export default function DashboardPage() {
                 body: JSON.stringify({ bookingId }),
             });
 
-            const result = await res.json();
+            const result = await res.json() as { error?: string; token?: string };
 
             if (!res.ok) {
                 alert(result.error || 'Gagal melanjutkan pembayaran');
@@ -116,8 +190,7 @@ export default function DashboardPage() {
             }
 
             if (result.token) {
-                // @ts-ignore
-                window.snap.pay(result.token, {
+                window.snap?.pay(result.token, {
                     onSuccess: function () {
                         setPayingBookingId(null);
                         // Realtime akan auto-update status

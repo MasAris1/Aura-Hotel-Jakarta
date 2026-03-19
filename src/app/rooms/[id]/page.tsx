@@ -1,9 +1,10 @@
 "use client";
 
 import { use, useState } from "react";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import roomsData from "@/data/rooms.json";
-import { Check, Star, Wind, Coffee, LayoutDashboard, Users, CreditCard } from "lucide-react";
+import { Check, Star, LayoutDashboard, Users, CreditCard } from "lucide-react";
 import Link from "next/link";
 
 export default function RoomDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -19,10 +20,12 @@ export default function RoomDetailsPage({ params }: { params: Promise<{ id: stri
         <main className="min-h-screen bg-background pt-24 pb-24 selection:bg-primary/20">
             {/* Image Gallery Header */}
             <section className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden">
-                <img
+                <Image
                     src={room.images[0]}
                     alt={room.name}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="100vw"
+                    className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
 
@@ -76,10 +79,12 @@ export default function RoomDetailsPage({ params }: { params: Promise<{ id: stri
                                 {room.images.slice(1).map((img, idx) => (
                                     <div key={idx} className="relative h-64 md:h-80 overflow-hidden group">
                                         <div className="absolute inset-0 bg-background/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
-                                        <img
+                                        <Image
                                             src={img}
                                             alt={`${room.name} interior`}
-                                            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
+                                            fill
+                                            sizes="(min-width: 768px) 50vw, 100vw"
+                                            className="object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
                                         />
                                     </div>
                                 ))}

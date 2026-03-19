@@ -1,14 +1,45 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { getSupabaseAdmin } from "@/utils/supabase/admin";
+import { getPublicSiteUrl, getRequiredEnv } from "@/lib/env";
+
+type BookingStatus = "UNPAID" | "PAID" | "EXPIRED" | "REFUNDED";
+
+type WebhookBooking = {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    check_in: string;
+    check_out: string;
+    status: BookingStatus;
+    rooms?: {
+        name?: string | null;
+    } | null;
+};
+
+type MidtransWebhookPayload = {
+    order_id: string;
+    status_code: string;
+    gross_amount: string;
+    signature_key: string;
+    transaction_status: string;
+    fraud_status?: string;
+    transaction_id?: string;
+    payment_type?: string;
+};
+
+function getErrorMessage(error: unknown) {
+    return error instanceof Error ? error.message : "Unknown server error";
+}
 
 export async function POST(req: Request) {
     try {
-        const body = await req.json();
-        const supabase: any = getSupabaseAdmin();
+        const body = await req.json() as MidtransWebhookPayload;
+        const supabase = getSupabaseAdmin();
 
         // 1. Validasi SHA-512 Kriptografi (Fase 5)
-        const serverKey = process.env.MIDTRANS_SERVER_KEY || "SB-Mid-server-DUMMY";
+        const serverKey = getRequiredEnv("MIDTRANS_SERVER_KEY");
         const { order_id, status_code, gross_amount, signature_key, transaction_status, fraud_status } = body;
 
         const payloadStr = order_id + status_code + gross_amount + serverKey;
@@ -22,11 +53,12 @@ export async function POST(req: Request) {
         // 2. Cek Idempotensi (Pastikan pesanan belum PAID/EXPIRED dari webhook sebelumnya)
         // Menggunakan supabase (Service Role Key) karena webhook dipanggil
         // oleh server Midtrans tanpa user session — perlu bypass RLS
-        const { data: booking, error: fetchError } = await supabase
+        const { data: bookingData, error: fetchError } = await supabase
             .from('bookings')
             .select('*, rooms(name)')
             .eq('id', order_id)
             .single();
+        const booking = bookingData as WebhookBooking | null;
 
         if (fetchError || !booking) {
             console.error("Booking Not Found:", order_id);
@@ -39,20 +71,20 @@ export async function POST(req: Request) {
         }
 
         // 3. Tentukan status dari Midtrans
-        let newStatus = booking.status;
+        let newStatus: BookingStatus = booking.status;
         let isSuccess = false;
 
-        if (transaction_status == 'capture') {
-            if (fraud_status == 'accept') {
+        if (transaction_status === 'capture') {
+            if (fraud_status === 'accept') {
                 newStatus = 'PAID';
                 isSuccess = true;
             }
-        } else if (transaction_status == 'settlement') {
+        } else if (transaction_status === 'settlement') {
             newStatus = 'PAID';
             isSuccess = true;
-        } else if (transaction_status == 'cancel' || transaction_status == 'deny' || transaction_status == 'expire') {
+        } else if (transaction_status === 'cancel' || transaction_status === 'deny' || transaction_status === 'expire') {
             newStatus = 'EXPIRED';
-        } else if (transaction_status == 'pending') {
+        } else if (transaction_status === 'pending') {
             newStatus = 'UNPAID';
         }
 
@@ -76,7 +108,7 @@ export async function POST(req: Request) {
                 booking_id: order_id,
                 midtrans_order_id: body.transaction_id,
                 payment_type: body.payment_type,
-                amount: body.gross_amount,
+                amount: Number(body.gross_amount),
                 status: transaction_status
             });
         }
@@ -115,7 +147,7 @@ export async function POST(req: Request) {
                                 </table>
 
                                 <p style="margin-top: 30px;">
-                                    <a href="${process.env.NEXT_PUBLIC_SITE_URL}/dashboard" style="background: #c9a25b; color: #fff; padding: 10px 20px; text-decoration: none; display: inline-block;">View e-Voucher</a>
+                                    <a href="${getPublicSiteUrl()}/dashboard" style="background: #c9a25b; color: #fff; padding: 10px 20px; text-decoration: none; display: inline-block;">View e-Voucher</a>
                                 </p>
                             </div>
                         `,
@@ -131,8 +163,8 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true, processed_status: newStatus }, { status: 200 });
 
-    } catch (e: any) {
-        console.error("Webhook Exception:", e);
+    } catch (error: unknown) {
+        console.error("Webhook Exception:", getErrorMessage(error));
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

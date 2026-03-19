@@ -2,6 +2,13 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { snap } from "@/lib/midtrans";
 import roomsData from "@/data/rooms.json";
+import type { Database } from "@/types/supabase";
+
+function getErrorMessage(error: unknown) {
+    return error instanceof Error ? error.message : "Unknown server error";
+}
+
+type BookingRow = Database["public"]["Tables"]["bookings"]["Row"];
 
 export async function POST(req: Request) {
     try {
@@ -19,13 +26,14 @@ export async function POST(req: Request) {
         }
 
         // Cari booking yang masih UNPAID milik user
-        const { data: booking, error: fetchError } = await supabase
+        const { data: bookingData, error: fetchError } = await supabase
             .from('bookings')
             .select('*')
             .eq('id', bookingId)
             .eq('user_id', user.id)
             .eq('status', 'UNPAID')
             .single();
+        const booking = bookingData as BookingRow | null;
 
         if (fetchError || !booking) {
             return NextResponse.json({ error: "Booking tidak ditemukan atau sudah dibayar" }, { status: 404 });
@@ -70,8 +78,8 @@ export async function POST(req: Request) {
             totalPrice
         });
 
-    } catch (e: any) {
-        console.error("Resume Payment Exception:", e);
+    } catch (error: unknown) {
+        console.error("Resume Payment Exception:", getErrorMessage(error));
         return NextResponse.json({ error: "Gagal melanjutkan pembayaran" }, { status: 500 });
     }
 }

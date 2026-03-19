@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { getPublicSiteUrl } from '@/lib/env'
 
 async function getAuthCallbackUrl() {
     const requestHeaders = await headers()
@@ -19,7 +20,7 @@ async function getAuthCallbackUrl() {
         return `${forwardedProto}://${forwardedHost}/auth/callback`
     }
 
-    return `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/auth/callback`
+    return `${getPublicSiteUrl()}/auth/callback`
 }
 
 export async function loginWithPassword(formData: FormData, redirectTo?: string) {

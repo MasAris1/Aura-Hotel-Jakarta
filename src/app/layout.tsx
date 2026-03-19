@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ButlerChat } from "@/components/ButlerChat";
 import Script from "next/script";
+import { getRequiredEnv } from "@/lib/env";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -26,12 +27,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const midtransClientKey = getRequiredEnv("NEXT_PUBLIC_MIDTRANS_CLIENT_KEY");
+
   return (
     <html lang="en" className="dark">
       <head>
         <Script
           src={process.env.NODE_ENV === 'production' ? "https://app.midtrans.com/snap/snap.js" : "https://app.sandbox.midtrans.com/snap/snap.js"}
-          data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "SB-Mid-client-DUMMY"}
+          data-client-key={midtransClientKey}
           strategy="beforeInteractive"
         />
       </head>

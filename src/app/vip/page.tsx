@@ -13,6 +13,11 @@ type Preferences = {
     drink: string;
 };
 
+type UserProfile = {
+    first_name?: string | null;
+    last_name?: string | null;
+};
+
 const defaultPrefs: Preferences = {
     climate: 22,
     aroma: "Sandalwood & Vanilla",
@@ -21,29 +26,43 @@ const defaultPrefs: Preferences = {
 };
 
 export default function VIPPortal() {
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [saved, setSaved] = useState(false);
-    const [prefs, setPrefs] = useState<Preferences>(defaultPrefs);
-
-    useEffect(() => {
-        // Load preferences from localStorage
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            try { setPrefs(JSON.parse(stored)); } catch { /* ignore */ }
+    const [prefs, setPrefs] = useState<Preferences>(() => {
+        if (typeof window === "undefined") {
+            return defaultPrefs;
         }
 
+        const stored = window.localStorage.getItem(STORAGE_KEY);
+        if (!stored) {
+            return defaultPrefs;
+        }
+
+        try {
+            return JSON.parse(stored) as Preferences;
+        } catch {
+            return defaultPrefs;
+        }
+    });
+
+    useEffect(() => {
         // Fetch user data
         const fetchUser = async () => {
             const supabase = createClient();
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('first_name, last_name')
+                    .eq('id', user.id)
+                    .single();
                 setUser(profile || { first_name: user.email?.split('@')[0], last_name: '' });
             }
             setLoading(false);
         };
-        fetchUser();
+
+        void fetchUser();
     }, []);
 
     const handleSave = () => {

@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useTransition } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { ArrowRight, KeyRound, Loader2, Mail } from "lucide-react";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
@@ -53,10 +54,12 @@ function LoginPageContent() {
             {/* Visual Side */}
             <div className="hidden lg:flex w-1/2 relative flex-col justify-end p-12">
                 <div className="absolute inset-0 z-0">
-                    <img
+                    <Image
                         src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=2940&auto=format&fit=crop"
                         alt="VIP Lounge"
-                        className="w-full h-full object-cover opacity-60 mix-blend-luminosity"
+                        fill
+                        sizes="50vw"
+                        className="object-cover opacity-60 mix-blend-luminosity"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                 </div>

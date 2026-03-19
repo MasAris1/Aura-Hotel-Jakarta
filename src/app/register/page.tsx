@@ -1,13 +1,22 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { Suspense, useState, useTransition } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { ArrowRight, Mail, KeyRound, Loader2 } from "lucide-react";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
 import { signup } from "../auth/actions";
 
 export default function RegisterPage() {
+    return (
+        <Suspense fallback={<RegisterPageFallback />}>
+            <RegisterPageContent />
+        </Suspense>
+    );
+}
+
+function RegisterPageContent() {
     const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
     const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
@@ -31,10 +40,12 @@ export default function RegisterPage() {
             {/* Visual Side */}
             <div className="hidden lg:flex w-1/2 relative flex-col justify-center p-12">
                 <div className="absolute inset-0 z-0">
-                    <img
+                    <Image
                         src="https://images.unsplash.com/photo-1542314831-c6a4d27ce66f?q=80&w=2940&auto=format&fit=crop"
                         alt="Luxury Suite"
-                        className="w-full h-full object-cover opacity-60 mix-blend-luminosity"
+                        fill
+                        sizes="50vw"
+                        className="object-cover opacity-60 mix-blend-luminosity"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                 </div>
@@ -158,6 +169,45 @@ export default function RegisterPage() {
                         <Link href={`/login${searchParams.get('redirect') ? `?redirect=${encodeURIComponent(searchParams.get('redirect')!)}` : ''}`} className="font-inter text-xs tracking-widest uppercase text-foreground hover:text-foreground/70 transition-colors underline underline-offset-4">
                             Proceed to Login
                         </Link>
+                    </div>
+                </div>
+            </div>
+        </main>
+    );
+}
+
+function RegisterPageFallback() {
+    return (
+        <main className="min-h-screen flex text-foreground overflow-hidden bg-background">
+            <div className="hidden lg:flex w-1/2 relative flex-col justify-center p-12">
+                <div className="absolute inset-0 z-0">
+                    <div className="w-full h-full bg-black/40" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                </div>
+                <div className="relative z-10 w-full max-w-md mx-auto">
+                    <h2 className="font-playfair text-4xl mb-4">Membership Invitation</h2>
+                    <p className="font-inter font-light text-foreground/70 text-sm leading-relaxed">
+                        Join an exclusive circle of travelers. Experience unparalleled service
+                        and sophisticated comfort.
+                    </p>
+                </div>
+            </div>
+
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-muted relative overflow-y-auto">
+                <div className="absolute top-8 right-8">
+                    <Link href="/" className="font-inter text-xs tracking-widest uppercase text-foreground/50 hover:text-foreground transition-colors">
+                        Return to Home
+                    </Link>
+                </div>
+
+                <div className="w-full max-w-sm my-auto">
+                    <div className="text-center mb-12">
+                        <h1 className="font-playfair text-3xl tracking-widest uppercase mb-2">Registration</h1>
+                        <p className="font-inter text-sm text-foreground/50">Submit your credentials.</p>
+                    </div>
+
+                    <div className="flex items-center justify-center py-16 text-foreground/50">
+                        <Loader2 className="w-5 h-5 animate-spin" />
                     </div>
                 </div>
             </div>
