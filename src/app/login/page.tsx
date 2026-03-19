@@ -1,9 +1,9 @@
 "use client";
 
+import { Suspense, useState, useTransition } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowRight, KeyRound, Loader2, Mail } from "lucide-react";
-import { useState, useTransition } from "react";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
 import { loginWithPassword, loginWithMagicLink } from "../auth/actions";
 
@@ -13,6 +13,14 @@ type AuthMessage = {
 };
 
 export default function LoginPage() {
+    return (
+        <Suspense fallback={<LoginPageFallback />}>
+            <LoginPageContent />
+        </Suspense>
+    );
+}
+
+function LoginPageContent() {
     const searchParams = useSearchParams();
     const [method, setMethod] = useState<"magic" | "password">("magic");
     const [isPending, startTransition] = useTransition();
@@ -185,6 +193,45 @@ export default function LoginPage() {
                         <Link href={`/register${searchParams.get('redirect') ? `?redirect=${encodeURIComponent(searchParams.get('redirect')!)}` : ''}`} className="font-inter text-xs tracking-widest uppercase text-foreground hover:text-foreground/70 transition-colors underline underline-offset-4">
                             Create Account
                         </Link>
+                    </div>
+                </div>
+            </div>
+        </main>
+    );
+}
+
+function LoginPageFallback() {
+    return (
+        <main className="min-h-screen flex text-foreground overflow-hidden bg-background">
+            <div className="hidden lg:flex w-1/2 relative flex-col justify-end p-12">
+                <div className="absolute inset-0 z-0">
+                    <div className="w-full h-full bg-black/40" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                </div>
+                <div className="relative z-10 w-full max-w-md">
+                    <h2 className="font-playfair text-4xl mb-4">The VIP Portal</h2>
+                    <p className="font-inter font-light text-foreground/70 text-sm leading-relaxed">
+                        Access your personalized sanctuary. Customize your suite&apos;s ambiance,
+                        request private charters, and communicate directly with The Royal Butler.
+                    </p>
+                </div>
+            </div>
+
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-muted relative">
+                <div className="absolute top-8 right-8">
+                    <Link href="/" className="font-inter text-xs tracking-widest uppercase text-foreground/50 hover:text-foreground transition-colors">
+                        Return to Home
+                    </Link>
+                </div>
+
+                <div className="w-full max-w-sm">
+                    <div className="text-center mb-12">
+                        <h1 className="font-playfair text-3xl tracking-widest uppercase mb-2">Authentication</h1>
+                        <p className="font-inter text-sm text-foreground/50">Identify yourself to proceed.</p>
+                    </div>
+
+                    <div className="flex items-center justify-center py-16 text-foreground/50">
+                        <Loader2 className="w-5 h-5 animate-spin" />
                     </div>
                 </div>
             </div>
