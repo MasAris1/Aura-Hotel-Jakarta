@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ArrowRight } from "lucide-react";
@@ -8,9 +8,9 @@ import type { Session } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 
 const navLinks = [
-  { name: "Home", href: "/" },
-  { name: "Facilities", href: "/#facilities" },
-  { name: "Suites", href: "/#collection" },
+  { name: "Home", href: "/#home", sectionId: "home" },
+  { name: "Facilities", href: "/#facilities", sectionId: "facilities" },
+  { name: "Suites", href: "/#collection", sectionId: "collection" },
 ];
 
 export function Navbar() {
@@ -18,7 +18,19 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [visibleSection, setVisibleSection] = useState<string | null>(null);
+  const [manualSection, setManualSection] = useState<string | null>(null);
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
+  const navDesktopRef = useRef<HTMLDivElement | null>(null);
+  const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
+  const releaseTimeoutRef = useRef<number | null>(null);
   const pathname = usePathname();
+  const currentSection =
+    pathname === "/"
+      ? manualSection ?? visibleSection
+      : pathname.startsWith("/rooms/")
+        ? "collection"
+        : null;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,11 +66,161 @@ export function Navbar() {
     };
   }, []);
 
+  useEffect(() => {
+    if (pathname !== "/") {
+      return;
+    }
+
+    const sectionIds = navLinks.map((link) => link.sectionId);
+
+    const updateVisibleSection = () => {
+      const viewportHeight = window.innerHeight;
+      let bestSection = sectionIds[0];
+      let bestVisibleArea = -1;
+
+      for (const sectionId of sectionIds) {
+        const section = document.getElementById(sectionId);
+
+        if (!section) {
+          continue;
+        }
+
+        const rect = section.getBoundingClientRect();
+        const visibleHeight =
+          Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0);
+        const visibleArea = Math.max(0, visibleHeight);
+
+        if (visibleArea > bestVisibleArea) {
+          bestVisibleArea = visibleArea;
+          bestSection = sectionId;
+        }
+      }
+
+      setVisibleSection(bestSection);
+    };
+
+    let ticking = false;
+    const requestUpdate = () => {
+      if (ticking) {
+        return;
+      }
+
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        updateVisibleSection();
+        ticking = false;
+      });
+    };
+
+    requestUpdate();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+
+    return () => {
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!manualSection) {
+      return;
+    }
+
+    if (visibleSection === manualSection) {
+      const releaseId = window.setTimeout(() => {
+        if (releaseTimeoutRef.current) {
+          window.clearTimeout(releaseTimeoutRef.current);
+          releaseTimeoutRef.current = null;
+        }
+        setManualSection(null);
+      }, 160);
+
+      return () => {
+        window.clearTimeout(releaseId);
+      };
+    }
+  }, [manualSection, visibleSection]);
+
+  useEffect(() => {
+    return () => {
+      if (releaseTimeoutRef.current) {
+        window.clearTimeout(releaseTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const updateIndicator = () => {
+      if (!navDesktopRef.current || !currentSection) {
+        setIndicatorStyle((current) => ({ ...current, opacity: 0 }));
+        return;
+      }
+
+      const activeLink = linkRefs.current[currentSection];
+
+      if (!activeLink) {
+        setIndicatorStyle((current) => ({ ...current, opacity: 0 }));
+        return;
+      }
+
+      setIndicatorStyle({
+        left: activeLink.offsetLeft,
+        width: activeLink.offsetWidth,
+        opacity: 1,
+      });
+    };
+
+    updateIndicator();
+    window.addEventListener("resize", updateIndicator);
+
+    return () => {
+      window.removeEventListener("resize", updateIndicator);
+    };
+  }, [currentSection, pathname]);
+
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
     setSession(null);
     setMobileMenuOpen(false);
+  };
+
+  const handleDesktopNavClick = (
+    event: MouseEvent<HTMLAnchorElement>,
+    sectionId: string,
+    href: string,
+  ) => {
+    if (pathname !== "/") {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (releaseTimeoutRef.current) {
+      window.clearTimeout(releaseTimeoutRef.current);
+    }
+
+    setManualSection(sectionId);
+    releaseTimeoutRef.current = window.setTimeout(() => {
+      setManualSection(null);
+      releaseTimeoutRef.current = null;
+    }, 1400);
+
+    if (sectionId === "home") {
+      window.history.replaceState(null, "", href);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const section = document.getElementById(sectionId);
+
+    if (!section) {
+      return;
+    }
+
+    window.history.replaceState(null, "", href);
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const useHeroChrome = pathname === "/" && !isScrolled && !mobileMenuOpen;
@@ -85,22 +247,33 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-2 lg:flex">
-          <div className="flex items-center rounded-full border border-white/10 bg-white/[0.03] p-1.5">
+          <div
+            ref={navDesktopRef}
+            className="relative flex items-center rounded-full border border-white/10 bg-white/[0.03] p-1.5"
+          >
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-1.5 rounded-full bg-primary shadow-[0_12px_28px_rgba(198,155,73,0.28)] transition-[left,width,opacity] duration-300 ease-out"
+              style={{
+                left: indicatorStyle.left,
+                width: indicatorStyle.width,
+                opacity: indicatorStyle.opacity,
+              }}
+            />
             {navLinks.map((link) => {
-              const isActive =
-                link.href === "/"
-                  ? pathname === "/"
-                  : link.href === "/#collection"
-                    ? pathname.startsWith("/rooms/")
-                    : false;
+              const isActive = currentSection === link.sectionId;
 
               return (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.28em] transition-all duration-300 ${
+                  ref={(element) => {
+                    linkRefs.current[link.sectionId] = element;
+                  }}
+                  onClick={(event) => handleDesktopNavClick(event, link.sectionId, link.href)}
+                  className={`relative z-10 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.28em] transition-all duration-300 ${
                     isActive
-                      ? "bg-primary text-primary-foreground shadow-[0_12px_28px_rgba(198,155,73,0.28)]"
+                      ? "text-primary-foreground"
                       : `${textClassName} hover:bg-white/6 hover:text-white`
                   }`}
                 >

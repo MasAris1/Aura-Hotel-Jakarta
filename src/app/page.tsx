@@ -53,12 +53,7 @@ const facilityFeatures = [
   },
 ];
 
-const heroFacts = [
-  { label: "Setting", value: "Bundaran HI" },
-  { label: "Mood", value: "Quiet luxury" },
-  { label: "Arrival", value: "Day to night" },
-  { label: "Service", value: "24/7 butler" },
-];
+const heroMetaPlaceholderCount = 4;
 
 export default function Home() {
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -66,6 +61,7 @@ export default function Home() {
   const progressRef = useRef<HTMLDivElement | null>(null);
   const philosophyRef = useRef<HTMLElement | null>(null);
   const collectionRef = useRef<HTMLElement | null>(null);
+  const fadeTimeoutRef = useRef<number | null>(null);
 
   const [isDesktopHero, setIsDesktopHero] = useState(false);
   const [hasVideoEnded, setHasVideoEnded] = useState(false);
@@ -265,25 +261,42 @@ export default function Home() {
 
   const handleVideoEnd = () => {
     setIsFadingToBlack(true);
-    setTimeout(() => {
+
+    if (fadeTimeoutRef.current) {
+      window.clearTimeout(fadeTimeoutRef.current);
+    }
+
+    fadeTimeoutRef.current = window.setTimeout(() => {
       setHasVideoEnded(true);
       setIsFadingToBlack(false);
+      fadeTimeoutRef.current = null;
     }, 1000);
   };
+
+  useEffect(() => {
+    return () => {
+      if (fadeTimeoutRef.current) {
+        window.clearTimeout(fadeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!hasVideoEnded || heroContentAnimatedRef.current) {
       return;
     }
 
-    gsap.from(".ux-hero-kicker, .ux-hero-meta, .ux-hero-main, .ux-hero-sub, .ux-hero-copy, .ux-hero-cta, .ux-hero-note, .ux-hero-footer", {
-      autoAlpha: 0,
-      y: 38,
-      duration: 0.95,
-      stagger: 0.12,
-      ease: "power3.out",
-      delay: 0.18,
-    });
+    gsap.from(
+      ".ux-hero-kicker, .ux-hero-meta, .ux-hero-main, .ux-hero-sub, .ux-hero-copy, .ux-hero-cta",
+      {
+        autoAlpha: 0,
+        y: 38,
+        duration: 0.95,
+        stagger: 0.12,
+        ease: "power3.out",
+        delay: 0.18,
+      },
+    );
 
     heroContentAnimatedRef.current = true;
   }, [hasVideoEnded]);
@@ -309,7 +322,10 @@ export default function Home() {
         </div>
       </div>
 
-      <section className="ux-hero-stack-target hero-section relative z-0 flex min-h-[100svh] w-full items-center justify-center overflow-hidden bg-[#050505] md:sticky md:top-0 md:h-screen">
+      <section
+        id="home"
+        className="ux-hero-stack-target hero-section relative z-0 flex min-h-[100svh] w-full scroll-mt-28 items-center justify-center overflow-hidden bg-[#050505] md:sticky md:top-0 md:h-screen"
+      >
         <div className="absolute inset-0 z-0">
           <Image
             src="/media/hero-bundaran-hi.webp"
@@ -358,19 +374,18 @@ export default function Home() {
           }`}
         >
           <div className="grid gap-6 sm:gap-8 lg:grid-cols-[minmax(0,340px)_auto] lg:items-start">
-            <div className="ux-hero-kicker max-w-sm">
-              <span className="block text-[10px] uppercase tracking-[0.38em] text-white/58">
-                ---
-              </span>
-            </div>
+            <div
+              aria-hidden="true"
+              className="ux-hero-kicker h-[14px] max-w-sm"
+            />
 
             <div
               aria-hidden="true"
               className="ux-hero-meta grid w-full max-w-md grid-cols-2 gap-x-3 gap-y-4 sm:max-w-sm sm:gap-x-6 lg:justify-self-end"
             >
-              {heroFacts.map((item) => (
+              {Array.from({ length: heroMetaPlaceholderCount }).map((_, index) => (
                 <div
-                  key={item.label}
+                  key={index}
                   className="min-h-[3.6rem] border-t border-transparent pt-3 opacity-0"
                 />
               ))}
@@ -396,7 +411,7 @@ export default function Home() {
                 suites for slow evenings in the capital.
               </p>
 
-                <div className="ux-hero-cta mt-10 flex flex-col gap-4 sm:flex-row sm:w-fit">
+              <div className="ux-hero-cta mt-10 flex flex-col gap-4 sm:w-fit sm:flex-row">
                 <Link
                   href="/booking"
                   className="group inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-xs uppercase tracking-[0.22em] text-white backdrop-blur-sm transition-all duration-300 hover:border-primary/35 hover:bg-primary hover:text-primary-foreground sm:px-8 sm:tracking-[0.28em]"
@@ -404,7 +419,7 @@ export default function Home() {
                   Reserve Your Stay
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
-                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -412,7 +427,7 @@ export default function Home() {
         <div
           aria-hidden="true"
           className={`pointer-events-none absolute bottom-6 left-1/2 z-30 -translate-x-1/2 transition-opacity duration-700 sm:bottom-8 ${
-            hasVideoEnded ? "opacity-100" : "opacity-0"
+            hasVideoEnded ? "opacity-100 delay-[2000ms]" : "opacity-0 delay-0"
           }`}
         >
           <div className="ux-hero-scroll-indicator flex w-max flex-col items-center justify-center gap-2.5">
@@ -432,7 +447,7 @@ export default function Home() {
       <section
         id="facilities"
         ref={philosophyRef}
-        className="relative z-20 -mt-8 px-4 pb-14 sm:-mt-[10vh] md:-mt-[14vh] md:px-6 md:pb-16"
+        className="relative z-20 -mt-8 scroll-mt-28 px-4 pb-14 sm:-mt-[10vh] md:-mt-[14vh] md:px-6 md:pb-16"
       >
         <div className="mx-auto max-w-7xl">
           <div className="ux-stack-panel ux-section-shell rounded-[1.5rem] border-border/80 pb-10 sm:rounded-t-[2rem] sm:rounded-b-[1.75rem] sm:pb-12">
@@ -477,7 +492,7 @@ export default function Home() {
       <section
         id="collection"
         ref={collectionRef}
-        className="relative z-20 px-4 pb-20 pt-6 sm:pt-8 md:px-6 md:pb-32"
+        className="relative z-20 scroll-mt-28 px-4 pb-20 pt-6 sm:pt-8 md:px-6 md:pb-32"
       >
         <div className="mx-auto max-w-7xl">
           <div className="ux-section-shell rounded-[1.5rem] border-border/80 pb-10 sm:rounded-[2rem] sm:pb-12">
