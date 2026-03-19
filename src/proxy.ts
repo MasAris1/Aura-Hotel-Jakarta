@@ -7,7 +7,7 @@ const MAX_REQUESTS = 50 // Requests per 10 seconds
 let lastCleanup = Date.now()
 const CLEANUP_INTERVAL = 60 * 1000 // Cleanup every 60 seconds
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     // Basic IP-based Rate Limiter (In-Memory)
     const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
     const now = Date.now()
