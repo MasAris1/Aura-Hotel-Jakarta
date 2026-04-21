@@ -3,14 +3,35 @@ import { updateSession } from '@/utils/supabase/middleware'
 
 const rateLimitMap = new Map<string, { count: number; lastReset: number }>()
 const RATE_LIMIT_KEEPALIVE = 10 * 1000 // 10 seconds
-const MAX_REQUESTS = 50 // Requests per 10 seconds
+const AUTH_MAX_REQUESTS = 20 // Auth-oriented requests per 10 seconds
 let lastCleanup = Date.now()
 const CLEANUP_INTERVAL = 60 * 1000 // Cleanup every 60 seconds
+const AUTH_RATE_LIMIT_PATHS = new Set([
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+    '/auth/callback',
+])
+
+function getClientIp(request: NextRequest) {
+    const forwardedFor = request.headers.get('x-forwarded-for')
+    if (forwardedFor) {
+        const firstIp = forwardedFor.split(',')[0]?.trim()
+        if (firstIp) {
+            return firstIp
+        }
+    }
+
+    const realIp = request.headers.get('x-real-ip')?.trim()
+    return realIp || null
+}
 
 export async function proxy(request: NextRequest) {
-    // Basic IP-based Rate Limiter (In-Memory)
-    const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
+    const ip = getClientIp(request)
     const now = Date.now()
+    const pathname = request.nextUrl.pathname
+    const shouldRateLimitAuth = AUTH_RATE_LIMIT_PATHS.has(pathname)
 
     // Periodic cleanup of stale entries to prevent memory leak
     if (now - lastCleanup > CLEANUP_INTERVAL) {
@@ -22,14 +43,15 @@ export async function proxy(request: NextRequest) {
         }
     }
 
-    if (ip !== 'unknown') {
-        const record = rateLimitMap.get(ip)
+    if (ip && shouldRateLimitAuth) {
+        const key = `auth:${ip}`
+        const record = rateLimitMap.get(key)
 
         if (!record || now - record.lastReset > RATE_LIMIT_KEEPALIVE) {
-            rateLimitMap.set(ip, { count: 1, lastReset: now })
+            rateLimitMap.set(key, { count: 1, lastReset: now })
         } else {
             record.count += 1
-            if (record.count > MAX_REQUESTS) {
+            if (record.count > AUTH_MAX_REQUESTS) {
                 return new NextResponse('Too Many Requests', { status: 429 })
             }
         }

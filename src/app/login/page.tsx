@@ -23,22 +23,26 @@ export default function LoginPage() {
 
 function LoginPageContent() {
     const searchParams = useSearchParams();
+    const redirectUrl = searchParams.get("redirect") || undefined;
     const [method, setMethod] = useState<"magic" | "password">("magic");
     const [isPending, startTransition] = useTransition();
     const [message, setMessage] = useState<AuthMessage | null>(null);
     const callbackError = searchParams.get("error");
+    const resetStatus = searchParams.get("reset");
     const [dismissedCallbackError, setDismissedCallbackError] = useState<string | null>(null);
     const activeCallbackError =
         callbackError && dismissedCallbackError !== callbackError ? callbackError : null;
-    const visibleMessage = message ?? (activeCallbackError ? { type: "error", text: activeCallbackError } : null);
+    const resetMessage = resetStatus === "success"
+        ? { type: "success" as const, text: "Password updated successfully. Please sign in with your new password." }
+        : null;
+    const visibleMessage = message ?? (activeCallbackError ? { type: "error" as const, text: activeCallbackError } : resetMessage);
 
     const handleAction = async (formData: FormData) => {
         setDismissedCallbackError(callbackError);
         setMessage(null);
-        const redirectUrl = searchParams.get("redirect") || undefined;
         startTransition(async () => {
             const result = method === "magic"
-                ? await loginWithMagicLink(formData)
+                ? await loginWithMagicLink(formData, redirectUrl)
                 : await loginWithPassword(formData, redirectUrl);
 
             if (result && "error" in result && result.error) {
@@ -120,7 +124,7 @@ function LoginPageContent() {
                         )}
 
                         <GoogleAuthButton
-                            next="/vip"
+                            next={redirectUrl}
                             label="Continue with Google"
                             disabled={isPending}
                             onError={(text) => {
@@ -176,6 +180,14 @@ function LoginPageContent() {
                                             placeholder="Enter your password"
                                             className="w-full bg-transparent border border-white/20 py-3 pl-12 pr-4 font-inter text-sm focus:outline-none focus:border-white transition-colors"
                                         />
+                                    </div>
+                                    <div className="mt-3 text-right">
+                                        <Link
+                                            href={`/forgot-password${redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : ""}`}
+                                            className="font-inter text-[10px] tracking-[0.26em] uppercase text-foreground/40 hover:text-foreground transition-colors"
+                                        >
+                                            Forgot password?
+                                        </Link>
                                     </div>
                                 </div>
                             )}

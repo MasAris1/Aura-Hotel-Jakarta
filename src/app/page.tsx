@@ -14,9 +14,13 @@ import {
   UtensilsCrossed,
   Waves,
 } from "lucide-react";
-import roomsData from "@/data/rooms.json";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  getStaticRooms,
+  resolveRoomDetails,
+  type RoomCatalogItem,
+} from "@/lib/roomCatalog";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -56,48 +60,72 @@ const facilityFeatures = [
 const heroMetaPlaceholderCount = 4;
 
 export default function Home() {
+  const fallbackRooms = getStaticRooms().map((room) => resolveRoomDetails(room.id));
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
   const pageRef = useRef<HTMLElement | null>(null);
   const progressRef = useRef<HTMLDivElement | null>(null);
   const philosophyRef = useRef<HTMLElement | null>(null);
   const collectionRef = useRef<HTMLElement | null>(null);
   const fadeTimeoutRef = useRef<number | null>(null);
+  const heroContentAnimatedRef = useRef(false);
+  const heroWarmupEventSentRef = useRef(false);
 
-  const [isDesktopHero, setIsDesktopHero] = useState(false);
   const [hasVideoEnded, setHasVideoEnded] = useState(false);
   const [isFadingToBlack, setIsFadingToBlack] = useState(false);
-  const heroContentAnimatedRef = useRef(false);
+  const [catalogRooms, setCatalogRooms] = useState<RoomCatalogItem[]>(fallbackRooms);
+
+  const dispatchWarmupEvent = () => {
+    if (heroWarmupEventSentRef.current) {
+      return;
+    }
+
+    heroWarmupEventSentRef.current = true;
+    window.dispatchEvent(new Event("aura:start-global-warmup"));
+  };
 
   useEffect(() => {
-    const desktopViewport = window.matchMedia("(min-width: 768px)");
-
-    const syncHeroMode = () => {
-      const isDesktop = desktopViewport.matches;
-      setIsDesktopHero(isDesktop);
-      setHasVideoEnded(!isDesktop);
-      setIsFadingToBlack(false);
-      heroContentAnimatedRef.current = false;
-    };
-
-    syncHeroMode();
-    desktopViewport.addEventListener("change", syncHeroMode);
-
-    return () => {
-      desktopViewport.removeEventListener("change", syncHeroMode);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isDesktopHero || !heroVideoRef.current || hasVideoEnded) {
+    if (!heroVideoRef.current || hasVideoEnded) {
       return;
     }
 
     heroVideoRef.current.currentTime = 0;
 
     void heroVideoRef.current.play().catch(() => {
+      dispatchWarmupEvent();
       setHasVideoEnded(true);
     });
-  }, [hasVideoEnded, isDesktopHero]);
+  }, [hasVideoEnded]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadRooms = async () => {
+      try {
+        const response = await fetch("/api/rooms", {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const result = (await response.json()) as { rooms?: RoomCatalogItem[] };
+
+        if (result.rooms?.length) {
+          setCatalogRooms(result.rooms);
+        }
+      } catch {
+        // Fallback to static catalog when live data is unavailable.
+      }
+    };
+
+    void loadRooms();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   useEffect(() => {
     const media = gsap.matchMedia();
@@ -273,6 +301,10 @@ export default function Home() {
     }, 1000);
   };
 
+  const handleVideoPlaying = () => {
+    dispatchWarmupEvent();
+  };
+
   useEffect(() => {
     return () => {
       if (fadeTimeoutRef.current) {
@@ -309,7 +341,7 @@ export default function Home() {
     return () => {
       window.clearTimeout(refreshId);
     };
-  }, [hasVideoEnded, isDesktopHero]);
+  }, [hasVideoEnded]);
 
   return (
     <main
@@ -334,24 +366,25 @@ export default function Home() {
             priority
             quality={78}
             sizes="100vw"
-            className={`hero-photo absolute inset-0 z-0 transition-transform duration-[1800ms] ease-out ${
-              hasVideoEnded ? "scale-100" : "scale-[1.035]"
+            className={`hero-photo absolute inset-0 z-0 transition-all duration-[1800ms] ease-out ${
+              hasVideoEnded ? "scale-100 opacity-100" : "scale-[1.02] opacity-0"
             }`}
           />
 
-          {isDesktopHero && !hasVideoEnded ? (
+          {!hasVideoEnded ? (
             <video
               ref={heroVideoRef}
-              className={`hero-video absolute inset-0 z-[1] transition-opacity duration-[1400ms] ease-out ${
-                hasVideoEnded ? "opacity-0" : "opacity-100"
-              }`}
+              className="hero-video absolute inset-0 z-[1] bg-[#050505]"
               autoPlay
               muted
               playsInline
               preload="auto"
-              poster="/media/hero-bundaran-hi.webp"
+              onPlaying={handleVideoPlaying}
               onEnded={handleVideoEnd}
-              onError={() => setHasVideoEnded(true)}
+              onError={() => {
+                dispatchWarmupEvent();
+                setHasVideoEnded(true);
+              }}
               aria-hidden="true"
             >
               <source src="/media/hero-bundaran-hi.mp4" type="video/mp4" />
@@ -411,15 +444,8 @@ export default function Home() {
                 suites for slow evenings in the capital.
               </p>
 
-              <div className="ux-hero-cta mt-10 flex flex-col gap-4 sm:w-fit sm:flex-row">
-                <Link
-                  href="/booking"
-                  className="group inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-xs uppercase tracking-[0.22em] text-white backdrop-blur-sm transition-all duration-300 hover:border-primary/35 hover:bg-primary hover:text-primary-foreground sm:px-8 sm:tracking-[0.28em]"
-                >
-                  Reserve Your Stay
-                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </Link>
-              </div>
+              <div aria-hidden="true" className="ux-hero-cta mt-10 h-12 sm:w-fit" />
+
             </div>
           </div>
         </div>
@@ -514,7 +540,7 @@ export default function Home() {
             </div>
 
             <div className="ux-collection-grid mt-10 grid grid-cols-1 gap-5 pb-8 sm:mt-14 sm:gap-6 lg:grid-cols-2">
-              {roomsData.map((room, index) => (
+              {catalogRooms.map((room, index) => (
                 <article
                   key={room.id}
                   className="ux-collection-card group overflow-hidden rounded-[1.75rem] border border-white/8 bg-[linear-gradient(180deg,rgba(28,31,42,0.96)_0%,rgba(18,21,30,0.98)_100%)] transition-all duration-500 transform-gpu hover:-translate-y-1.5 hover:border-primary/28 hover:shadow-[0_28px_60px_rgba(255,215,0,0.36)]"
@@ -579,7 +605,7 @@ export default function Home() {
                             Per night
                           </span>
                           <span className="mt-2 block font-serif text-2xl text-white">
-                            IDR {room.price.toLocaleString("id-ID")}
+                            IDR {room.basePrice.toLocaleString("id-ID")}
                           </span>
                         </div>
 

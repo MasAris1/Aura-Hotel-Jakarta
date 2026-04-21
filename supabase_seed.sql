@@ -1,6 +1,8 @@
 -- ==========================================
 -- SEED DATA: Isi tabel rooms dengan data kamar
--- Jalankan SQL ini di Supabase SQL Editor SETELAH menjalankan supabase_setup.sql
+-- Jalankan di Supabase SQL Editor SETELAH:
+-- 1. supabase_setup.sql
+-- 2. supabase_reconcile.sql (untuk project yang sudah berjalan / live)
 -- ==========================================
 
 -- Hapus data lama jika ada (opsional)
@@ -66,3 +68,24 @@ ON CONFLICT (id) DO UPDATE SET
     images = EXCLUDED.images,
     description = EXCLUDED.description,
     status = EXCLUDED.status;
+
+-- ==========================================
+-- OPSIONAL: PROMOSIKAN USER MENJADI ADMIN / RECEPTIONIST
+-- Jalankan setelah user terkait selesai registrasi agar profile sudah terbentuk.
+-- ==========================================
+
+-- UPDATE public.profiles
+-- SET role = 'admin'
+-- WHERE id = (
+--     SELECT id
+--     FROM auth.users
+--     WHERE email = 'admin@your-domain.com'
+-- );
+
+-- UPDATE public.profiles
+-- SET role = 'receptionist'
+-- WHERE id = (
+--     SELECT id
+--     FROM auth.users
+--     WHERE email = 'frontdesk@your-domain.com'
+-- );

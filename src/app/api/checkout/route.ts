@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/utils/supabase/server";
+import { getSupabaseAdmin } from "@/utils/supabase/admin";
+import { BookingQuoteError, getRoomQuote } from "@/lib/booking";
 import { snap } from "@/lib/midtrans";
-import roomsData from "@/data/rooms.json";
 import type { Database } from "@/types/supabase";
+import {
+    TRANSACTION_STATUSES,
+    upsertBookingTransaction,
+} from "@/lib/transactions";
 
 function getErrorMessage(error: unknown) {
     return error instanceof Error ? error.message : "Unknown server error";
@@ -32,6 +37,7 @@ export async function POST(req: Request) {
 
         const data = parsed.data;
         const supabase = await createClient();
+        const supabaseAdmin = getSupabaseAdmin();
 
         // Cek Otentikasi
         const { data: { user } } = await supabase.auth.getUser();
@@ -39,24 +45,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        // Kalkulasi Durasi
-        const durationInMs = new Date(data.checkOut).getTime() - new Date(data.checkIn).getTime();
-        const durationInDays = Math.ceil(durationInMs / (1000 * 60 * 60 * 24));
-
-        if (durationInDays < 1) {
-            return NextResponse.json({ error: "Invalid date range" }, { status: 400 });
-        }
-
-        // Cari harga kamar dari data statis rooms.json
-        const room = roomsData.find(r => r.id === data.roomId);
-        if (!room) {
-            return NextResponse.json({ error: "Kamar tidak ditemukan" }, { status: 404 });
-        }
-
-        const pricePerNight = room.price;
-        const subtotal = pricePerNight * durationInDays;
-        const taxRate = 0.21; // 21% pajak & biaya
-        const totalPrice = Math.round(subtotal * (1 + taxRate));
+        const quote = await getRoomQuote(
+            supabaseAdmin,
+            data.roomId,
+            data.checkIn,
+            data.checkOut,
+        );
 
         // Coba insert Booking dengan Supabase
         const { data: bookingData, error: insertError } = await supabase.from('bookings').insert({
@@ -68,7 +62,7 @@ export async function POST(req: Request) {
             special_requests: data.specialRequests,
             check_in: data.checkIn,
             check_out: data.checkOut,
-            total_price: totalPrice,
+            total_price: quote.totalPrice,
             status: 'UNPAID'
         }).select().single();
         const booking = bookingData as BookingRow | null;
@@ -84,11 +78,17 @@ export async function POST(req: Request) {
         }
 
         try {
+            await upsertBookingTransaction(supabaseAdmin, {
+                bookingId: booking.id,
+                amount: Number(booking.total_price ?? 0),
+                status: TRANSACTION_STATUSES.initiated,
+            });
+
             // == FASE 4: INTEGRASI MIDTRANS & GRACEFUL DEGRADATION ==
             const parameter = {
                 transaction_details: {
                     order_id: booking.id,
-                    gross_amount: totalPrice
+                    gross_amount: quote.totalPrice
                 },
                 customer_details: {
                     first_name: data.firstName,
@@ -97,36 +97,61 @@ export async function POST(req: Request) {
                 },
                 item_details: [{
                     id: data.roomId,
-                    price: Math.round(totalPrice / durationInDays),
-                    quantity: durationInDays,
-                    name: `${room.name} (${durationInDays} Night${durationInDays > 1 ? 's' : ''})`
+                    price: quote.nights > 0 ? Math.round(quote.totalPrice / quote.nights) : quote.totalPrice,
+                    quantity: quote.nights,
+                    name: `${quote.room.name} (${quote.nights} Night${quote.nights > 1 ? 's' : ''})`
                 }]
             };
 
             // Pastikan total item_details.price * quantity = gross_amount (rounding fix)
             const itemTotal = parameter.item_details[0].price * parameter.item_details[0].quantity;
-            if (itemTotal !== totalPrice) {
-                parameter.item_details[0].price += (totalPrice - itemTotal);
+            if (itemTotal !== quote.totalPrice) {
+                parameter.item_details[0].price += (quote.totalPrice - itemTotal);
             }
 
             const transaction = await snap.createTransaction(parameter);
             const token = transaction.token;
 
-            return NextResponse.json({ success: true, bookingId: booking.id, token, totalPrice }, { status: 201 });
+            await upsertBookingTransaction(supabaseAdmin, {
+                bookingId: booking.id,
+                amount: Number(booking.total_price ?? 0),
+                paymentType: "midtrans",
+                status: TRANSACTION_STATUSES.pending,
+            });
+
+            return NextResponse.json({ success: true, bookingId: booking.id, token, totalPrice: quote.totalPrice }, { status: 201 });
 
         } catch (midtransError: unknown) {
             console.error("Midtrans Error:", getErrorMessage(midtransError));
 
-            // Failsafe: Graceful Degradation. Jika midtrans down, hapus/batalkan pesanan yang berstatus UNPAID
-            // agar kamar kembali Available tanpa menunggu cron block 1 jam
-            await supabase.from('bookings').delete().match({ id: booking.id, status: 'UNPAID' });
+            // Jangan hapus booking agar histori transaksi tetap utuh.
+            await supabase
+                .from('bookings')
+                .update({ status: 'EXPIRED', updated_at: new Date().toISOString() })
+                .eq('id', booking.id)
+                .eq('status', 'UNPAID');
+
+            try {
+                await upsertBookingTransaction(supabaseAdmin, {
+                    bookingId: booking.id,
+                    amount: Number(booking.total_price ?? 0),
+                    paymentType: "midtrans",
+                    status: TRANSACTION_STATUSES.failed,
+                });
+            } catch (transactionError) {
+                console.error("Transaction Logging Error:", getErrorMessage(transactionError));
+            }
 
             return NextResponse.json({
-                error: "Sistem pembayaran sedang tidak tersedia. Pemesanan dibatalkan otomatis agar kamar tidak terkunci. Silakan coba beberapa saat lagi."
+                error: "Sistem pembayaran sedang tidak tersedia. Pemesanan ditandai gagal agar histori tetap tercatat. Silakan coba membuat reservasi baru beberapa saat lagi."
             }, { status: 503 });
         }
 
     } catch (error: unknown) {
+        if (error instanceof BookingQuoteError) {
+            return NextResponse.json({ error: error.message }, { status: error.statusCode });
+        }
+
         console.error("Checkout Exception:", getErrorMessage(error));
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }

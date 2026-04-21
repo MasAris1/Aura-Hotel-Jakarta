@@ -3,70 +3,111 @@
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { z } from 'zod'
+import { ensureProfileForUser, getPostAuthRedirect, getPublicAuthErrorMessage, sanitizeInternalRedirect } from '@/lib/auth'
+import { getPublicSiteUrl, resolveTrustedRequestOrigin } from '@/lib/env'
 import { createClient } from '@/utils/supabase/server'
-import { getPublicSiteUrl } from '@/lib/env'
 
-async function getAuthCallbackUrl() {
+const emailSchema = z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email('Please enter a valid email address.')
+    .max(320, 'Email is too long.')
+
+const loginPasswordSchema = z
+    .string()
+    .min(1, 'Password is required.')
+    .max(256, 'Password is too long.')
+
+const managedPasswordSchema = z
+    .string()
+    .min(8, 'Password must be at least 8 characters.')
+    .max(72, 'Password is too long.')
+
+function readFormValue(formData: FormData, key: string) {
+    return String(formData.get(key) ?? '')
+}
+
+async function getAuthCallbackUrl(nextPath?: string | null) {
     const requestHeaders = await headers()
-    const origin = requestHeaders.get('origin')
+    const safeNextPath = sanitizeInternalRedirect(nextPath)
+    const baseOrigin = resolveTrustedRequestOrigin({
+        origin: requestHeaders.get('origin'),
+        forwardedHost: requestHeaders.get('x-forwarded-host'),
+        forwardedProto: requestHeaders.get('x-forwarded-proto'),
+        fallback: getPublicSiteUrl(),
+    })
 
-    if (origin) {
-        return `${origin}/auth/callback`
+    const buildCallbackUrl = (base: string) => {
+        const callbackUrl = new URL('/auth/callback', base)
+
+        if (safeNextPath) {
+            callbackUrl.searchParams.set('next', safeNextPath)
+        }
+
+        return callbackUrl.toString()
     }
 
-    const forwardedHost = requestHeaders.get('x-forwarded-host')
-    if (forwardedHost) {
-        const forwardedProto = requestHeaders.get('x-forwarded-proto') ?? 'https'
-        return `${forwardedProto}://${forwardedHost}/auth/callback`
-    }
-
-    return `${getPublicSiteUrl()}/auth/callback`
+    return buildCallbackUrl(baseOrigin)
 }
 
 export async function loginWithPassword(formData: FormData, redirectTo?: string) {
     const supabase = await createClient()
-
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-
-    // basic validation
-    if (!email || !password) {
-        return { error: 'Email and password are required' }
-    }
-
-    const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+    const parsedInput = z.object({
+        email: emailSchema,
+        password: loginPasswordSchema,
+    }).safeParse({
+        email: readFormValue(formData, 'email'),
+        password: readFormValue(formData, 'password'),
     })
 
-    if (error) {
-        return { error: error.message }
+    if (!parsedInput.success) {
+        return { error: parsedInput.error.issues[0]?.message ?? 'Invalid login form.' }
+    }
+
+    const { email, password } = parsedInput.data
+    let profile = null
+
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        })
+
+        if (error) {
+            return { error: getPublicAuthErrorMessage(error, 'Unable to sign in right now.') }
+        }
+
+        profile = data.user ? await ensureProfileForUser(supabase, data.user) : null
+    } catch (error) {
+        return { error: getPublicAuthErrorMessage(error, 'Unable to sign in right now.') }
     }
 
     revalidatePath('/', 'layout')
-    redirect(redirectTo || '/vip')
+    redirect(getPostAuthRedirect(profile?.role, redirectTo))
 }
 
-export async function loginWithMagicLink(formData: FormData) {
+export async function loginWithMagicLink(formData: FormData, redirectTo?: string) {
     const supabase = await createClient()
+    const parsedEmail = emailSchema.safeParse(readFormValue(formData, 'email'))
 
-    const email = formData.get('email') as string
-
-    if (!email) {
-        return { error: 'Email is required' }
+    if (!parsedEmail.success) {
+        return { error: parsedEmail.error.issues[0]?.message ?? 'Please enter a valid email address.' }
     }
 
-    const redirectTo = await getAuthCallbackUrl()
+    const emailRedirectTo = await getAuthCallbackUrl(redirectTo)
 
+    const email = parsedEmail.data
     const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-            emailRedirectTo: redirectTo,
+            emailRedirectTo,
         },
     })
 
     if (error) {
-        return { error: error.message }
+        return { error: getPublicAuthErrorMessage(error, 'Unable to send the magic link right now.') }
     }
 
     return { success: 'Magic link sent! Please check your email.' }
@@ -74,32 +115,111 @@ export async function loginWithMagicLink(formData: FormData) {
 
 export async function signup(formData: FormData, redirectTo?: string) {
     const supabase = await createClient()
+    const parsedInput = z.object({
+        email: emailSchema,
+        password: managedPasswordSchema,
+        confirmPassword: managedPasswordSchema,
+    }).safeParse({
+        email: readFormValue(formData, 'email'),
+        password: readFormValue(formData, 'password'),
+        confirmPassword: readFormValue(formData, 'confirmPassword'),
+    })
 
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const confirmPassword = formData.get('confirmPassword') as string
-
-    if (!email || !password) {
-        return { error: 'Email and password are required' }
+    if (!parsedInput.success) {
+        return { error: parsedInput.error.issues[0]?.message ?? 'Invalid registration form.' }
     }
+
+    const { email, password, confirmPassword } = parsedInput.data
+    let profile = null
 
     if (password !== confirmPassword) {
         return { error: 'Passwords do not match' }
     }
 
-    const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-    })
+    try {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+        })
 
-    if (error) {
-        return { error: error.message }
-    }
+        if (error) {
+            return { error: getPublicAuthErrorMessage(error, 'Unable to create your account right now.') }
+        }
 
-    if (data.session === null) {
-        return { success: 'Please check your email to confirm your registration.' }
+        if (data.session === null) {
+            return { success: 'Please check your email to confirm your registration.' }
+        }
+
+        profile = data.user ? await ensureProfileForUser(supabase, data.user) : null
+    } catch (error) {
+        return { error: getPublicAuthErrorMessage(error, 'Unable to create your account right now.') }
     }
 
     revalidatePath('/', 'layout')
-    redirect(redirectTo || '/vip')
+    redirect(getPostAuthRedirect(profile?.role, redirectTo))
+}
+
+export async function requestPasswordReset(formData: FormData, redirectTo?: string) {
+    const supabase = await createClient()
+    const parsedEmail = emailSchema.safeParse(readFormValue(formData, 'email'))
+
+    if (!parsedEmail.success) {
+        return { error: parsedEmail.error.issues[0]?.message ?? 'Please enter a valid email address.' }
+    }
+
+    const safeRedirect = sanitizeInternalRedirect(redirectTo) ?? '/login'
+    const resetPath = `/reset-password?redirect=${encodeURIComponent(safeRedirect)}`
+    const resetCallbackUrl = await getAuthCallbackUrl(resetPath)
+
+    const { error } = await supabase.auth.resetPasswordForEmail(parsedEmail.data, {
+        redirectTo: resetCallbackUrl,
+    })
+
+    if (error) {
+        return { error: getPublicAuthErrorMessage(error, 'Unable to send a password reset link right now.') }
+    }
+
+    return { success: 'Password reset link sent. Please check your email.' }
+}
+
+export async function updatePassword(formData: FormData, redirectTo?: string) {
+    const supabase = await createClient()
+    const parsedInput = z.object({
+        password: managedPasswordSchema,
+        confirmPassword: managedPasswordSchema,
+    }).safeParse({
+        password: readFormValue(formData, 'password'),
+        confirmPassword: readFormValue(formData, 'confirmPassword'),
+    })
+
+    if (!parsedInput.success) {
+        return { error: parsedInput.error.issues[0]?.message ?? 'Invalid password reset form.' }
+    }
+
+    const { password, confirmPassword } = parsedInput.data
+
+    if (password !== confirmPassword) {
+        return { error: 'Passwords do not match' }
+    }
+
+    const {
+        data: { user },
+        error: userError,
+    } = await supabase.auth.getUser()
+
+    if (userError || !user) {
+        return { error: 'Your reset session is invalid or has expired. Please request a new reset link.' }
+    }
+
+    const { error } = await supabase.auth.updateUser({ password })
+
+    if (error) {
+        return { error: getPublicAuthErrorMessage(error, 'Unable to update your password right now.') }
+    }
+
+    await supabase.auth.signOut()
+
+    revalidatePath('/', 'layout')
+    const nextLogin = sanitizeInternalRedirect(redirectTo) ?? '/login'
+    redirect(`${nextLogin}${nextLogin.includes('?') ? '&' : '?'}reset=success`)
 }

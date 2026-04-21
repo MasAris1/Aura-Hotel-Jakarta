@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, MapPin, Phone, Mail } from "lucide-react";
+import { MapPin, Phone, Mail } from "lucide-react";
 
 const footerLinks = {
   explore: [
@@ -33,14 +33,6 @@ export function Footer() {
               A refined stay experience with skyline views, intuitive booking,
               and concierge-led hospitality from arrival until late check-out.
             </p>
-
-            <Link
-              href="/booking"
-              className="mt-8 inline-flex items-center gap-3 rounded-full border border-primary/30 bg-primary/10 px-5 py-3 text-xs uppercase tracking-[0.28em] text-primary transition-all duration-300 hover:border-primary/50 hover:bg-primary hover:text-primary-foreground"
-            >
-              Reserve your stay
-              <ArrowUpRight className="h-4 w-4" />
-            </Link>
           </div>
 
           <div>

@@ -2,20 +2,26 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { getSupabaseAdmin } from "@/utils/supabase/admin";
 import { getPublicSiteUrl, getRequiredEnv } from "@/lib/env";
+import { resolveMidtransStatuses, upsertBookingTransaction } from "@/lib/transactions";
+import { resolveRoomDetails } from "@/lib/roomCatalog";
 
-type BookingStatus = "UNPAID" | "PAID" | "EXPIRED" | "REFUNDED";
+type BookingStatus =
+    | "UNPAID"
+    | "PAID"
+    | "EXPIRED"
+    | "REFUNDED"
+    | "CHECKED_IN"
+    | "CHECKED_OUT";
 
 type WebhookBooking = {
     id: string;
+    room_id: string | null;
     email: string;
     first_name: string;
     last_name: string;
     check_in: string;
     check_out: string;
     status: BookingStatus;
-    rooms?: {
-        name?: string | null;
-    } | null;
 };
 
 type MidtransWebhookPayload = {
@@ -35,6 +41,9 @@ function getErrorMessage(error: unknown) {
 
 export async function POST(req: Request) {
     try {
+        // Service role is required because Midtrans webhooks arrive without user session.
+        getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
+
         const body = await req.json() as MidtransWebhookPayload;
         const supabase = getSupabaseAdmin();
 
@@ -55,7 +64,7 @@ export async function POST(req: Request) {
         // oleh server Midtrans tanpa user session — perlu bypass RLS
         const { data: bookingData, error: fetchError } = await supabase
             .from('bookings')
-            .select('*, rooms(name)')
+            .select('id, room_id, email, first_name, last_name, check_in, check_out, status')
             .eq('id', order_id)
             .single();
         const booking = bookingData as WebhookBooking | null;
@@ -65,27 +74,32 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Order Not Found" }, { status: 404 });
         }
 
-        if (booking.status === 'PAID' || booking.status === 'EXPIRED' || booking.status === 'REFUNDED') {
+        const outcome = resolveMidtransStatuses(
+            transaction_status,
+            fraud_status,
+            booking.status,
+        );
+        const newStatus = outcome.bookingStatus as BookingStatus;
+        const isSuccess = outcome.isSuccess;
+        const isAlreadyFinal =
+            booking.status === 'PAID' ||
+            booking.status === 'CHECKED_IN' ||
+            booking.status === 'CHECKED_OUT' ||
+            booking.status === 'EXPIRED' ||
+            booking.status === 'REFUNDED';
+        const numericAmount = Number(body.gross_amount);
+        const roomName = resolveRoomDetails(booking.room_id).name;
+
+        await upsertBookingTransaction(supabase, {
+            bookingId: order_id,
+            amount: Number.isFinite(numericAmount) ? numericAmount : null,
+            paymentType: body.payment_type ?? "midtrans",
+            status: outcome.transactionStatus,
+        });
+
+        if (isAlreadyFinal && newStatus === booking.status) {
             console.log(`Webhook Idempotency: Order ${order_id} already ${booking.status}`);
             return NextResponse.json({ success: true, message: "Order already processed" }, { status: 200 });
-        }
-
-        // 3. Tentukan status dari Midtrans
-        let newStatus: BookingStatus = booking.status;
-        let isSuccess = false;
-
-        if (transaction_status === 'capture') {
-            if (fraud_status === 'accept') {
-                newStatus = 'PAID';
-                isSuccess = true;
-            }
-        } else if (transaction_status === 'settlement') {
-            newStatus = 'PAID';
-            isSuccess = true;
-        } else if (transaction_status === 'cancel' || transaction_status === 'deny' || transaction_status === 'expire') {
-            newStatus = 'EXPIRED';
-        } else if (transaction_status === 'pending') {
-            newStatus = 'UNPAID';
         }
 
         // 4. Update Database (menggunakan supabase agar bypass RLS)
@@ -103,14 +117,7 @@ export async function POST(req: Request) {
                 return NextResponse.json({ error: "Db Update Failed" }, { status: 500 });
             }
 
-            // Simpan ke log transaksi
-            await supabase.from('transactions').insert({
-                booking_id: order_id,
-                midtrans_order_id: body.transaction_id,
-                payment_type: body.payment_type,
-                amount: Number(body.gross_amount),
-                status: transaction_status
-            });
+            booking.status = newStatus;
         }
 
         // 5. Distribusi E-Voucher (Resend)
@@ -124,7 +131,7 @@ export async function POST(req: Request) {
                     await resend.emails.send({
                         from: 'Aura Hotel <reservations@aura-hotel.com>',
                         to: [booking.email],
-                        subject: `Booking Confirmation - ${booking.rooms?.name}`,
+                        subject: `Booking Confirmation - ${roomName}`,
                         html: `
                             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                                 <h1 style="color: #c9a25b;">Booking Confirmed!</h1>
@@ -138,7 +145,7 @@ export async function POST(req: Request) {
                                     </tr>
                                     <tr style="border-bottom: 1px solid #EEE;">
                                         <td style="padding: 10px 0; color: #666;">Room</td>
-                                        <td style="padding: 10px 0; text-align: right; font-weight: bold;">${booking.rooms?.name}</td>
+                                        <td style="padding: 10px 0; text-align: right; font-weight: bold;">${roomName}</td>
                                     </tr>
                                     <tr style="border-bottom: 1px solid #EEE;">
                                         <td style="padding: 10px 0; color: #666;">Dates</td>
@@ -164,7 +171,17 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: true, processed_status: newStatus }, { status: 200 });
 
     } catch (error: unknown) {
-        console.error("Webhook Exception:", getErrorMessage(error));
+        const message = getErrorMessage(error);
+
+        if (
+            message.includes("SUPABASE_SERVICE_ROLE_KEY") ||
+            message.includes("MIDTRANS_SERVER_KEY")
+        ) {
+            console.error("Webhook Configuration Error:", message);
+            return NextResponse.json({ error: "Webhook server misconfigured" }, { status: 500 });
+        }
+
+        console.error("Webhook Exception:", message);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

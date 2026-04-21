@@ -1,0 +1,3927 @@
+{
+  "version": "2.10",
+  "children": [
+    {
+      "type": "frame",
+      "id": "CNfmC",
+      "x": 1720,
+      "y": 0,
+      "name": "Slide 02 Home Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "DenEs",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "RFSeH",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "HxAmF",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 02 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "gFhNp",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "01. Home Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "8xxYE",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Halaman pembuka yang menonjolkan suasana hotel, mengarahkan navigasi utama, dan membangun kesan visual premium sejak detik pertama.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "yDFhm",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "3yHdn",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "1C5RX",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/OoRq5.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "YBXpn",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sumber visual diekspor langsung dari node Pencil: Home Desktop.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "DxBrN",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Gsfzf",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "tKOuy",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "g21YK",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Hero visual besar membangun kesan luxury, navbar menjaga orientasi section, card membantu pemindaian konten, dan motion scroll membuat landing page terasa lebih hidup.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "RIj6N",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "NlJI8",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "83Xar",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, next/image, next/link, Lucide React, GSAP ScrollTrigger, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "IyzfL",
+      "x": 3440,
+      "y": 0,
+      "name": "Slide 03 Room Detail Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "13w2i",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "NpQUt",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "Ss4yo",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 03 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "CGc2E",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "02. Room Detail Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "DBOe9",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Halaman detail kamar menekankan foto hero, spesifikasi kamar, fasilitas, galeri, dan kartu reservasi yang tetap terlihat.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "9DbnC",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "zCk7U",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Gk1oI",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/Ana99.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "r3ULK",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sumber visual diekspor langsung dari node Pencil: Room Detail Desktop.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "tHa28",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "KKItZ",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "YlAPl",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "jNQkd",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Header foto besar memperkuat daya tarik kamar, metadata ringkas membantu keputusan cepat, daftar amenity mudah dipindai, dan sticky booking card menjaga CTA tetap terlihat.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "thihG",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "PqHsk",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "1raLW",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, next/image, next/link, Lucide React, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "gednH",
+      "x": 0,
+      "y": 1020,
+      "name": "Slide 04 Booking Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "O8Fs8",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "pnmHs",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "s3qXL",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 04 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "pvkSZ",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "03. Booking Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "4X1VF",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Halaman pemesanan multi step yang menata tanggal inap, identitas tamu, ringkasan harga, dan aksi pembayaran.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "H1pK1",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "nIG7S",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "mNi9R",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/X0oq6.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "GwK2M",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sumber visual diekspor langsung dari node Pencil: Booking Desktop.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "grILx",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Om8ik",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "GkQuw",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "NMgwr",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Alur bertahap mengurangi beban kognitif, form membantu ketepatan input, ringkasan biaya menjaga transparansi, dan CTA pembayaran dibuat menonjol.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "YTz8i",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ouQh1",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "70RRz",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, next/navigation, next/image, next/link, Lucide React, Midtrans Snap UI, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "wfEoX",
+      "x": 1720,
+      "y": 1020,
+      "name": "Slide 05 Login Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "MNLkv",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "KV6CU",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "RXIrn",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 05 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "Ifh72",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "04. Login Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "f4eHH",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Halaman autentikasi dengan split layout dan opsi masuk melalui magic link, password, atau Google sign in.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "8gS5t",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "PRz68",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "hmPzi",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/0OFVk.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "biT3X",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sumber visual diekspor langsung dari node Pencil: Login Desktop.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "tyGmd",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "8lEtS",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "FtB6H",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "w5iu7",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Split layout menyeimbangkan branding dan fungsi, tab metode login memperjelas pilihan, feedback state membantu user, dan tombol CTA dibuat kontras.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "3mxka",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "9DJmT",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "G3rBJ",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, next/image, next/link, next/navigation, Lucide React, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "25byj",
+      "x": 3440,
+      "y": 1020,
+      "name": "Slide 06 Register Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "4D78n",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "XqCKN",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "NcbLw",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 06 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "dwhKb",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "05. Register Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "VQyrN",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Halaman registrasi mempertahankan bahasa visual premium sambil memfokuskan user pada pembuatan akun baru.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "yoJ7k",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "G2bAm",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "EJj69",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/gFWBa.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "ms6ce",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sumber visual diekspor langsung dari node Pencil: Register Desktop.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ShffI",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "fmNYg",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "LV8lN",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "9Xg8p",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Visual kiri menjaga identitas brand, form kanan dibuat fokus dan bersih, pesan status mudah dikenali, dan alur registrasi terasa ringan.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "PFu1T",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "AUF8O",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "jXlXA",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, next/image, next/link, next/navigation, Lucide React, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "61OJC",
+      "x": 0,
+      "y": 2040,
+      "name": "Slide 07 Forgot Password Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "CXOs3",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "UQpUS",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "1yayv",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 07 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "w20k9",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "06. Forgot Password Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "I9jEZ",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Halaman bantuan password mengutamakan kejelasan instruksi dan tindakan tunggal untuk meminta tautan reset.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "AtVqV",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "LKPNQ",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "h5qxR",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/c2zJC.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "BQQUH",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sumber visual diekspor langsung dari node Pencil: Forgot Password Desktop.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "tj37z",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "DtL23",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "AT0a5",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ILXgG",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Back link memberi orientasi, isi form sangat ringkas, pesan sukses dan error mudah dibedakan, serta visual pendamping menjaga konsistensi brand.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Mci7Q",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "eYYqX",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "UZgoM",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, next/image, next/link, next/navigation, Lucide React, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "apq6D",
+      "x": 1720,
+      "y": 2040,
+      "name": "Slide 08 Reset Password Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "w697L",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "MQbFx",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "EvPQF",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 08 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "sWkZh",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "07. Reset Password Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "p9u1Q",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Halaman reset password memfokuskan user pada penggantian kata sandi dengan tampilan yang tetap konsisten.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "l9YAm",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "UjikC",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "3Nqv3",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/PC64g.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "6NpKx",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sumber visual diekspor langsung dari node Pencil: Reset Password Desktop.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "4b60r",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "cE5HM",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "S1w6C",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "AOdCQ",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Aksi utama tunggal membuat proses jelas, struktur visual menurunkan distraksi, feedback status membantu validasi, dan link kembali menjaga navigasi.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "s2Oas",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "YRtJ3",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "7hqSe",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, next/image, next/link, next/navigation, Lucide React, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "4C5Dr",
+      "x": 3440,
+      "y": 2040,
+      "name": "Slide 09 VIP Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "R6x6M",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "Jcpks",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "BGGk4",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 09 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "ydOD9",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "08. VIP Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "hHwRD",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Portal preferensi tamu VIP untuk personalisasi kenyamanan kamar dan layanan dengan nuansa yang sangat eksklusif.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "BaqhL",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "xtONT",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "zjUI1",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/XU4PN.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "P1HLO",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sumber visual diekspor langsung dari node Pencil: VIP Desktop.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Oog1o",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "UQHRl",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "kmh9w",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "v5ja7",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Panel preferensi dibuat seperti control room pribadi, elemen pengaturan terasa eksklusif, feedback simpan memperjelas status, dan ikon membantu identifikasi fitur.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "mfOwd",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "2RUyI",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "E9VHG",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, Lucide React, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "c6qfV",
+      "x": 0,
+      "y": 3060,
+      "name": "Slide 10 Dashboard Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "54uH7",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "pREHy",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "WeLi2",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 10 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "oWtRL",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "09. Dashboard Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "YGAhy",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Dashboard tamu menyajikan ringkasan reservasi, status transaksi, pencarian, tab, dan tabel informasi dalam satu area kerja.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "YV93f",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "uVdH2",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Qh2BJ",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/OsYmv.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "4wGFf",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sumber visual diekspor langsung dari node Pencil: Dashboard Desktop.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "TTgxB",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "l7Z7B",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "6xquw",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "K7wpq",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Card statistik mempermudah scanning, badge status memperjelas kondisi reservasi, tabel menjaga keterbacaan data, dan tab membantu pengelompokan informasi.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "CcKCa",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "6R6aS",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "EVWsS",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, shadcn/ui Card Badge Table Tabs Input Button, next/image, next/link, Lucide React, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "OmUNt",
+      "x": 1720,
+      "y": 3060,
+      "name": "Slide 11 Admin Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "OLPMP",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "b6U6D",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "xbKnZ",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 11 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "35m4F",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "10. Admin Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "9XZbk",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Dashboard admin versi ringkas menampilkan KPI, tabel reservasi, tab manajemen, dan panel operasional utama.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "MUWvU",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "bt4ih",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "LIoFQ",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/uw0vu.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "SsX2s",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sumber visual diekspor langsung dari node Pencil: Admin Desktop.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "BqZ66",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "QbYyd",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "BootB",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "GIL9e",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Hierarki visual kuat membantu membaca metrik, kombinasi tabel dan tab menjaga kontrol tetap rapi, badge status mempercepat identifikasi, dan layout terasa seperti workspace.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "N2fVU",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ZViBm",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ARjQq",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, shadcn/ui Card Badge Table Tabs Separator, next/link, Lucide React, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "feMxi",
+      "x": 3440,
+      "y": 3060,
+      "name": "Slide 12 Dashboard Extended Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "Z9dIZ",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "6LMcz",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "IhtQQ",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 12 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "eY1md",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "11. Dashboard Extended Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "xKtQ5",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Versi dashboard yang lebih panjang menunjukkan kepadatan informasi saat seluruh blok analitik dan riwayat tampil bersama.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "ecv5J",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "Nmx9H",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "wfTmm",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/LECWi.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "WGPcg",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sumber visual diekspor langsung dari node Pencil: Dashboard Extended Desktop.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "OMBdD",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ew9HS",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Jc7LR",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "58HJl",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Scroll layout tetap konsisten, ritme card menjaga pemisahan informasi, tabel dan blok analitik mudah diikuti, dan skala konten tetap terkontrol.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "WGx0E",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "9G3ZR",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "HolRf",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, shadcn/ui Card Badge Table Tabs Input Button, next/image, next/link, Lucide React, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "GEjgo",
+      "x": 0,
+      "y": 4080,
+      "name": "Slide 13 Admin Complete Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "O7wk5",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "CE406",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "mIfcQ",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 13 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "p1k0N",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "12. Admin Complete Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "8TD2M",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Workspace admin lengkap memperlihatkan kedalaman panel operasional ketika seluruh modul manajemen dibuka sekaligus.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "i6h1D",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "TeCie",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Wcyx3",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/FORKg.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "L2bWq",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sumber visual diekspor langsung dari node Pencil: Admin Complete Desktop.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "DQWNh",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "AWMoO",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "lb5Pb",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "MmfaM",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Struktur panjang membutuhkan konsistensi komponen, sectioning menjaga fokus, tabel dan kontrol aksi tetap terbaca, dan bahasa visual tetap seragam.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "xFIRf",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "js7U7",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "xafKo",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, shadcn/ui Card Badge Table Tabs Separator, next/link, Lucide React, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "t8yj6",
+      "x": 1720,
+      "y": 4080,
+      "name": "Slide 14 Home Extended Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "mypwq",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "SBayX",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "U0J6t",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 14 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "tfzwP",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "13. Home Extended Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "QhoI7",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Versi home fullpage yang sudah diperbaiki menampilkan navbar di bagian atas serta section facilities dan suites dengan ritme yang lebih sesuai dengan UI asli.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "wyy6M",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "ztFtq",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "J8pVr",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-crops/home-extended-composite.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "PmfAA",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Preview komposit dibuat dari area utama frame Home Extended untuk menonjolkan navbar, facilities, dan suites secara bersamaan.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "U6Ss4",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "0lr61",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "LWQmJ",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "MPWyk",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Navbar kembali berada di atas, transisi hero ke facilities terasa lebih natural, grid kartu fasilitas terlihat lebih rapi, dan section suites tampil lebih terbaca sebagai lanjutan journey halaman utama.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "xVDSU",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "b2NoS",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "tdlA2",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, next/image, next/link, Lucide React, GSAP ScrollTrigger, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "cXtrb",
+      "x": 0,
+      "y": 0,
+      "name": "Slide 01 Cover",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#090E15",
+            "position": 0
+          },
+          {
+            "color": "#131D2B",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "gap": 32,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "0sgPm",
+          "name": "coverLeft",
+          "width": 700,
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 22,
+          "justifyContent": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "cUSQH",
+              "name": "coverKicker",
+              "fill": "#C79B49",
+              "content": "Presentasi Formal UI",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "BKz8e",
+              "name": "coverTitle",
+              "fill": "#F5F0E6",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "User Interface Website Aura Hotel",
+              "lineHeight": 1.08,
+              "fontFamily": "Playfair Display",
+              "fontSize": 54,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "FWbzI",
+              "name": "coverSubtitle",
+              "fill": "#BCC5D3",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Materi ini disusun dari desain aktual pada file aura-faithful.pen. Fokus pembahasan hanya pada tampilan, komponen visual, dan framework UI yang digunakan pada setiap screen desktop.",
+              "lineHeight": 1.45,
+              "fontFamily": "Inter",
+              "fontSize": 22,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "GEYAt",
+              "name": "coverScope",
+              "width": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "padding": 20,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "0mXSd",
+                  "name": "coverScopeLabel",
+                  "fill": "#C79B49",
+                  "content": "Ruang Lingkup",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "IZ6vW",
+                  "name": "coverScopeBody",
+                  "fill": "#F5F0E6",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Board ini meninjau seluruh screen desktop pada desain, menjelaskan keputusan UI yang tampak, dan mencantumkan teknologi UI pada masing masing screen.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Pt19E",
+          "name": "coverRight",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "frame",
+              "id": "G9g7B",
+              "name": "coverImage",
+              "clip": true,
+              "width": "fill_container",
+              "height": 610,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "presentation-assets/6hxZg.png",
+                "mode": "fill"
+              },
+              "cornerRadius": 24
+            },
+            {
+              "type": "frame",
+              "id": "ekcmr",
+              "name": "coverNote",
+              "width": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "padding": 20,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "1OySZ",
+                  "name": "coverNoteLabel",
+                  "fill": "#C79B49",
+                  "content": "Sumber Visual",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "IyKAQ",
+                  "name": "coverNoteBody",
+                  "fill": "#F5F0E6",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Seluruh preview pada board ini diekspor ulang langsung dari node Pencil ke folder presentasi, sehingga tidak bergantung pada screenshot lama yang sudah ada di folder desain.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "3Buei",
+      "x": 3440,
+      "y": 5100,
+      "name": "Slide 17 Closing",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#090E15",
+            "position": 0
+          },
+          {
+            "color": "#131D2B",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "text",
+          "id": "YyLON",
+          "name": "closingKicker",
+          "fill": "#C79B49",
+          "content": "Penutup",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "rljDT",
+          "name": "closingTitle",
+          "fill": "#F5F0E6",
+          "content": "Kesimpulan Analisis UI",
+          "fontFamily": "Playfair Display",
+          "fontSize": 50,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "O8NB8",
+          "name": "closingIntro",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Secara keseluruhan, desain Aura Hotel kini lebih akurat pada home fullpage: navbar kembali ke posisi atas, section facilities lebih rapi, dan section suites tampil lebih jelas sebagai bagian dari alur eksplorasi kamar.",
+          "lineHeight": 1.45,
+          "fontFamily": "Inter",
+          "fontSize": 22,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "DIyv6",
+          "name": "closingRow",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 24,
+          "children": [
+            {
+              "type": "frame",
+              "id": "uIflI",
+              "name": "closingTakeaway",
+              "width": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "padding": 20,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "uZ4lE",
+                  "name": "closingTakeawayLabel",
+                  "fill": "#C79B49",
+                  "content": "Temuan UI Utama",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "ZE8Io",
+                  "name": "closingTakeawayBody",
+                  "fill": "#F5F0E6",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Landing page unggul pada storytelling visual. Screen autentikasi kuat pada fokus form. Dashboard dan admin paling banyak memakai komponen data, status, dan navigasi kerja. Perbaikan terbaru memperkuat home fullpage, facilities, dan suites.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "AkHBy",
+              "name": "closingStack",
+              "width": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "padding": 20,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "2oFeZ",
+                  "name": "closingStackLabel",
+                  "fill": "#C79B49",
+                  "content": "Stack UI Dominan",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "exKaU",
+                  "name": "closingStackBody",
+                  "fill": "#F5F0E6",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, next/image, next/link, next/font, Lucide React, GSAP ScrollTrigger, dan shadcn/ui pada area dashboard serta admin.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "m2phL",
+      "x": 0,
+      "y": 5100,
+      "name": "Slide 15 Facilities Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "LdiJZ",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "6C17a",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "vBzgK",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 15 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "B98rK",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "14. Facilities Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "YUOVD",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Frame khusus yang menonjolkan section facilities, lengkap dengan navbar di atas, heading besar, dan grid kartu fasilitas yang kini lebih rapi.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "H0ZKc",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "EiAKS",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "TM2xd",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/SiKuz.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "EmMxG",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Preview difokuskan pada area facilities dari frame Pencil yang telah diperbaiki.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "h3jrj",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "xVWhT",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "kgrf7",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "0Vt4X",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Heading section kini lebih jelas, navbar tetap berada di atas, jarak antar card lebih seimbang, dan keseluruhan area terasa seperti satu panel luxury yang utuh.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "KD0w2",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "vHjKC",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ZboDp",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, next/image, next/link, Lucide React, GSAP ScrollTrigger, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "OpcbQ",
+      "x": 1720,
+      "y": 5100,
+      "name": "Slide 16 Suites Desktop",
+      "width": 1600,
+      "height": 900,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#0A0F17",
+            "position": 0
+          },
+          {
+            "color": "#111A26",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 32,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#243041"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 48,
+      "children": [
+        {
+          "type": "frame",
+          "id": "HDyf1",
+          "name": "homeHeader",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "VDquN",
+              "name": "homeLabel",
+              "fill": "#C79B49",
+              "content": "Analisis UI Aktual",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "d4A1P",
+              "name": "homeIndex",
+              "fill": "#8B97A9",
+              "content": "Slide 16 / 17",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "QsqdY",
+          "name": "homeTitle",
+          "fill": "#F5F0E6",
+          "content": "15. Suites Desktop",
+          "fontFamily": "Playfair Display",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "PVSOL",
+          "name": "homeSubtitle",
+          "fill": "#BCC5D3",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Frame khusus untuk section suites yang menampilkan grid kartu kamar secara lebih fokus sebagai area eksplorasi sebelum user masuk ke halaman detail atau booking.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "mqLNJ",
+          "name": "homeContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 28,
+          "children": [
+            {
+              "type": "frame",
+              "id": "daRxU",
+              "name": "homePreview",
+              "width": 920,
+              "height": "fill_container",
+              "fill": "#111823",
+              "cornerRadius": 24,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#243041"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "WwYRM",
+                  "name": "homeImage",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 520,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "presentation-assets/4ksD0.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18
+                },
+                {
+                  "type": "text",
+                  "id": "8vCPN",
+                  "name": "homeCaption",
+                  "fill": "#8B97A9",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Preview difokuskan pada area suites dari frame Pencil untuk memperjelas struktur kartu kamar.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "rIghG",
+              "name": "homeSide",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "1fECn",
+                  "name": "homeUICard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "N5vcy",
+                      "name": "homeUILabel",
+                      "fill": "#C79B49",
+                      "content": "Fokus UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Ewppp",
+                      "name": "homeUIBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Grid dua kolom membantu perbandingan kamar, kartu tetap konsisten secara visual, area harga dan CTA mudah dipindai, dan ritme konten terasa padat namun terkontrol.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "q3ZMm",
+                  "name": "homeTechCard",
+                  "width": "fill_container",
+                  "fill": "#111823",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#243041"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "AzypR",
+                      "name": "homeTechLabel",
+                      "fill": "#C79B49",
+                      "content": "Teknologi UI",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "scsOT",
+                      "name": "homeTechBody",
+                      "fill": "#F5F0E6",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Next.js App Router, React 19, TypeScript, Tailwind CSS 4, next/image, next/link, Lucide React, GSAP ScrollTrigger, dan next/font.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

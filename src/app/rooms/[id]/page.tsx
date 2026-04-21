@@ -1,19 +1,60 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import roomsData from "@/data/rooms.json";
 import { Check, Star, LayoutDashboard, Users, CreditCard } from "lucide-react";
 import Link from "next/link";
+import {
+    getStaticRoomById,
+    resolveRoomDetails,
+    type RoomCatalogItem,
+} from "@/lib/roomCatalog";
 
 export default function RoomDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
-    const room = roomsData.find((r) => r.id === id);
+    const staticRoom = getStaticRoomById(id);
+    const [room, setRoom] = useState<RoomCatalogItem | null>(() => (
+        staticRoom
+            ? resolveRoomDetails(staticRoom.id)
+            : null
+    ));
     const [guests, setGuests] = useState(1);
 
-    if (!room) {
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadRoom = async () => {
+            try {
+                const response = await fetch(`/api/rooms/${id}`, { cache: "no-store" });
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const result = await response.json() as { room?: RoomCatalogItem };
+
+                if (isMounted && result.room) {
+                    setRoom(result.room);
+                }
+            } catch {
+                // Keep static fallback.
+            }
+        };
+
+        void loadRoom();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [id]);
+
+    if (!room && !staticRoom) {
         notFound();
+    }
+
+    if (!room) {
+        return null;
     }
 
     return (
@@ -25,6 +66,7 @@ export default function RoomDetailsPage({ params }: { params: Promise<{ id: stri
                     alt={room.name}
                     fill
                     sizes="100vw"
+                    priority
                     className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
@@ -98,7 +140,7 @@ export default function RoomDetailsPage({ params }: { params: Promise<{ id: stri
                             <div className="border-b border-border pb-6 mb-6">
                                 <span className="text-foreground/50 text-xs font-sans tracking-widest uppercase block mb-2">Starting Rate</span>
                                 <span className="font-serif text-4xl text-foreground leading-none">
-                                    IDR {room.price.toLocaleString('id-ID')}
+                                    IDR {room.basePrice.toLocaleString('id-ID')}
                                 </span>
                                 <span className="text-foreground/50 text-xs font-sans mt-2 block">per night, excluding taxes & fees</span>
                             </div>

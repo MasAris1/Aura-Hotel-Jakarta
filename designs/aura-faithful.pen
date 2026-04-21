@@ -1,0 +1,5251 @@
+{
+  "version": "2.10",
+  "children": [
+    {
+      "type": "frame",
+      "id": "QJc9Z",
+      "x": 0,
+      "y": -597,
+      "name": "Aura UI Overview Board",
+      "width": 1940,
+      "fill": "#EDE8DE",
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 36,
+      "children": [
+        {
+          "type": "text",
+          "id": "MVFyW",
+          "fill": "#141414",
+          "content": "Aura Website UI Capture",
+          "fontFamily": "Inter",
+          "fontSize": 38,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "dDc9G",
+          "fill": "#5F584D",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Desktop overview built from real localhost screenshots where possible. Home uses a 1440x900 laptop capture after the full intro delay; Admin remains reconstructed from source because the live route is gated by authentication.",
+          "lineHeight": 1.4,
+          "fontFamily": "Inter",
+          "fontSize": 18,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "ZtqUt",
+          "name": "rowA",
+          "width": "fill_container",
+          "gap": 20,
+          "children": [
+            {
+              "type": "frame",
+              "id": "o01yP",
+              "name": "homeCell",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "5xybL",
+                  "fill": "#171717",
+                  "content": "Home",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "ZO4wy",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 263,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "screenshots-desktop/home-laptop-viewport.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#D2C7B8"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "O87l4",
+              "name": "roomCell",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "V5SAU",
+                  "fill": "#171717",
+                  "content": "Room Detail",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "qcf7L",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 263,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "screenshots-desktop/room-detail.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#D2C7B8"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "LNYg1",
+              "name": "bookingCell",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "xTeLq",
+                  "fill": "#171717",
+                  "content": "Booking",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "dPAO2",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 263,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "screenshots-desktop/booking.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#D2C7B8"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "h2SRm",
+              "name": "dashCell",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "usz05",
+                  "fill": "#171717",
+                  "content": "Dashboard",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "P9the",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 263,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "screenshots-desktop/Bp5aU.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#D2C7B8"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "yclx2",
+          "name": "rowB",
+          "width": "fill_container",
+          "gap": 20,
+          "children": [
+            {
+              "type": "frame",
+              "id": "AOpnd",
+              "name": "loginCell",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "OQOR3",
+                  "fill": "#171717",
+                  "content": "Login",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "aqyb1",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 263,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "screenshots-desktop/login.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#D2C7B8"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "VWlpJ",
+              "name": "registerCell",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "3Etq1",
+                  "fill": "#171717",
+                  "content": "Register",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "jHm5A",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 263,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "screenshots-desktop/register.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#D2C7B8"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "eVtvL",
+              "name": "forgotCell",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "elBjK",
+                  "fill": "#171717",
+                  "content": "Forgot Password",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "HLqbb",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 263,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "screenshots-desktop/forgot-password.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#D2C7B8"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "M9Bfz",
+              "name": "resetCell",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "WHBTv",
+                  "fill": "#171717",
+                  "content": "Reset Password",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "uWAtu",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 263,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "screenshots-desktop/reset-password.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#D2C7B8"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "vdI4j",
+          "name": "rowC",
+          "width": "fill_container",
+          "gap": 20,
+          "children": [
+            {
+              "type": "frame",
+              "id": "64dc3",
+              "name": "vipCell",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "WVC35",
+                  "fill": "#171717",
+                  "content": "VIP Portal",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "SpnY0",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 560,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "screenshots-desktop/L2UW7.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#D2C7B8"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "9LfAi",
+              "name": "adminCell",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ez0K6",
+                  "fill": "#171717",
+                  "content": "Admin Panel",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "GF7El",
+                  "name": "adminThumb",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 560,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "screenshots-desktop/fDbCs.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 18,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#D2C7B8"
+                  },
+                  "layout": "none"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "OoRq5",
+      "x": 0,
+      "y": 1140,
+      "name": "Home Desktop",
+      "width": 1480,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "t6feI",
+          "fill": "#181818",
+          "content": "Home / Laptop Viewport",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "naFLf",
+          "name": "heroReal",
+          "clip": true,
+          "width": 1440,
+          "height": 900,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "screenshots-desktop/home-laptop-viewport.png",
+            "mode": "fill"
+          },
+          "cornerRadius": 22,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#CFC3B3"
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Ana99",
+      "x": 1700,
+      "y": 1140,
+      "name": "Room Detail Desktop",
+      "width": 1480,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "KBWJt",
+          "fill": "#181818",
+          "content": "Room Detail / Desktop",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "LKDP5",
+          "clip": true,
+          "width": 1440,
+          "height": 900,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "screenshots-desktop/room-detail.png",
+            "mode": "fill"
+          },
+          "cornerRadius": 22,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#CFC3B3"
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "X0oq6",
+      "x": 0,
+      "y": 2360,
+      "name": "Booking Desktop",
+      "width": 1480,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "MMyOk",
+          "fill": "#181818",
+          "content": "Booking / Desktop",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "XI8NV",
+          "clip": true,
+          "width": 1440,
+          "height": 900,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "screenshots-desktop/booking.png",
+            "mode": "fill"
+          },
+          "cornerRadius": 22,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#CFC3B3"
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "0OFVk",
+      "x": 1700,
+      "y": 2360,
+      "name": "Login Desktop",
+      "width": 1480,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "PTVbd",
+          "fill": "#181818",
+          "content": "Login / Desktop",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "4bzUG",
+          "clip": true,
+          "width": 1440,
+          "height": 900,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "screenshots-desktop/login.png",
+            "mode": "fill"
+          },
+          "cornerRadius": 22,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#CFC3B3"
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "gFWBa",
+      "x": 0,
+      "y": 3580,
+      "name": "Register Desktop",
+      "width": 1480,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "iIAuh",
+          "fill": "#181818",
+          "content": "Register / Desktop",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "bklfn",
+          "clip": true,
+          "width": 1440,
+          "height": 900,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "screenshots-desktop/register.png",
+            "mode": "fill"
+          },
+          "cornerRadius": 22,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#CFC3B3"
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "c2zJC",
+      "x": 1700,
+      "y": 3580,
+      "name": "Forgot Password Desktop",
+      "width": 1480,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "DRiT5",
+          "fill": "#181818",
+          "content": "Forgot Password / Desktop",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "2AwoK",
+          "clip": true,
+          "width": 1440,
+          "height": 900,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "screenshots-desktop/forgot-password.png",
+            "mode": "fill"
+          },
+          "cornerRadius": 22,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#CFC3B3"
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "PC64g",
+      "x": 0,
+      "y": 4800,
+      "name": "Reset Password Desktop",
+      "width": 1480,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "LQk0M",
+          "fill": "#181818",
+          "content": "Reset Password / Desktop",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "eLZ47",
+          "clip": true,
+          "width": 1440,
+          "height": 900,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "screenshots-desktop/reset-password.png",
+            "mode": "fill"
+          },
+          "cornerRadius": 22,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#CFC3B3"
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "XU4PN",
+      "x": 1700,
+      "y": 4800,
+      "name": "VIP Desktop",
+      "width": 1480,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "WSzP3",
+          "fill": "#181818",
+          "content": "VIP Portal / Desktop (reconstructed from code)",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "L2UW7",
+          "name": "vipCanvas",
+          "clip": true,
+          "width": 1440,
+          "height": 900,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 180,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#0E1219",
+                "position": 0
+              },
+              {
+                "color": "#141923",
+                "position": 1
+              }
+            ]
+          },
+          "cornerRadius": 22,
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "AyAPC",
+              "name": "vipNav",
+              "width": "fill_container",
+              "height": 82,
+              "fill": "#0F141B",
+              "cornerRadius": 999,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#242B38"
+              },
+              "padding": 16,
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "wuL8B",
+                  "name": "vipLogo",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "UMOM7",
+                      "fill": "#F3F0E8",
+                      "content": "AURA",
+                      "fontFamily": "Playfair Display",
+                      "fontSize": 26,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "8Lle7",
+                      "fill": "#8D939E",
+                      "content": "LUXURY STAY IN JAKARTA",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "S9BYN",
+                  "name": "vipCenter",
+                  "fill": "#151C26",
+                  "cornerRadius": 999,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#242B38"
+                  },
+                  "gap": 6,
+                  "padding": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "YEfAr",
+                      "fill": "#B4BAC4",
+                      "content": "HOME",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "cbuWi",
+                      "fill": "#8E95A0",
+                      "content": "FACILITIES",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "8fM1v",
+                      "fill": "#8E95A0",
+                      "content": "SUITES",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "HFAkE",
+                  "name": "vipRight",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Z0wLm",
+                      "name": "vipPortal",
+                      "width": 142,
+                      "height": 40,
+                      "fill": "#141A23",
+                      "cornerRadius": 999,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#242B38"
+                      },
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "zDpsJ",
+                          "fill": "#D6DBE2",
+                          "content": "GUEST PORTAL",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "QUYod",
+                      "fill": "#808792",
+                      "content": "LOGOUT",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Zfkzc",
+              "name": "vipBody",
+              "width": "fill_container",
+              "height": "fill_container",
+              "gap": 36,
+              "padding": 36,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "dXUQ1",
+                  "name": "vipSidebar",
+                  "width": 280,
+                  "height": "fill_container",
+                  "layout": "vertical",
+                  "gap": 24,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "a8ZDP",
+                      "name": "avatarRow",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "VY5Tl",
+                          "fill": "#C69B49",
+                          "width": 72,
+                          "height": 72
+                        },
+                        {
+                          "type": "text",
+                          "id": "2C6ei",
+                          "fill": "#F4F0E8",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Alya Prameswari\nVIP Member",
+                          "lineHeight": 1.45,
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "wz9MX",
+                      "width": "fill_container",
+                      "height": 48,
+                      "fill": "#C69B49",
+                      "cornerRadius": 14,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Fjatg",
+                          "name": "sidebarLabel",
+                          "fill": "#11161D",
+                          "content": "Preferences",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "95yV8",
+                  "name": "vipContent",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "layout": "vertical",
+                  "gap": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "P16PO",
+                      "fill": "#F4F0E8",
+                      "content": "Suite Preferences",
+                      "fontFamily": "Inter",
+                      "fontSize": 42,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "TuUh9",
+                      "fill": "#B7B2A9",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Customize your environment before arrival. The Royal Butler will prepare climate, aromatherapy, pillows, and arrival drink to your preference.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "yZShB",
+                      "name": "row1",
+                      "width": "fill_container",
+                      "gap": 24,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Fh47q",
+                          "name": "card1",
+                          "width": "fill_container",
+                          "height": 220,
+                          "fill": "#1A202B",
+                          "cornerRadius": 22,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#2A3342"
+                          },
+                          "layout": "vertical",
+                          "gap": 18,
+                          "padding": 24,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "FhLsl",
+                              "name": "climateTitle",
+                              "fill": "#F2EEE7",
+                              "content": "Climate",
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "6fshf",
+                              "width": "fill_container",
+                              "height": 58,
+                              "fill": "#10141C",
+                              "cornerRadius": 999,
+                              "stroke": {
+                                "thickness": 1,
+                                "fill": "#343D4D"
+                              },
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "PNAQY",
+                                  "fill": "#F2EEE7",
+                                  "content": "-            22°C            +",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 16,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "7ffQg",
+                              "fill": "#9FA7B4",
+                              "content": "22°C / Adjust before arrival",
+                              "lineHeight": 1.4,
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "GN1aU",
+                          "name": "card2",
+                          "width": "fill_container",
+                          "height": 220,
+                          "fill": "#1A202B",
+                          "cornerRadius": 22,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#2A3342"
+                          },
+                          "layout": "vertical",
+                          "gap": 18,
+                          "padding": 24,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "DWDG0",
+                              "name": "aromaTitle",
+                              "fill": "#F2EEE7",
+                              "content": "Aromatherapy",
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "FoODJ",
+                              "width": "fill_container",
+                              "height": 74,
+                              "fill": "#10141C",
+                              "cornerRadius": 18,
+                              "stroke": {
+                                "thickness": 1,
+                                "fill": "#343D4D"
+                              },
+                              "padding": [
+                                0,
+                                18
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "BO8T9",
+                                  "fill": "#D9D4CB",
+                                  "content": "Select aroma ▾",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 15,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "1EtLA",
+                              "fill": "#9FA7B4",
+                              "content": "Sandalwood & Vanilla",
+                              "lineHeight": 1.4,
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "dvRdY",
+                      "name": "row2",
+                      "width": "fill_container",
+                      "gap": 24,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "PjhZu",
+                          "name": "card3",
+                          "width": "fill_container",
+                          "height": 220,
+                          "fill": "#1A202B",
+                          "cornerRadius": 22,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#2A3342"
+                          },
+                          "layout": "vertical",
+                          "gap": 18,
+                          "padding": 24,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "AgeJP",
+                              "name": "pillowTitle",
+                              "fill": "#F2EEE7",
+                              "content": "Pillow Menu",
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "DAHwX",
+                              "width": "fill_container",
+                              "height": 74,
+                              "fill": "#10141C",
+                              "cornerRadius": 18,
+                              "stroke": {
+                                "thickness": 1,
+                                "fill": "#343D4D"
+                              },
+                              "padding": [
+                                0,
+                                18
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "DYzQZ",
+                                  "fill": "#D9D4CB",
+                                  "content": "Select pillow ▾",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 15,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "WATlU",
+                              "fill": "#9FA7B4",
+                              "content": "Goose Down (Soft)",
+                              "lineHeight": 1.4,
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "f1JVN",
+                          "name": "card4",
+                          "width": "fill_container",
+                          "height": 220,
+                          "fill": "#1A202B",
+                          "cornerRadius": 22,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#2A3342"
+                          },
+                          "layout": "vertical",
+                          "gap": 18,
+                          "padding": 24,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "weItl",
+                              "name": "drinkTitle",
+                              "fill": "#F2EEE7",
+                              "content": "Arrival Drink",
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "7rkof",
+                              "width": "fill_container",
+                              "height": 74,
+                              "fill": "#10141C",
+                              "cornerRadius": 18,
+                              "stroke": {
+                                "thickness": 1,
+                                "fill": "#343D4D"
+                              },
+                              "padding": [
+                                0,
+                                18
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "1wP54",
+                                  "fill": "#D9D4CB",
+                                  "content": "Select drink ▾",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 15,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "INk5B",
+                              "fill": "#9FA7B4",
+                              "content": "Dom Pérignon Vintage",
+                              "lineHeight": 1.4,
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "zsgk2",
+                      "name": "saveRow",
+                      "width": "fill_container",
+                      "height": 56,
+                      "justifyContent": "end",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "H1iTF",
+                          "name": "saveBtn",
+                          "width": 240,
+                          "height": 56,
+                          "fill": "#C69B49",
+                          "cornerRadius": 16,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "DX2cp",
+                              "fill": "#11161D",
+                              "content": "Save Preferences",
+                              "fontFamily": "Inter",
+                              "fontSize": 15,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "OsYmv",
+      "x": 0,
+      "y": 6020,
+      "name": "Dashboard Desktop",
+      "width": 1480,
+      "height": 1273,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "XH0TF",
+          "fill": "#181818",
+          "content": "Dashboard / Desktop (reconstructed from code)",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "Bp5aU",
+          "layoutPosition": "absolute",
+          "x": 20,
+          "y": 61,
+          "name": "dashCanvas",
+          "clip": true,
+          "width": 1440,
+          "height": 1192,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 180,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#0C1118",
+                "position": 0
+              },
+              {
+                "color": "#161D28",
+                "position": 1
+              }
+            ]
+          },
+          "cornerRadius": 22,
+          "layout": "vertical",
+          "gap": 24,
+          "padding": 32,
+          "children": [
+            {
+              "type": "frame",
+              "id": "iqXwk",
+              "name": "dashNav",
+              "width": "fill_container",
+              "height": 82,
+              "fill": "#0F141B",
+              "cornerRadius": 999,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#242B38"
+              },
+              "padding": 16,
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ZKoQb",
+                  "name": "dashLogo",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "dz5rB",
+                      "fill": "#F3F0E8",
+                      "content": "AURA",
+                      "fontFamily": "Playfair Display",
+                      "fontSize": 26,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "0DY5R",
+                      "fill": "#8D939E",
+                      "content": "LUXURY STAY IN JAKARTA",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "xNqoy",
+                  "name": "dashCenter",
+                  "fill": "#151C26",
+                  "cornerRadius": 999,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#242B38"
+                  },
+                  "gap": 6,
+                  "padding": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ISi9X",
+                      "fill": "#B4BAC4",
+                      "content": "HOME",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "EtNcu",
+                      "fill": "#8E95A0",
+                      "content": "FACILITIES",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "co25b",
+                      "fill": "#8E95A0",
+                      "content": "SUITES",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "0Co2t",
+                  "name": "dashRight",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "2Zvag",
+                      "name": "dashPortal",
+                      "width": 142,
+                      "height": 40,
+                      "fill": "#141A23",
+                      "cornerRadius": 999,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#242B38"
+                      },
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "cHuNF",
+                          "fill": "#D6DBE2",
+                          "content": "GUEST PORTAL",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "SgKhr",
+                      "fill": "#808792",
+                      "content": "LOGOUT",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "VBue2",
+              "name": "topRow",
+              "width": "fill_container",
+              "height": 260,
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "qXvrm",
+                  "name": "hero",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": "#171E29",
+                  "cornerRadius": 28,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Hujko",
+                      "fill": "#F3F0E8",
+                      "content": "Your Reservation Portfolio",
+                      "fontFamily": "Inter",
+                      "fontSize": 40,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "kb1Qi",
+                      "fill": "#B8B2A8",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Track reservation status, payment progress, and voucher access from one polished view built on your booking data.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "GQpOj",
+                      "width": 200,
+                      "height": 46,
+                      "fill": "#C69B49",
+                      "cornerRadius": 14,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "dA6EN",
+                          "fill": "#11161D",
+                          "content": "Create Reservation",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "QxirM",
+                      "name": "heroBadge",
+                      "width": 190,
+                      "height": 34,
+                      "fill": "#C69B49",
+                      "cornerRadius": 999,
+                      "padding": 12,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Uh0uE",
+                          "fill": "#11161D",
+                          "content": "Reservation Overview",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "zQaxp",
+                  "name": "chart",
+                  "width": 360,
+                  "height": "fill_container",
+                  "fill": "#151B25",
+                  "cornerRadius": 28,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 14,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "NXbak",
+                      "fill": "#F3F0E8",
+                      "content": "Monthly revenue trajectory",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "OusO9",
+                      "name": "barRow",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "gap": 10,
+                      "alignItems": "end",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "fBMSE",
+                          "width": "fill_container",
+                          "height": 72,
+                          "fill": "#6A5330",
+                          "cornerRadius": [
+                            14,
+                            14,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "pJOhT",
+                          "width": "fill_container",
+                          "height": 104,
+                          "fill": "#846637",
+                          "cornerRadius": [
+                            14,
+                            14,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "YbiVq",
+                          "width": "fill_container",
+                          "height": 128,
+                          "fill": "#9A7640",
+                          "cornerRadius": [
+                            14,
+                            14,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "nGUzf",
+                          "width": "fill_container",
+                          "height": 154,
+                          "fill": "#B88B45",
+                          "cornerRadius": [
+                            14,
+                            14,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Z7ewc",
+                          "width": "fill_container",
+                          "height": 176,
+                          "fill": "#C69B49",
+                          "cornerRadius": [
+                            14,
+                            14,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "cPMnn",
+                          "width": "fill_container",
+                          "height": 138,
+                          "fill": "#9A7640",
+                          "cornerRadius": [
+                            14,
+                            14,
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Tr06d",
+              "name": "metrics",
+              "width": "fill_container",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "C0r1s",
+                  "width": "fill_container",
+                  "height": 138,
+                  "fill": "#151B25",
+                  "cornerRadius": 22,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 18,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "JGleO",
+                      "fill": "#A8B0BD",
+                      "content": "Revenue captured",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "0Yr97",
+                      "fill": "#F3F0E8",
+                      "content": "IDR 128M",
+                      "fontFamily": "Inter",
+                      "fontSize": 30,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "bDiv3",
+                      "fill": "#7F8A99",
+                      "content": "Average booking value improved this month",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "nfLOh",
+                  "width": "fill_container",
+                  "height": 138,
+                  "fill": "#151B25",
+                  "cornerRadius": 22,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 18,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "EvUYr",
+                      "fill": "#A8B0BD",
+                      "content": "Conversion quality",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "3CJUw",
+                      "fill": "#F3F0E8",
+                      "content": "76%",
+                      "fontFamily": "Inter",
+                      "fontSize": 30,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "74cs7",
+                      "fill": "#7F8A99",
+                      "content": "Settled reservations vs total analytic scope",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ZrEWN",
+                  "width": "fill_container",
+                  "height": 138,
+                  "fill": "#151B25",
+                  "cornerRadius": 22,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 18,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "x1PYa",
+                      "fill": "#A8B0BD",
+                      "content": "Live operations",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "xwMiX",
+                      "fill": "#F3F0E8",
+                      "content": "14 active",
+                      "fontFamily": "Inter",
+                      "fontSize": 30,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "WKyKb",
+                      "fill": "#7F8A99",
+                      "content": "Guests in-house and arrivals inside 7 days",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "x3FR5",
+                  "width": "fill_container",
+                  "height": 138,
+                  "fill": "#151B25",
+                  "cornerRadius": 22,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 18,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "57i3G",
+                      "fill": "#A8B0BD",
+                      "content": "Revenue at risk",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "k1UTN",
+                      "fill": "#F3F0E8",
+                      "content": "6 unpaid",
+                      "fontFamily": "Inter",
+                      "fontSize": 30,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "WcFYU",
+                      "fill": "#7F8A99",
+                      "content": "Future revenue still waiting on settlement",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "F0aDq",
+              "name": "lower",
+              "width": "fill_container",
+              "height": "fill_container",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "gsMmn",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": "#151B25",
+                  "cornerRadius": 26,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 18,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Kj44T",
+                      "fill": "#F3F0E8",
+                      "content": "Operational queue with live actions",
+                      "fontFamily": "Inter",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "DARoC",
+                      "name": "tabs",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "phFMO",
+                          "width": 96,
+                          "height": 36,
+                          "fill": "#C69B49",
+                          "cornerRadius": 999,
+                          "padding": 10,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "eTQbs",
+                              "fill": "#11161D",
+                              "content": "Focus",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "6xbeB",
+                          "width": 96,
+                          "height": 36,
+                          "fill": "#222A37",
+                          "cornerRadius": 999,
+                          "padding": 10,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "zEIru",
+                              "fill": "#C9C4BA",
+                              "content": "Arrivals",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "032Yc",
+                          "width": 158,
+                          "height": 36,
+                          "fill": "#222A37",
+                          "cornerRadius": 999,
+                          "padding": 10,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "gVrtF",
+                              "fill": "#C9C4BA",
+                              "content": "All Reservations",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "oYUYf",
+                      "name": "searchBar",
+                      "width": "fill_container",
+                      "height": 44,
+                      "fill": "#0F141D",
+                      "cornerRadius": 14,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#2A3341"
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "W8WTJ",
+                          "fill": "#707B89",
+                          "content": "Search reservation, guest, room, status...",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "8tGZC",
+                          "fill": "#ffffff",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "D4euY",
+                      "name": "row1",
+                      "width": "fill_container",
+                      "height": 82,
+                      "fill": "#0F141D",
+                      "cornerRadius": 18,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "09zgm",
+                          "fill": "#F2EEE7",
+                          "content": "Executive Suite • #AUR-1042 • PAID",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "xfHk0",
+                          "fill": "#7F8A99",
+                          "content": "Check-in 12 Apr • 3 nights • IDR 18.4M",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "xu81z",
+                      "name": "row2",
+                      "width": "fill_container",
+                      "height": 82,
+                      "fill": "#0F141D",
+                      "cornerRadius": 18,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ksNoV",
+                          "fill": "#F2EEE7",
+                          "content": "Bundaran Residence • #AUR-1039 • CHECKED IN",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "2rq24",
+                          "fill": "#7F8A99",
+                          "content": "In-house stay • voucher ready • IDR 22.1M",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "opRPh",
+                      "name": "row3",
+                      "width": "fill_container",
+                      "height": 82,
+                      "fill": "#0F141D",
+                      "cornerRadius": 18,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "3fzds",
+                          "fill": "#F2EEE7",
+                          "content": "Skyline Villa • #AUR-1031 • UNPAID",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "um6Be",
+                          "fill": "#7F8A99",
+                          "content": "Pending payment follow-up • IDR 11.8M",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "cwUwi",
+                  "name": "side",
+                  "width": 360,
+                  "height": "fill_container",
+                  "layout": "vertical",
+                  "gap": 24,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "wOSYK",
+                      "width": "fill_container",
+                      "height": 212,
+                      "fill": "#151B25",
+                      "cornerRadius": 24,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#2A3341"
+                      },
+                      "layout": "vertical",
+                      "gap": 12,
+                      "padding": 20,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "azrRo",
+                          "fill": "#F3F0E8",
+                          "content": "Status mix",
+                          "fontFamily": "Inter",
+                          "fontSize": 22,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "QNtVD",
+                          "fill": "#A8B0BD",
+                          "content": "Paid / Checked In",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "zxTnj",
+                          "width": "fill_container",
+                          "height": 10,
+                          "fill": "#0F141D",
+                          "cornerRadius": 999,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#232B38"
+                          },
+                          "layout": "none",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "TvCmn",
+                              "x": 0,
+                              "y": 0,
+                              "width": 248,
+                              "height": 10,
+                              "fill": "#C69B49",
+                              "cornerRadius": 999
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "kOpNn",
+                          "fill": "#A8B0BD",
+                          "content": "Unpaid / At risk",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "rHXYb",
+                          "width": "fill_container",
+                          "height": 10,
+                          "fill": "#0F141D",
+                          "cornerRadius": 999,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#232B38"
+                          },
+                          "layout": "none",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "TDJ32",
+                              "x": 0,
+                              "y": 0,
+                              "width": 132,
+                              "height": 10,
+                              "fill": "#8A5C32",
+                              "cornerRadius": 999
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "uMUCk",
+                          "fill": "#A8B0BD",
+                          "content": "Expired / Refunded",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "sh5wx",
+                          "width": "fill_container",
+                          "height": 10,
+                          "fill": "#0F141D",
+                          "cornerRadius": 999,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#232B38"
+                          },
+                          "layout": "none",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "AISnd",
+                              "x": 0,
+                              "y": 0,
+                              "width": 92,
+                              "height": 10,
+                              "fill": "#7A3038",
+                              "cornerRadius": 999
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "gsKQu",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "fill": "#151B25",
+                      "cornerRadius": 24,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#2A3341"
+                      },
+                      "layout": "vertical",
+                      "gap": 12,
+                      "padding": 18,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "OcpXR",
+                          "fill": "#F3F0E8",
+                          "content": "Revenue composition",
+                          "fontFamily": "Inter",
+                          "fontSize": 22,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "tPThb",
+                          "name": "comp1",
+                          "width": "fill_container",
+                          "height": 82,
+                          "fill": "#10241E",
+                          "cornerRadius": 18,
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": 14,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "tXyS6",
+                              "fill": "#DFF7E7",
+                              "content": "Checked out • IDR 64M",
+                              "fontFamily": "Inter",
+                              "fontSize": 16,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "Pmj1O",
+                              "fill": "#7BBE95",
+                              "content": "Settled and completed stays",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "DAiPB",
+                          "name": "comp2",
+                          "width": "fill_container",
+                          "height": 82,
+                          "fill": "#10202A",
+                          "cornerRadius": 18,
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": 14,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "1M4iY",
+                              "fill": "#DCEFFE",
+                              "content": "In-house • IDR 28M",
+                              "fontFamily": "Inter",
+                              "fontSize": 16,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "O3aYG",
+                              "fill": "#82B8D9",
+                              "content": "Currently checked in",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "OIgR0",
+                          "name": "comp3",
+                          "width": "fill_container",
+                          "height": 82,
+                          "fill": "#2A2012",
+                          "cornerRadius": 18,
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": 14,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "3l8Sx",
+                              "fill": "#F7E7C6",
+                              "content": "Upcoming paid • IDR 36M",
+                              "fontFamily": "Inter",
+                              "fontSize": 16,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "s6ZXB",
+                              "fill": "#D7B26C",
+                              "content": "Paid reservations not yet consumed",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "uw0vu",
+      "x": 1700,
+      "y": 6020,
+      "name": "Admin Desktop",
+      "width": 1480,
+      "height": 1129,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "Ydefb",
+          "fill": "#181818",
+          "content": "Admin Panel / Desktop (reconstructed from code)",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "fDbCs",
+          "name": "adminCanvas",
+          "clip": true,
+          "width": 1440,
+          "height": 1048,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 180,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#090D14",
+                "position": 0
+              },
+              {
+                "color": "#131A25",
+                "position": 1
+              }
+            ]
+          },
+          "cornerRadius": 22,
+          "layout": "vertical",
+          "gap": 24,
+          "padding": 32,
+          "children": [
+            {
+              "type": "frame",
+              "id": "kAUrd",
+              "name": "adminNav",
+              "width": "fill_container",
+              "height": 82,
+              "fill": "#0F141B",
+              "cornerRadius": 999,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#242B38"
+              },
+              "padding": 16,
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "BiNDz",
+                  "name": "adminLogo",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "kzqJg",
+                      "fill": "#F3F0E8",
+                      "content": "AURA",
+                      "fontFamily": "Playfair Display",
+                      "fontSize": 26,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "C96kf",
+                      "fill": "#8D939E",
+                      "content": "LUXURY STAY IN JAKARTA",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "4n5VS",
+                  "name": "adminCenter",
+                  "fill": "#151C26",
+                  "cornerRadius": 999,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#242B38"
+                  },
+                  "gap": 6,
+                  "padding": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "SEUNg",
+                      "fill": "#B4BAC4",
+                      "content": "HOME",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "aisva",
+                      "fill": "#8E95A0",
+                      "content": "FACILITIES",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "xRBvl",
+                      "fill": "#8E95A0",
+                      "content": "SUITES",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "GAmY2",
+                  "name": "adminRight",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "LL3SK",
+                      "name": "adminPortal",
+                      "width": 136,
+                      "height": 40,
+                      "fill": "#141A23",
+                      "cornerRadius": 999,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#242B38"
+                      },
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "wiJjP",
+                          "fill": "#D6DBE2",
+                          "content": "ADMIN PANEL",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "x3HNo",
+                      "fill": "#808792",
+                      "content": "LOGOUT",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "O5JC4",
+              "name": "aTop",
+              "width": "fill_container",
+              "height": 260,
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "9CU4d",
+                  "name": "aHero",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": "#171E29",
+                  "cornerRadius": 28,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "0GmUE",
+                      "fill": "#F3F0E8",
+                      "content": "Demand, Revenue & Conversion Signal",
+                      "fontFamily": "Inter",
+                      "fontSize": 38,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "fQtsM",
+                      "fill": "#B8B2A8",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Executive-grade view of booking demand, realized revenue, conversion quality, room inventory, and operational pressure across the current booking funnel.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "fSnoS",
+                      "name": "aButtonRow",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "64fpO",
+                          "width": 180,
+                          "height": 44,
+                          "fill": "#202734",
+                          "cornerRadius": 14,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "DVnWO",
+                              "fill": "#D3D8E1",
+                              "content": "Operations Dashboard",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "dKBbE",
+                          "width": 170,
+                          "height": 44,
+                          "fill": "#C69B49",
+                          "cornerRadius": 14,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "yRVo0",
+                              "fill": "#11161D",
+                              "content": "Create Booking",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "PhPRC",
+                      "name": "adminBadge",
+                      "width": 190,
+                      "height": 34,
+                      "fill": "#C69B49",
+                      "cornerRadius": 999,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "uHUJH",
+                          "fill": "#11161D",
+                          "content": "Administrator Access",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "n9EDJ",
+                  "name": "aChart",
+                  "width": 380,
+                  "height": "fill_container",
+                  "fill": "#151B25",
+                  "cornerRadius": 28,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 14,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "F4RVF",
+                      "fill": "#F3F0E8",
+                      "content": "Demand vs realized trend",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "yTKpP",
+                      "name": "aBars",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "gap": 10,
+                      "alignItems": "end",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "IYusn",
+                          "width": "fill_container",
+                          "height": 78,
+                          "fill": "#273242",
+                          "cornerRadius": [
+                            14,
+                            14,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "fBVkg",
+                          "width": "fill_container",
+                          "height": 110,
+                          "fill": "#394862",
+                          "cornerRadius": [
+                            14,
+                            14,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "oF5Gk",
+                          "width": "fill_container",
+                          "height": 142,
+                          "fill": "#4C5F80",
+                          "cornerRadius": [
+                            14,
+                            14,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Z9GBh",
+                          "width": "fill_container",
+                          "height": 174,
+                          "fill": "#8F6E3D",
+                          "cornerRadius": [
+                            14,
+                            14,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "4eHkA",
+                          "width": "fill_container",
+                          "height": 176,
+                          "fill": "#C69B49",
+                          "cornerRadius": [
+                            14,
+                            14,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "IMq9I",
+                          "width": "fill_container",
+                          "height": 152,
+                          "fill": "#A37C42",
+                          "cornerRadius": [
+                            14,
+                            14,
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "2Hk8z",
+              "name": "aMetrics",
+              "width": "fill_container",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ohB2A",
+                  "width": "fill_container",
+                  "height": 138,
+                  "fill": "#151B25",
+                  "cornerRadius": 22,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 18,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "cA4ma",
+                      "fill": "#A8B0BD",
+                      "content": "Gross booking demand",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "sT51e",
+                      "fill": "#F3F0E8",
+                      "content": "IDR 186M",
+                      "fontFamily": "Inter",
+                      "fontSize": 30,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "DXhqK",
+                      "fill": "#7F8A99",
+                      "content": "Average ticket is trending up with stronger suite mix",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "iSdhH",
+                  "width": "fill_container",
+                  "height": 138,
+                  "fill": "#151B25",
+                  "cornerRadius": 22,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 18,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "CrsV4",
+                      "fill": "#A8B0BD",
+                      "content": "Realized revenue",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "TebIS",
+                      "fill": "#F3F0E8",
+                      "content": "IDR 128M",
+                      "fontFamily": "Inter",
+                      "fontSize": 30,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "0wTb9",
+                      "fill": "#7F8A99",
+                      "content": "Revenue realized from paid and completed outcomes",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "yp9EI",
+                  "width": "fill_container",
+                  "height": 138,
+                  "fill": "#151B25",
+                  "cornerRadius": 22,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 18,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "KJhws",
+                      "fill": "#A8B0BD",
+                      "content": "Conversion quality",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "CmejG",
+                      "fill": "#F3F0E8",
+                      "content": "69%",
+                      "fontFamily": "Inter",
+                      "fontSize": 30,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "mFLiB",
+                      "fill": "#7F8A99",
+                      "content": "Share of bookings converted into settled states",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "1G9o0",
+                  "width": "fill_container",
+                  "height": 138,
+                  "fill": "#151B25",
+                  "cornerRadius": 22,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 18,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "pAUmF",
+                      "fill": "#A8B0BD",
+                      "content": "Revenue leakage",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "higYN",
+                      "fill": "#F3F0E8",
+                      "content": "IDR 22M",
+                      "fontFamily": "Inter",
+                      "fontSize": 30,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "golFh",
+                      "fill": "#7F8A99",
+                      "content": "Expired and refunded value suppressing conversion",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "HY2KR",
+              "name": "aLower",
+              "width": "fill_container",
+              "height": "fill_container",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "dEs1u",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": "#151B25",
+                  "cornerRadius": 26,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 18,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "GER7u",
+                      "fill": "#F3F0E8",
+                      "content": "Recent reservations",
+                      "fontFamily": "Inter",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "yrXsc",
+                      "name": "workspaceTabs",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "6Opcj",
+                          "width": 100,
+                          "height": 36,
+                          "fill": "#C69B49",
+                          "cornerRadius": 999,
+                          "padding": 10,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "JPfs0",
+                              "fill": "#11161D",
+                              "content": "Overview",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "7YngR",
+                          "width": 88,
+                          "height": 36,
+                          "fill": "#222A37",
+                          "cornerRadius": 999,
+                          "padding": 10,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "O9fbK",
+                              "fill": "#C9C4BA",
+                              "content": "Queue",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "sgl8J",
+                          "width": 112,
+                          "height": 36,
+                          "fill": "#222A37",
+                          "cornerRadius": 999,
+                          "padding": 10,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "6KwQO",
+                              "fill": "#C9C4BA",
+                              "content": "Audit Logs",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "ok47V",
+                          "width": 92,
+                          "height": 36,
+                          "fill": "#222A37",
+                          "cornerRadius": 999,
+                          "padding": 10,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "rtXXj",
+                              "fill": "#C9C4BA",
+                              "content": "Team",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "tmlf2",
+                          "width": 96,
+                          "height": 36,
+                          "fill": "#222A37",
+                          "cornerRadius": 999,
+                          "padding": 10,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "1zudw",
+                              "fill": "#C9C4BA",
+                              "content": "Rooms",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "JL2OZ",
+                      "name": "adminRow1",
+                      "width": "fill_container",
+                      "height": 82,
+                      "fill": "#0F141D",
+                      "cornerRadius": 18,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "jp5qc",
+                          "fill": "#F2EEE7",
+                          "content": "#AUR-1042 • Alya Prameswari • Executive Suite • PAID",
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "zjTBM",
+                          "fill": "#7F8A99",
+                          "content": "Check-in 12 Apr • IDR 18.4M",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "1G9hq",
+                      "name": "adminRow2",
+                      "width": "fill_container",
+                      "height": 82,
+                      "fill": "#0F141D",
+                      "cornerRadius": 18,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "R9jAr",
+                          "fill": "#F2EEE7",
+                          "content": "#AUR-1041 • Daniel Harsa • Skyline Villa • CHECKED IN",
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "4PJ9h",
+                          "fill": "#7F8A99",
+                          "content": "Arrived today • suite assigned • IDR 22.1M",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Ju8oH",
+                      "name": "adminRow3",
+                      "width": "fill_container",
+                      "height": 82,
+                      "fill": "#0F141D",
+                      "cornerRadius": 18,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Jjhk0",
+                          "fill": "#F2EEE7",
+                          "content": "#AUR-1038 • Maya Putri • Bundaran Suite • UNPAID",
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "eJ7EI",
+                          "fill": "#7F8A99",
+                          "content": "Awaiting payment • IDR 11.8M",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "6e0ID",
+                  "width": 360,
+                  "height": "fill_container",
+                  "fill": "#151B25",
+                  "cornerRadius": 26,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 18,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Tytgn",
+                      "fill": "#F3F0E8",
+                      "content": "Risk snapshot",
+                      "fontFamily": "Inter",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "6C167",
+                      "name": "risk1",
+                      "width": "fill_container",
+                      "height": 128,
+                      "fill": "#2A2012",
+                      "cornerRadius": 20,
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Fya2e",
+                          "fill": "#F5E4BD",
+                          "content": "Pending payments • 6",
+                          "fontFamily": "Inter",
+                          "fontSize": 18,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "AwOi7",
+                          "fill": "#D5BE86",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Reservations still convertible if payment is resumed quickly.",
+                          "lineHeight": 1.35,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "bYfH9",
+                      "name": "risk2",
+                      "width": "fill_container",
+                      "height": 172,
+                      "fill": "#2C1719",
+                      "cornerRadius": 20,
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ojvxT",
+                          "fill": "#F3D5D8",
+                          "content": "Expired or refunded • IDR 22M",
+                          "fontFamily": "Inter",
+                          "fontSize": 18,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "UqAn5",
+                          "fill": "#D8A5AB",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Highest leakage month: Mar 25. Prioritize failed payment recovery and refund review.",
+                          "lineHeight": 1.35,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "LECWi",
+      "x": 0,
+      "y": 7360,
+      "name": "Dashboard Extended Desktop",
+      "width": 1480,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "9IdB2",
+          "fill": "#181818",
+          "content": "Dashboard / Desktop - Extended",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "71rNG",
+          "name": "dashExtendedCanvas",
+          "clip": true,
+          "width": 1440,
+          "height": 1680,
+          "fill": "#121823",
+          "cornerRadius": 22,
+          "layout": "vertical",
+          "gap": 24,
+          "padding": 32,
+          "children": [
+            {
+              "type": "frame",
+              "id": "IuZ9f",
+              "name": "dashHero",
+              "clip": true,
+              "width": "fill_container",
+              "height": 900,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "screenshots-desktop/Bp5aU.png",
+                "mode": "fill"
+              },
+              "cornerRadius": 22
+            },
+            {
+              "type": "frame",
+              "id": "iu02P",
+              "name": "dashInsight",
+              "width": "fill_container",
+              "height": 250,
+              "fill": "#151B25",
+              "cornerRadius": 26,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#2A3341"
+              },
+              "layout": "vertical",
+              "gap": 18,
+              "padding": 24,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "valBz",
+                  "fill": "#F3F0E8",
+                  "content": "What the current booking data is saying",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "frame",
+                  "id": "FJ52S",
+                  "name": "dashInsightRow",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "gap": 16,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "95hfy",
+                      "name": "insA",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "fill": "#0F141D",
+                      "cornerRadius": 22,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 10,
+                      "padding": 18,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "B0Hca",
+                          "fill": "#7F8A99",
+                          "content": "Peak month",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "sKA5y",
+                          "fill": "#F3F0E8",
+                          "content": "Apr 25",
+                          "fontFamily": "Inter",
+                          "fontSize": 24,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "LHAHn",
+                          "fill": "#A8B0BD",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "IDR 68M captured in the strongest month across the current horizon.",
+                          "lineHeight": 1.5,
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "bSYCd",
+                      "name": "insB",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "fill": "#0F141D",
+                      "cornerRadius": 22,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 10,
+                      "padding": 18,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "heQ84",
+                          "fill": "#7F8A99",
+                          "content": "Best performing room",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "gZTja",
+                          "fill": "#F3F0E8",
+                          "content": "Kempinski Signature Suite",
+                          "fontFamily": "Inter",
+                          "fontSize": 22,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "p6Ayt",
+                          "fill": "#A8B0BD",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "8 bookings contributing IDR 64M in settled revenue.",
+                          "lineHeight": 1.5,
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "bm7UT",
+                      "name": "insC",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "fill": "#0F141D",
+                      "cornerRadius": 22,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 10,
+                      "padding": 18,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "zpVK0",
+                          "fill": "#7F8A99",
+                          "content": "Attention required",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "0hOeW",
+                          "fill": "#F3F0E8",
+                          "content": "14 items",
+                          "fontFamily": "Inter",
+                          "fontSize": 24,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "27uD2",
+                          "fill": "#A8B0BD",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "6 payment follow-up, 3 arrivals today, and 5 guests currently in-house.",
+                          "lineHeight": 1.5,
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "4UFX3",
+              "name": "dashBottom",
+              "width": "fill_container",
+              "height": 340,
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Fvpk5",
+                  "name": "dashRooms",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": "#151B25",
+                  "cornerRadius": 26,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "XKdSs",
+                      "fill": "#F3F0E8",
+                      "content": "Top room performers",
+                      "fontFamily": "Inter",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "dsJ2X",
+                      "name": "roomRow1",
+                      "width": "fill_container",
+                      "height": 58,
+                      "fill": "#0F141D",
+                      "cornerRadius": 18,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "dMtkj",
+                          "fill": "#F2EEE7",
+                          "content": "Kempinski Signature Suite • Signature Suite • 8 bookings • IDR 64M",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "NMLhB",
+                      "name": "roomRow2",
+                      "width": "fill_container",
+                      "height": 58,
+                      "fill": "#0F141D",
+                      "cornerRadius": 18,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "bvweI",
+                          "fill": "#F2EEE7",
+                          "content": "Skyline Villa • Skyline Villa • 6 bookings • IDR 28M",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "gFGRy",
+                      "name": "roomRow3",
+                      "width": "fill_container",
+                      "height": 58,
+                      "fill": "#0F141D",
+                      "cornerRadius": 18,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "QcLNU",
+                          "fill": "#F2EEE7",
+                          "content": "Bundaran Residence • Executive Suite • 5 bookings • IDR 22M",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "hM8cg",
+                  "name": "dashPulse",
+                  "width": 360,
+                  "height": "fill_container",
+                  "fill": "#151B25",
+                  "cornerRadius": 26,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#2A3341"
+                  },
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "EiaEY",
+                      "fill": "#F3F0E8",
+                      "content": "Daily pulse",
+                      "fontFamily": "Inter",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "OOFIa",
+                      "name": "pulseA",
+                      "width": "fill_container",
+                      "height": 74,
+                      "fill": "#0F141D",
+                      "cornerRadius": 20,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "zazZn",
+                          "fill": "#F2EEE7",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Arrivals today • 3 guests need readiness before check-in.",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Dhwxr",
+                      "name": "pulseB",
+                      "width": "fill_container",
+                      "height": 74,
+                      "fill": "#0F141D",
+                      "cornerRadius": 20,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "HGjmi",
+                          "fill": "#F2EEE7",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Active in-house stays • 5 guests currently moving through operations.",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "GSAqx",
+                      "name": "pulseC",
+                      "width": "fill_container",
+                      "height": 74,
+                      "fill": "#0F141D",
+                      "cornerRadius": 20,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "h4AKH",
+                          "fill": "#F2EEE7",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Closed outcomes • 11 completed, expired, or refunded reservations.",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "FORKg",
+      "x": 1700,
+      "y": 7360,
+      "name": "Admin Complete Desktop",
+      "width": 1480,
+      "height": 3085,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "baTHB",
+          "fill": "#181818",
+          "content": "Admin / Desktop - Complete Workspace",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "8fKqQ",
+          "name": "adminCompleteCanvas",
+          "clip": true,
+          "width": 1440,
+          "height": 3004,
+          "fill": "#121823",
+          "cornerRadius": 22,
+          "layout": "vertical",
+          "gap": 24,
+          "padding": 32,
+          "children": [
+            {
+              "type": "frame",
+              "id": "4fsaw",
+              "name": "adminTop",
+              "clip": true,
+              "width": "fill_container",
+              "height": 900,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "screenshots-desktop/fDbCs.png",
+                "mode": "fill"
+              },
+              "cornerRadius": 22
+            },
+            {
+              "type": "frame",
+              "id": "XrgP2",
+              "name": "reporting",
+              "width": "fill_container",
+              "height": 220,
+              "fill": "#151B25",
+              "cornerRadius": 26,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#2A3341"
+              },
+              "layout": "vertical",
+              "gap": 16,
+              "padding": 24,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "7U7vl",
+                  "fill": "#F3F0E8",
+                  "content": "Export reservation report",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "cktz3",
+                  "fill": "#A8B0BD",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Download a CSV snapshot for finance, audit, or daily operations using simple booking filters.",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "vcnrc",
+                  "name": "reportRow",
+                  "width": "fill_container",
+                  "height": 56,
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "94D9q",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "fill": "#0B1017",
+                      "cornerRadius": 14,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "padding": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "HsJAZ",
+                          "fill": "#A8B0BD",
+                          "content": "Created from",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "crPxD",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "fill": "#0B1017",
+                      "cornerRadius": 14,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "padding": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Cyy9x",
+                          "fill": "#A8B0BD",
+                          "content": "Created to",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "lTsly",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "fill": "#0B1017",
+                      "cornerRadius": 14,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "padding": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "yhs4N",
+                          "fill": "#A8B0BD",
+                          "content": "Status: ALL",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "12bhw",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "fill": "#0B1017",
+                      "cornerRadius": 14,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "padding": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "a7q17",
+                          "fill": "#A8B0BD",
+                          "content": "Channel: Direct",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "I08SR",
+                      "name": "exportBtn",
+                      "width": 160,
+                      "height": "fill_container",
+                      "fill": "#C69B49",
+                      "cornerRadius": 14,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "AO7ar",
+                          "fill": "#11161D",
+                          "content": "Export CSV",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "bXB0v",
+              "name": "workspace",
+              "width": "fill_container",
+              "height": 1544,
+              "fill": "#151B25",
+              "cornerRadius": 26,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#2A3341"
+              },
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "WtrRL",
+                  "name": "queueRow",
+                  "width": "fill_container",
+                  "height": 250,
+                  "gap": 24,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "sffze",
+                      "name": "queueLeft",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "fill": "#0F141D",
+                      "cornerRadius": 22,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 12,
+                      "padding": 20,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "cu8xw",
+                          "fill": "#F3F0E8",
+                          "content": "Payment follow-up",
+                          "fontFamily": "Inter",
+                          "fontSize": 22,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "pngah",
+                          "fill": "#A8B0BD",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Reservations still waiting for settlement.",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "bm4K2",
+                          "name": "qRow1",
+                          "width": "fill_container",
+                          "height": 44,
+                          "fill": "#141A22",
+                          "cornerRadius": 14,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#232B38"
+                          },
+                          "layout": "vertical",
+                          "gap": 4,
+                          "padding": 12,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "tDFPm",
+                              "fill": "#F2EEE7",
+                              "content": "Maya Putri • Bundaran Suite • Awaiting payment • IDR 11.8M",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "UaqJZ",
+                          "name": "qRow2",
+                          "width": "fill_container",
+                          "height": 44,
+                          "fill": "#141A22",
+                          "cornerRadius": 14,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#232B38"
+                          },
+                          "layout": "vertical",
+                          "gap": 4,
+                          "padding": 12,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "wVj0I",
+                              "fill": "#F2EEE7",
+                              "content": "Rico Aditya • Executive Suite • Awaiting payment • IDR 9.4M",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "c2TfZ",
+                      "name": "queueRight",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "fill": "#0F141D",
+                      "cornerRadius": 22,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 12,
+                      "padding": 20,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "VJBiO",
+                          "fill": "#F3F0E8",
+                          "content": "Admin routing",
+                          "fontFamily": "Inter",
+                          "fontSize": 22,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "NkiYy",
+                          "fill": "#A8B0BD",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Role behavior now split between admin and receptionist.",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "pBlB0",
+                          "name": "rCard1",
+                          "width": "fill_container",
+                          "height": 46,
+                          "fill": "#141A22",
+                          "cornerRadius": 14,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#232B38"
+                          },
+                          "padding": 14,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Jb58K",
+                              "fill": "#F2EEE7",
+                              "content": "Protected admin route • only users with admin role can enter /admin.",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "gtOIL",
+                          "name": "rCard2",
+                          "width": "fill_container",
+                          "height": 46,
+                          "fill": "#141A22",
+                          "cornerRadius": 14,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#232B38"
+                          },
+                          "padding": 14,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Uk2iW",
+                              "fill": "#F2EEE7",
+                              "content": "Smart post-login redirect • admins land here, receptionists go to dashboard.",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "W2Cxg",
+                          "name": "rCard3",
+                          "width": "fill_container",
+                          "height": 46,
+                          "fill": "#141A22",
+                          "cornerRadius": 14,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#232B38"
+                          },
+                          "padding": 14,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "QHFIZ",
+                              "fill": "#F2EEE7",
+                              "content": "Profile bootstrap • new users receive default profiles automatically.",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "gbJfG",
+                  "name": "auditCard",
+                  "width": "fill_container",
+                  "height": 336,
+                  "fill": "#0F141D",
+                  "cornerRadius": 22,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#232B38"
+                  },
+                  "layout": "vertical",
+                  "gap": 14,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "4p76f",
+                      "fill": "#F3F0E8",
+                      "content": "Audit logs",
+                      "fontFamily": "Inter",
+                      "fontSize": 22,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "WR0FB",
+                      "fill": "#A8B0BD",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Review booking, transaction, profile, and room changes with actor visibility.",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "KDRY8",
+                      "name": "auditFilters",
+                      "width": "fill_container",
+                      "height": 48,
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "DcOlH",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "fill": "#141A22",
+                          "cornerRadius": 14,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#232B38"
+                          },
+                          "padding": 14,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "nIPvX",
+                              "fill": "#A8B0BD",
+                              "content": "Table: bookings",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "CfyOr",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "fill": "#141A22",
+                          "cornerRadius": 14,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#232B38"
+                          },
+                          "padding": 14,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "yXEtK",
+                              "fill": "#A8B0BD",
+                              "content": "Action: UPDATE",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "kS6lH",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "fill": "#141A22",
+                          "cornerRadius": 14,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#232B38"
+                          },
+                          "padding": 14,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "8l1DC",
+                              "fill": "#A8B0BD",
+                              "content": "Actor: admin UUID",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "5uF3V",
+                      "name": "auditLog1",
+                      "width": "fill_container",
+                      "height": 84,
+                      "fill": "#141A22",
+                      "cornerRadius": 16,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "RasaT",
+                          "fill": "#F2EEE7",
+                          "content": "bookings • UPDATE • Alya Prameswari • Apr 12, 09:14",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "K9UDL",
+                          "fill": "#A8B0BD",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Status moved from UNPAID to PAID, total price retained, actor visible.",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "88P2A",
+                      "name": "auditLog2",
+                      "width": "fill_container",
+                      "height": 84,
+                      "fill": "#141A22",
+                      "cornerRadius": 16,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "F1xAz",
+                          "fill": "#F2EEE7",
+                          "content": "rooms • PATCH • admin@aura.id • Apr 11, 18:42",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Vxmh1",
+                          "fill": "#A8B0BD",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Room visibility updated to AVAILABLE and description edited for public display.",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "xxgBM",
+                  "name": "teamCard",
+                  "width": "fill_container",
+                  "height": 260,
+                  "fill": "#0F141D",
+                  "cornerRadius": 22,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#232B38"
+                  },
+                  "layout": "vertical",
+                  "gap": 14,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "9NfUn",
+                      "fill": "#F3F0E8",
+                      "content": "Team & role management",
+                      "fontFamily": "Inter",
+                      "fontSize": 22,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "W3syP",
+                      "fill": "#A8B0BD",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Promote guests to receptionist and demote receptionists back to guest.",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "yC8Gh",
+                      "name": "teamRow1",
+                      "width": "fill_container",
+                      "height": 70,
+                      "fill": "#141A22",
+                      "cornerRadius": 16,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "padding": 16,
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "LN00q",
+                          "fill": "#F2EEE7",
+                          "content": "Alya Prameswari • alya@aura.id • guest",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "ZcyQa",
+                          "name": "teamBtn1",
+                          "width": 146,
+                          "height": 36,
+                          "fill": "#C69B49",
+                          "cornerRadius": 12,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Y6B6O",
+                              "fill": "#11161D",
+                              "content": "Promote",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ChArm",
+                      "name": "teamRow2",
+                      "width": "fill_container",
+                      "height": 70,
+                      "fill": "#141A22",
+                      "cornerRadius": 16,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "padding": 16,
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "cnMyq",
+                          "fill": "#F2EEE7",
+                          "content": "Rico Aditya • rico@aura.id • receptionist",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "JD6HR",
+                          "name": "teamBtn2",
+                          "width": 146,
+                          "height": 36,
+                          "fill": "#1A2230",
+                          "cornerRadius": 12,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#2A3341"
+                          },
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "lWBhO",
+                              "fill": "#D3D8E1",
+                              "content": "Demote",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "lCGhy",
+                  "name": "roomsCard",
+                  "width": "fill_container",
+                  "height": 500,
+                  "fill": "#0F141D",
+                  "cornerRadius": 22,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#232B38"
+                  },
+                  "layout": "vertical",
+                  "gap": 14,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "3Dvdp",
+                      "fill": "#F3F0E8",
+                      "content": "Room management",
+                      "fontFamily": "Inter",
+                      "fontSize": 22,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ooaO8",
+                      "fill": "#A8B0BD",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Create, update, archive, restore, and control public availability for rooms.",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ftsPk",
+                      "name": "roomForm",
+                      "width": "fill_container",
+                      "height": 136,
+                      "fill": "#141A22",
+                      "cornerRadius": 16,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 12,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "ZWPWt",
+                          "name": "roomFormRow",
+                          "width": "fill_container",
+                          "height": 44,
+                          "gap": 12,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "TKN7b",
+                              "width": "fill_container",
+                              "height": "fill_container",
+                              "fill": "#0B1017",
+                              "cornerRadius": 14,
+                              "stroke": {
+                                "thickness": 1,
+                                "fill": "#232B38"
+                              },
+                              "padding": 14,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "QZnLY",
+                                  "fill": "#A8B0BD",
+                                  "content": "Room name",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "LNc4T",
+                              "width": "fill_container",
+                              "height": "fill_container",
+                              "fill": "#0B1017",
+                              "cornerRadius": 14,
+                              "stroke": {
+                                "thickness": 1,
+                                "fill": "#232B38"
+                              },
+                              "padding": 14,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "lQ15D",
+                                  "fill": "#A8B0BD",
+                                  "content": "Type / Price",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "EPChG",
+                              "width": "fill_container",
+                              "height": "fill_container",
+                              "fill": "#0B1017",
+                              "cornerRadius": 14,
+                              "stroke": {
+                                "thickness": 1,
+                                "fill": "#232B38"
+                              },
+                              "padding": 14,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "CFvYZ",
+                                  "fill": "#A8B0BD",
+                                  "content": "Capacity / Status",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "xSut3",
+                          "name": "roomAction",
+                          "width": 180,
+                          "height": 44,
+                          "fill": "#C69B49",
+                          "cornerRadius": 14,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "z0w8b",
+                              "fill": "#11161D",
+                              "content": "Create Room",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "u5vuc",
+                      "name": "roomItem1",
+                      "width": "fill_container",
+                      "height": 84,
+                      "fill": "#141A22",
+                      "cornerRadius": 16,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "7GnwX",
+                          "fill": "#F2EEE7",
+                          "content": "Kempinski Signature Suite • AVAILABLE • Visible",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "MDa0E",
+                          "fill": "#A8B0BD",
+                          "content": "2 guests • IDR 18.900.000 • Created 10 Apr 2026",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "4OAwC",
+                      "name": "roomItem2",
+                      "width": "fill_container",
+                      "height": 84,
+                      "fill": "#141A22",
+                      "cornerRadius": 16,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#232B38"
+                      },
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "NptC7",
+                          "fill": "#F2EEE7",
+                          "content": "Skyline Villa • UNAVAILABLE • Archived",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "onFif",
+                          "fill": "#A8B0BD",
+                          "content": "4 guests • IDR 11.800.000 • Created 08 Apr 2026",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "7HUVJ",
+                  "fill": "#F3F0E8",
+                  "content": "Admin workspace",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "frame",
+                  "id": "QjbuZ",
+                  "name": "workspaceTabs",
+                  "width": "fill_container",
+                  "height": 42,
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "fQZND",
+                      "name": "tab1",
+                      "width": 120,
+                      "height": 42,
+                      "fill": "#C69B49",
+                      "cornerRadius": 14,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "O7gdp",
+                          "fill": "#11161D",
+                          "content": "Overview",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "QthCw",
+                      "name": "tab2",
+                      "width": 120,
+                      "height": 42,
+                      "fill": "#1A2230",
+                      "cornerRadius": 14,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "TypLl",
+                          "fill": "#D3D8E1",
+                          "content": "Queue",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "I94Zn",
+                      "name": "tab3",
+                      "width": 120,
+                      "height": 42,
+                      "fill": "#1A2230",
+                      "cornerRadius": 14,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "59dE1",
+                          "fill": "#D3D8E1",
+                          "content": "Audit Logs",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "dmpw8",
+                      "name": "tab4",
+                      "width": 120,
+                      "height": 42,
+                      "fill": "#1A2230",
+                      "cornerRadius": 14,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "JpmZJ",
+                          "fill": "#D3D8E1",
+                          "content": "Team",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "e6UG1",
+                      "name": "tab5",
+                      "width": 120,
+                      "height": 42,
+                      "fill": "#1A2230",
+                      "cornerRadius": 14,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "WOYCA",
+                          "fill": "#D3D8E1",
+                          "content": "Rooms",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "6hxZg",
+      "x": 0,
+      "y": 10660,
+      "name": "Home Extended Desktop",
+      "width": 1480,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "dj2ZM",
+          "fill": "#181818",
+          "content": "Home / Laptop Fullpage (Facilities + Suites)",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "CgmJE",
+          "name": "fullHome",
+          "clip": true,
+          "width": 1440,
+          "height": 3880,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "screenshots-desktop/home-extended-clean.png",
+            "mode": "fill"
+          },
+          "cornerRadius": 22
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "SiKuz",
+      "x": 1700,
+      "y": 10660,
+      "name": "Facilities Desktop",
+      "width": 1480,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "bUZjA",
+          "fill": "#181818",
+          "content": "Facilities / Desktop",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "nAVeh",
+          "name": "heroReal",
+          "clip": true,
+          "width": 1440,
+          "height": 2000,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "section-assets/facilities-desktop.png",
+            "mode": "fill"
+          },
+          "cornerRadius": 22,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#CFC3B3"
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "4ksD0",
+      "x": 3400,
+      "y": 10660,
+      "name": "Suites Desktop",
+      "width": 1480,
+      "fill": "#EFEAE0",
+      "cornerRadius": 28,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#D5CCBF"
+      },
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 20,
+      "children": [
+        {
+          "type": "text",
+          "id": "W9xLo",
+          "fill": "#181818",
+          "content": "Suites / Desktop",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "wNa6o",
+          "name": "heroReal",
+          "width": "fill_container",
+          "height": 3660,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "section-assets/suites-desktop-clean.png",
+            "mode": "fill"
+          },
+          "cornerRadius": 22,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#CFC3B3"
+          },
+          "children": [
+            {
+              "type": "frame",
+              "id": "BeAcI",
+              "name": "Frame 2",
+              "clip": true,
+              "width": 6,
+              "height": 662,
+              "fill": "#FFFFFF",
+              "layout": "none"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "uT1am",
+          "name": "Frame 1",
+          "clip": true,
+          "width": 44,
+          "height": 181,
+          "fill": "#FFFFFF",
+          "layout": "none"
+        }
+      ]
+    }
+  ]
+}

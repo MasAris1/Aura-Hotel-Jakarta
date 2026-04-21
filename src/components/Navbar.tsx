@@ -3,8 +3,16 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
+import {
+  clearSessionCache,
+  readSessionCache,
+  writeSessionCache,
+  CLIENT_WARMUP_KEYS,
+  type UserProfile,
+} from "@/lib/clientWarmup";
+import { getRoleHomePath, isAdminRole, isStaffRole } from "@/lib/auth";
 import { createClient } from "@/utils/supabase/client";
 
 const navLinks = [
@@ -18,6 +26,10 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [userRole, setUserRole] = useState<string | null>(
+    () =>
+      readSessionCache<UserProfile>(CLIENT_WARMUP_KEYS.userProfile)?.role ?? null,
+  );
   const [visibleSection, setVisibleSection] = useState<string | null>(null);
   const [manualSection, setManualSection] = useState<string | null>(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
@@ -32,6 +44,12 @@ export function Navbar() {
         ? "collection"
         : null;
 
+  const clearWarmCaches = () => {
+    clearSessionCache(CLIENT_WARMUP_KEYS.bookingIdentity);
+    clearSessionCache(CLIENT_WARMUP_KEYS.dashboardSnapshot);
+    clearSessionCache(CLIENT_WARMUP_KEYS.userProfile);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 36);
@@ -42,6 +60,45 @@ export function Navbar() {
 
     const supabase = createClient();
 
+    const syncUserRole = async (currentSession: Session | null) => {
+      if (!currentSession?.user) {
+        setUserRole(null);
+        return;
+      }
+
+      const cachedProfile = readSessionCache<UserProfile>(
+        CLIENT_WARMUP_KEYS.userProfile,
+      );
+
+      if (cachedProfile?.role) {
+        setUserRole(cachedProfile.role);
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, role")
+        .eq("id", currentSession.user.id)
+        .single();
+
+      if (!profile) {
+        setUserRole(cachedProfile?.role ?? null);
+        return;
+      }
+
+      const nextProfile: UserProfile = {
+        first_name:
+          profile.first_name ??
+          cachedProfile?.first_name ??
+          currentSession.user.email?.split("@")[0] ??
+          "Guest",
+        last_name: profile.last_name ?? cachedProfile?.last_name ?? "",
+        role: profile.role,
+      };
+
+      writeSessionCache(CLIENT_WARMUP_KEYS.userProfile, nextProfile);
+      setUserRole(profile.role ?? null);
+    };
+
     const fetchSession = async () => {
       const {
         data: { session: currentSession },
@@ -49,6 +106,7 @@ export function Navbar() {
 
       setSession(currentSession);
       setAuthLoading(false);
+      void syncUserRole(currentSession);
     };
 
     void fetchSession();
@@ -58,6 +116,14 @@ export function Navbar() {
     } = supabase.auth.onAuthStateChange((_event, currentSession) => {
       setSession(currentSession);
       setAuthLoading(false);
+
+      if (!currentSession) {
+        clearWarmCaches();
+        setUserRole(null);
+        return;
+      }
+
+      void syncUserRole(currentSession);
     });
 
     return () => {
@@ -182,6 +248,7 @@ export function Navbar() {
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
+    clearWarmCaches();
     setSession(null);
     setMobileMenuOpen(false);
   };
@@ -224,6 +291,13 @@ export function Navbar() {
   };
 
   const useHeroChrome = pathname === "/" && !isScrolled && !mobileMenuOpen;
+  const isStaffUser = isStaffRole(userRole);
+  const portalHref = session ? getRoleHomePath(userRole) : "/login";
+  const portalLabel = isAdminRole(userRole)
+    ? "Admin Panel"
+    : isStaffUser
+      ? "Ops Dashboard"
+      : "Guest Portal";
   const shellClassName = useHeroChrome
     ? "border-white/10 bg-black/18 shadow-none"
     : "border-primary/12 bg-[#0f131b]/88 shadow-[0_24px_70px_rgba(0,0,0,0.38)]";
@@ -288,10 +362,10 @@ export function Navbar() {
           {!authLoading && session ? (
             <>
               <Link
-                href="/dashboard"
+                href={portalHref}
                 className={`rounded-full border border-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.26em] transition-colors duration-300 ${textClassName} hover:border-primary/35 hover:text-white`}
               >
-                Guest Portal
+                {portalLabel}
               </Link>
               <button
                 onClick={handleLogout}
@@ -310,14 +384,6 @@ export function Navbar() {
               Login
             </Link>
           ) : null}
-
-          <Link
-            href="/booking"
-            className="group inline-flex items-center gap-3 rounded-full border border-primary/40 bg-primary px-5 py-2.5 text-[11px] uppercase tracking-[0.28em] text-primary-foreground transition-all duration-300 hover:translate-x-0.5 hover:shadow-[0_18px_36px_rgba(198,155,73,0.34)]"
-          >
-            Reserve
-            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
-          </Link>
         </div>
 
         <button
@@ -365,11 +431,11 @@ export function Navbar() {
             {!authLoading && session ? (
               <>
                 <Link
-                  href="/dashboard"
+                  href={portalHref}
                   onClick={() => setMobileMenuOpen(false)}
                   className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] px-6 py-5 text-lg uppercase tracking-[0.28em] text-white/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-white"
                 >
-                  Guest Portal
+                  {portalLabel}
                 </Link>
                 <button
                   type="button"
@@ -390,15 +456,6 @@ export function Navbar() {
                 Login
               </Link>
             ) : null}
-
-            <Link
-              href="/booking"
-              onClick={() => setMobileMenuOpen(false)}
-              className="mt-2 inline-flex items-center justify-between rounded-[1.75rem] bg-primary px-6 py-5 text-lg uppercase tracking-[0.28em] text-primary-foreground transition-all duration-300 hover:shadow-[0_18px_36px_rgba(198,155,73,0.32)]"
-            >
-              Reserve your stay
-              <ArrowRight className="h-4 w-4" />
-            </Link>
           </div>
         </div>
       ) : null}

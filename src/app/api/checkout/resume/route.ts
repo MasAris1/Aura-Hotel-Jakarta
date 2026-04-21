@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
+import { getSupabaseAdmin } from "@/utils/supabase/admin";
 import { snap } from "@/lib/midtrans";
-import roomsData from "@/data/rooms.json";
 import type { Database } from "@/types/supabase";
+import {
+    TRANSACTION_STATUSES,
+    upsertBookingTransaction,
+} from "@/lib/transactions";
+import { resolveRoomDetails } from "@/lib/roomCatalog";
 
 function getErrorMessage(error: unknown) {
     return error instanceof Error ? error.message : "Unknown server error";
@@ -19,6 +24,7 @@ export async function POST(req: Request) {
         }
 
         const supabase = await createClient();
+        const supabaseAdmin = getSupabaseAdmin();
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
@@ -39,9 +45,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Booking tidak ditemukan atau sudah dibayar" }, { status: 404 });
         }
 
-        // Cari data kamar dari rooms.json
-        const room = roomsData.find(r => r.id === booking.room_id);
-        const roomName = room?.name || 'Room';
+        const roomName = resolveRoomDetails(booking.room_id).name;
 
         // Kalkulasi ulang durasi
         const durationInMs = new Date(booking.check_out).getTime() - new Date(booking.check_in).getTime();
@@ -69,7 +73,26 @@ export async function POST(req: Request) {
             }]
         };
 
-        const transaction = await snap.createTransaction(parameter);
+        await upsertBookingTransaction(supabaseAdmin, {
+            bookingId: booking.id,
+            amount: totalPrice,
+            paymentType: "midtrans",
+            status: TRANSACTION_STATUSES.pending,
+        });
+
+        let transaction;
+        try {
+            transaction = await snap.createTransaction(parameter);
+        } catch (midtransError) {
+            await upsertBookingTransaction(supabaseAdmin, {
+                bookingId: booking.id,
+                amount: totalPrice,
+                paymentType: "midtrans",
+                status: TRANSACTION_STATUSES.failed,
+            });
+
+            throw midtransError;
+        }
 
         return NextResponse.json({
             success: true,

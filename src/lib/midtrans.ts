@@ -18,3 +18,19 @@ export const coreApi = new midtransClient.CoreApi({
     serverKey,
     clientKey
 });
+
+type MidtransTransactionApi = {
+    cancel: (transactionId: string) => Promise<unknown>;
+    refund: (
+        transactionId: string,
+        parameter?: {
+            refund_key?: string;
+            amount?: number;
+            reason?: string;
+        },
+    ) => Promise<unknown>;
+};
+
+export const midtransTransaction = (
+    coreApi as unknown as { transaction: MidtransTransactionApi }
+).transaction;

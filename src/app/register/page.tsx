@@ -18,12 +18,12 @@ export default function RegisterPage() {
 
 function RegisterPageContent() {
     const searchParams = useSearchParams();
+    const redirectUrl = searchParams.get("redirect") || undefined;
     const [isPending, startTransition] = useTransition();
     const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
 
     const handleAction = async (formData: FormData) => {
         setMessage(null);
-        const redirectUrl = searchParams.get("redirect") || undefined;
         startTransition(async () => {
             const result = await signup(formData, redirectUrl);
 
@@ -83,7 +83,7 @@ function RegisterPageContent() {
                         )}
 
                         <GoogleAuthButton
-                            next="/vip"
+                            next={redirectUrl}
                             label="Continue with Google"
                             disabled={isPending}
                             onError={(text) => setMessage(text ? { type: "error", text } : null)}

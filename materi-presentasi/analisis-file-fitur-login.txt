@@ -1,0 +1,898 @@
+ANALISIS FILE FITUR LOGIN
+PROJECT: AURA HOTEL WEB
+
+Dokumen ini menjelaskan file dan kode yang membahas fitur login pada project ini. Fokus pembahasan mencakup login, register, forgot password, reset password, callback auth, session, middleware, role-based redirect, serta fondasi database yang mendukung autentikasi.
+
+======================================================================
+1. GAMBARAN UMUM STRUKTUR FITUR LOGIN
+======================================================================
+
+Secara umum, fitur login di project ini tidak berada dalam satu file saja, melainkan tersebar pada beberapa lapisan:
+
+1. Halaman antarmuka login dan register
+2. Action server untuk autentikasi
+3. Callback route untuk OAuth dan magic link
+4. Helper role, profile, dan redirect
+5. Middleware untuk proteksi route
+6. Helper session Supabase untuk server dan client
+7. Komponen UI yang menampilkan status login
+8. Struktur database untuk profile dan role user
+
+Bagian terpenting untuk dipelajari adalah:
+- halaman login
+- action auth
+- callback auth
+- helper auth
+- middleware
+
+======================================================================
+2. FILE INTI FITUR LOGIN
+======================================================================
+
+2.1 HALAMAN LOGIN
+
+Folder: src/app | File: login/page.tsx | Baris: 24-54
+
+Fungsi utama file ini:
+- menampilkan halaman login
+- membaca parameter redirect dari URL
+- memberi pilihan metode login
+- mengirim form ke action auth yang sesuai
+- menampilkan pesan error atau success
+
+Potongan kode penting:
+
+```tsx
+const redirectUrl = searchParams.get("redirect") || undefined;
+const [method, setMethod] = useState<"magic" | "password">("magic");
+
+const result = method === "magic"
+  ? await loginWithMagicLink(formData, redirectUrl)
+  : await loginWithPassword(formData, redirectUrl);
+```
+
+Analisis:
+Kode ini menunjukkan bahwa halaman login menjadi titik awal seluruh flow autentikasi. File ini membaca tujuan awal user melalui parameter `redirect`, lalu menentukan apakah login diproses dengan metode `magic link` atau `password`.
+
+Folder: src/app | File: login/page.tsx | Baris: 126-135
+
+Potongan kode penting:
+
+```tsx
+<GoogleAuthButton
+  next={redirectUrl}
+  label="Continue with Google"
+  disabled={isPending}
+/>
+```
+
+Analisis:
+Bagian ini menunjukkan bahwa login Google tidak ditulis langsung di halaman login, tetapi dipisahkan ke komponen tersendiri. Meskipun begitu, parameter `redirect` tetap diteruskan agar flow pasca-login tetap konsisten.
+
+Folder: src/app | File: login/page.tsx | Baris: 148-203
+
+Potongan kode penting:
+
+```tsx
+<form
+  key={method}
+  action={handleAction}
+  className="space-y-6"
+>
+```
+
+Analisis:
+Form login dihubungkan langsung ke `handleAction`, yang pada akhirnya memanggil server action auth. Jadi, file ini fokus pada interaksi user, bukan pada proses autentikasi inti.
+
+2.2 ACTION AUTH
+
+Folder: src/app/auth | File: actions.ts | Baris: 55-89
+
+Fungsi utama bagian ini:
+- menangani login email dan password
+- memvalidasi input
+- memanggil Supabase Auth
+- memastikan profile tersedia
+- menentukan redirect akhir
+
+Potongan kode penting:
+
+```ts
+export async function loginWithPassword(formData: FormData, redirectTo?: string) {
+  const supabase = await createClient()
+  ...
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
+  ...
+  profile = data.user ? await ensureProfileForUser(supabase, data.user) : null
+  redirect(getPostAuthRedirect(profile?.role, redirectTo))
+}
+```
+
+Analisis:
+Inilah inti login email dan password. Setelah kredensial diverifikasi, sistem tidak langsung selesai, tetapi memastikan row `profiles` tersedia lalu menentukan redirect berdasarkan role dan tujuan awal user.
+
+Folder: src/app/auth | File: actions.ts | Baris: 91-114
+
+Potongan kode penting:
+
+```ts
+export async function loginWithMagicLink(formData: FormData, redirectTo?: string) {
+  ...
+  const emailRedirectTo = await getAuthCallbackUrl(redirectTo)
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo,
+    },
+  })
+}
+```
+
+Analisis:
+Bagian ini menangani login dengan magic link. File ini membangun callback URL terlebih dahulu, lalu mengirim email login melalui Supabase Auth.
+
+Folder: src/app/auth | File: actions.ts | Baris: 116-160
+
+Potongan kode penting:
+
+```ts
+export async function signup(formData: FormData, redirectTo?: string) {
+  ...
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  })
+  ...
+  profile = data.user ? await ensureProfileForUser(supabase, data.user) : null
+  redirect(getPostAuthRedirect(profile?.role, redirectTo))
+}
+```
+
+Analisis:
+Flow register berada di file yang sama dengan login. Artinya, seluruh autentikasi inti memang dipusatkan di `actions.ts`.
+
+Folder: src/app/auth | File: actions.ts | Baris: 162-183
+
+Potongan kode penting:
+
+```ts
+export async function requestPasswordReset(formData: FormData, redirectTo?: string) {
+  ...
+  const resetPath = `/reset-password?redirect=${encodeURIComponent(safeRedirect)}`
+  const resetCallbackUrl = await getAuthCallbackUrl(resetPath)
+
+  const { error } = await supabase.auth.resetPasswordForEmail(parsedEmail.data, {
+    redirectTo: resetCallbackUrl,
+  })
+}
+```
+
+Analisis:
+Bagian ini menangani forgot password. Setelah user memasukkan email, sistem mengirim link reset password yang akan kembali ke route callback project.
+
+Folder: src/app/auth | File: actions.ts | Baris: 185-225
+
+Potongan kode penting:
+
+```ts
+export async function updatePassword(formData: FormData, redirectTo?: string) {
+  ...
+  const { error } = await supabase.auth.updateUser({ password })
+  ...
+  await supabase.auth.signOut()
+  redirect(`${nextLogin}${nextLogin.includes('?') ? '&' : '?'}reset=success`)
+}
+```
+
+Analisis:
+Bagian ini menangani penggantian password setelah user membuka link reset. Setelah password berhasil diubah, user dikeluarkan dari session dan diarahkan kembali ke halaman login dengan status sukses.
+
+2.3 CALLBACK AUTH
+
+Folder: src/app/auth/callback | File: route.ts | Baris: 6-41
+
+Fungsi utama file ini:
+- menerima hasil autentikasi dari Supabase
+- memproses `code` menjadi session
+- membaca tujuan redirect lanjutan
+- mengarahkan user ke halaman akhir
+
+Potongan kode penting:
+
+```ts
+const code = requestUrl.searchParams.get('code')
+const next = requestUrl.searchParams.get('next')
+```
+
+Analisis:
+File callback menerima dua informasi penting: `code` hasil autentikasi dan `next` sebagai tujuan lanjutan.
+
+Folder: src/app/auth/callback | File: route.ts | Baris: 23-30
+
+Potongan kode penting:
+
+```ts
+const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+if (!error) {
+  const profile = data.user ? await ensureProfileForUser(supabase, data.user) : null
+  const destination = getPostAuthRedirect(profile?.role, next)
+  return NextResponse.redirect(new URL(destination, safeOrigin))
+}
+```
+
+Analisis:
+Inilah pusat flow callback. Route ini:
+- mengaktifkan session
+- memastikan profile user ada
+- membaca role user
+- menentukan redirect akhir
+
+Jadi, callback adalah jembatan penting antara Supabase Auth dan halaman internal project.
+
+2.4 LOGIN GOOGLE
+
+Folder: src/components | File: GoogleAuthButton.tsx | Baris: 25-62
+
+Fungsi utama file ini:
+- menjalankan login dengan Google OAuth
+- menyiapkan redirect ke callback auth
+- meneruskan redirect lanjutan `next`
+
+Potongan kode penting:
+
+```tsx
+const redirectTo = new URL("/auth/callback", window.location.origin);
+const safeNext = sanitizeInternalRedirect(next);
+
+if (safeNext) {
+  redirectTo.searchParams.set("next", safeNext);
+}
+```
+
+Analisis:
+Sebelum user dikirim ke Google, komponen ini menyusun callback URL dan memastikan `next` aman.
+
+Folder: src/components | File: GoogleAuthButton.tsx | Baris: 38-43
+
+Potongan kode penting:
+
+```tsx
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: "google",
+  options: {
+    redirectTo: redirectTo.toString(),
+  },
+});
+```
+
+Analisis:
+Baris ini menunjukkan bahwa autentikasi Google sepenuhnya diproses melalui Supabase OAuth.
+
+======================================================================
+3. FILE HELPER ROLE, PROFILE, DAN REDIRECT
+======================================================================
+
+3.1 HELPER AUTH
+
+Folder: src/lib | File: auth.ts | Baris: 11-33
+
+Fungsi utama bagian ini:
+- menentukan jenis role user
+- menentukan halaman tujuan berdasarkan role
+
+Potongan kode penting:
+
+```ts
+export function getRoleHomePath(role: ProfileRole | undefined | null) {
+  if (isAdminRole(role)) {
+    return "/admin";
+  }
+
+  if (isReceptionistRole(role)) {
+    return "/dashboard";
+  }
+
+  return "/vip";
+}
+```
+
+Analisis:
+Fungsi ini adalah dasar role-based redirect. Dari sinilah sistem memutuskan ke mana user diarahkan setelah login jika tidak ada tujuan khusus.
+
+Folder: src/lib | File: auth.ts | Baris: 35-67
+
+Potongan kode penting:
+
+```ts
+export function sanitizeInternalRedirect(redirectTo?: string | null) {
+  ...
+}
+
+export function getPostAuthRedirect(role, redirectTo) {
+  const safeRedirect = sanitizeInternalRedirect(redirectTo);
+
+  if (safeRedirect) {
+    if (safeRedirect.startsWith("/admin") && !isAdminRole(role)) {
+      return "/dashboard";
+    }
+
+    return safeRedirect;
+  }
+
+  return getRoleHomePath(role);
+}
+```
+
+Analisis:
+Bagian ini sangat penting karena menggabungkan dua hal:
+- keamanan redirect
+- aturan role-based redirect
+
+Jadi redirect pasca-login tidak hanya nyaman, tetapi juga aman.
+
+Folder: src/lib | File: auth.ts | Baris: 92-135
+
+Potongan kode penting:
+
+```ts
+export async function getProfileForUser(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+)
+
+export async function ensureProfileForUser(
+  supabase: SupabaseClient<Database>,
+  user: User,
+)
+```
+
+Analisis:
+Bagian ini menangani keterkaitan antara `auth.users` dan `public.profiles`. Flow login project ini memang bergantung pada `profiles`, terutama untuk membaca role user.
+
+Folder: src/lib | File: auth.ts | Baris: 137-189
+
+Potongan kode penting:
+
+```ts
+export function getPublicAuthErrorMessage(
+  error: unknown,
+  fallback = "Authentication failed. Please try again.",
+)
+```
+
+Analisis:
+Fungsi ini memetakan error teknis Supabase menjadi pesan yang lebih aman untuk UI login, register, dan callback.
+
+3.2 HELPER ENV UNTUK AUTH
+
+Folder: src/lib | File: env.ts | Baris: 19-33
+
+Potongan kode penting:
+
+```ts
+export function getPublicSiteUrl() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  ...
+}
+```
+
+Analisis:
+Bagian ini menentukan base URL public yang dipakai untuk callback auth dan reset password.
+
+Folder: src/lib | File: env.ts | Baris: 58-121
+
+Potongan kode penting:
+
+```ts
+export function getTrustedOrigins() { ... }
+export function isTrustedOrigin(origin?: string | null) { ... }
+export function resolveTrustedRequestOrigin(options?: { ... }) { ... }
+```
+
+Analisis:
+Bagian ini mendukung keamanan callback URL dan redirect dengan membatasi origin yang dianggap valid.
+
+======================================================================
+4. FILE SESSION DAN MIDDLEWARE
+======================================================================
+
+4.1 SUPABASE SERVER CLIENT
+
+Folder: src/utils/supabase | File: server.ts | Baris: 6-30
+
+Potongan kode penting:
+
+```ts
+export async function createClient() {
+  const cookieStore = await cookies()
+
+  return createServerClient<Database>(
+    getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
+    getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+    {
+      cookies: {
+        getAll() { ... },
+        setAll(cookiesToSet) { ... },
+      },
+    }
+  )
+}
+```
+
+Analisis:
+File ini dipakai oleh action auth dan callback auth untuk menangani session login di sisi server.
+
+4.2 SUPABASE BROWSER CLIENT
+
+Folder: src/utils/supabase | File: client.ts | Baris: 4-19
+
+Potongan kode penting:
+
+```ts
+export function createClient() {
+  ...
+  return createBrowserClient<Database>(
+    supabaseUrl,
+    supabaseAnonKey
+  )
+}
+```
+
+Analisis:
+File ini dipakai oleh halaman login, register, navbar, booking, dan komponen Google login untuk mengakses session dari browser.
+
+4.3 MIDDLEWARE AUTH
+
+Folder: src/utils/supabase | File: middleware.ts | Baris: 37-60
+
+Potongan kode penting:
+
+```ts
+const {
+  data: { user },
+} = await supabase.auth.getUser()
+
+const needsAuthentication =
+  pathname.startsWith('/dashboard') ||
+  pathname.startsWith('/vip') ||
+  pathname.startsWith('/booking') ||
+  pathname.startsWith('/checkout') ||
+  pathname.startsWith('/admin')
+
+if (!user && needsAuthentication) {
+  const url = request.nextUrl.clone()
+  const redirectUrl = pathname + request.nextUrl.search
+  url.pathname = '/login'
+  url.search = `?redirect=${encodeURIComponent(redirectUrl)}`
+  return NextResponse.redirect(url)
+}
+```
+
+Analisis:
+Ini adalah inti proteksi route. Jika user belum login, route privat tidak bisa diakses dan user diarahkan ke login dengan parameter redirect.
+
+Folder: src/utils/supabase | File: middleware.ts | Baris: 62-72
+
+Potongan kode penting:
+
+```ts
+const profile =
+  user && (isAuthPage || pathname.startsWith('/admin'))
+    ? await getProfileForUser(supabase, user.id)
+    : null
+
+if (user && pathname.startsWith('/admin') && !isAdminRole(profile?.role)) {
+  const url = request.nextUrl.clone()
+  url.pathname = '/dashboard'
+  url.search = ''
+  return NextResponse.redirect(url)
+}
+```
+
+Analisis:
+Middleware tidak hanya memeriksa session, tetapi juga memeriksa role user saat mengakses area admin.
+
+Folder: src/utils/supabase | File: middleware.ts | Baris: 74-93
+
+Potongan kode penting:
+
+```ts
+if (user && isAuthPage) {
+  const redirectTarget = getPostAuthRedirect(
+    profile?.role,
+    request.nextUrl.searchParams.get('redirect')
+  )
+  ...
+  return NextResponse.redirect(url)
+}
+```
+
+Analisis:
+Ini membuat user yang sudah login tidak tetap berada di `/login` atau `/register`, tetapi langsung diarahkan ke halaman tujuan yang benar.
+
+4.4 PROXY DAN RATE LIMIT AUTH
+
+Folder: src | File: proxy.ts | Baris: 9-15
+
+Potongan kode penting:
+
+```ts
+const AUTH_RATE_LIMIT_PATHS = new Set([
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/auth/callback',
+])
+```
+
+Analisis:
+File ini menentukan route mana saja yang dianggap sensitif secara autentikasi dan diberi pembatasan request.
+
+Folder: src | File: proxy.ts | Baris: 30-60
+
+Potongan kode penting:
+
+```ts
+export async function proxy(request: NextRequest) {
+  const ip = getClientIp(request)
+  ...
+  if (ip && shouldRateLimitAuth) {
+    ...
+    if (record.count > AUTH_MAX_REQUESTS) {
+      return new NextResponse('Too Many Requests', { status: 429 })
+    }
+  }
+
+  return await updateSession(request)
+}
+```
+
+Analisis:
+File ini berada sebelum middleware auth utama dan menjadi lapisan pengamanan awal terhadap traffic auth yang berlebihan.
+
+======================================================================
+5. FILE PENDUKUNG FLOW AUTH
+======================================================================
+
+5.1 REGISTER
+
+Folder: src/app | File: register/page.tsx | Baris: 19-36
+
+Potongan kode penting:
+
+```tsx
+const redirectUrl = searchParams.get("redirect") || undefined;
+...
+const result = await signup(formData, redirectUrl);
+```
+
+Analisis:
+Halaman register mengikuti pola yang sama dengan login, yaitu tetap membawa `redirect` agar pengalaman user konsisten setelah autentikasi selesai.
+
+Folder: src/app | File: register/page.tsx | Baris: 85-91
+
+Potongan kode penting:
+
+```tsx
+<GoogleAuthButton
+  next={redirectUrl}
+  label="Continue with Google"
+  disabled={isPending}
+/>
+```
+
+Analisis:
+Register juga mendukung Google OAuth, sehingga flow auth project ini terintegrasi antara login dan pendaftaran.
+
+5.2 FORGOT PASSWORD
+
+Folder: src/app | File: forgot-password/page.tsx | Baris: 23-40
+
+Potongan kode penting:
+
+```tsx
+const redirectUrl = searchParams.get("redirect") || "/login";
+...
+const result = await requestPasswordReset(formData, redirectUrl);
+```
+
+Analisis:
+Halaman forgot password berperan sebagai UI untuk mengirim email reset password melalui server action auth.
+
+5.3 RESET PASSWORD
+
+Folder: src/app | File: reset-password/page.tsx | Baris: 23-38
+
+Potongan kode penting:
+
+```tsx
+const redirectUrl = searchParams.get("redirect") || "/login";
+...
+const result = await updatePassword(formData, redirectUrl);
+```
+
+Analisis:
+Halaman reset password dipakai setelah user membuka link dari email. File ini hanyalah antarmuka, sedangkan logika inti tetap ada di `src/app/auth/actions.ts`.
+
+======================================================================
+6. FILE YANG MEMAKAI HASIL LOGIN
+======================================================================
+
+6.1 NAVBAR
+
+Folder: src/components | File: Navbar.tsx | Baris: 61-127
+
+Potongan kode penting:
+
+```tsx
+const supabase = createClient();
+
+const {
+  data: { session: currentSession },
+} = await supabase.auth.getSession();
+```
+
+Analisis:
+Navbar membaca session aktif user di sisi client untuk menentukan apakah user sudah login atau belum.
+
+Folder: src/components | File: Navbar.tsx | Baris: 293-300
+
+Potongan kode penting:
+
+```tsx
+const isStaffUser = isStaffRole(userRole);
+const portalHref = session ? getRoleHomePath(userRole) : "/login";
+const portalLabel = isAdminRole(userRole)
+  ? "Admin Panel"
+  : isStaffUser
+    ? "Ops Dashboard"
+    : "Guest Portal";
+```
+
+Analisis:
+Navbar menggunakan hasil login untuk menentukan label portal dan link tujuan sesuai role user.
+
+Folder: src/components | File: Navbar.tsx | Baris: 248-254
+
+Potongan kode penting:
+
+```tsx
+const handleLogout = async () => {
+  const supabase = createClient();
+  await supabase.auth.signOut();
+  clearWarmCaches();
+  setSession(null);
+}
+```
+
+Analisis:
+Logout juga merupakan bagian dari fitur login secara keseluruhan, dan di project ini ditangani di Navbar.
+
+6.2 APP WARMUP
+
+Folder: src/components | File: AppWarmup.tsx | Baris: 92-142
+
+Potongan kode penting:
+
+```tsx
+const {
+  data: { session },
+} = await supabase.auth.getSession();
+...
+const { data: profile } = await supabase
+  .from("profiles")
+  .select("first_name, last_name, role")
+  .eq("id", session.user.id)
+  .single();
+```
+
+Analisis:
+File ini tidak melakukan login, tetapi sangat berkaitan dengan fitur login karena:
+- membaca session aktif
+- mengambil profile user
+- menyimpan cache user ke `sessionStorage`
+
+Folder: src/components | File: AppWarmup.tsx | Baris: 115-119
+
+Potongan kode penting:
+
+```tsx
+if (isAdminRole(profile?.role)) {
+  router.prefetch("/admin");
+} else if (profile?.role === "receptionist") {
+  router.prefetch("/dashboard");
+}
+```
+
+Analisis:
+Setelah login, aplikasi sudah menyiapkan perpindahan halaman sesuai role agar terasa lebih cepat.
+
+6.3 HALAMAN ADMIN
+
+Folder: src/app | File: admin/page.tsx | Baris: 211-225
+
+Potongan kode penting:
+
+```ts
+if (!user) {
+  redirect("/login?redirect=/admin");
+}
+
+const profile = await getProfileForUser(supabase, user.id);
+
+if (!isAdminRole(profile?.role)) {
+  redirect("/dashboard");
+}
+```
+
+Analisis:
+Halaman admin adalah contoh konkret penggunaan hasil login:
+- belum login, diarahkan ke login
+- sudah login tapi bukan admin, ditolak
+
+6.4 HALAMAN BOOKING
+
+Folder: src/app | File: booking/page.tsx | Baris: 70-84
+
+Potongan kode penting:
+
+```tsx
+const { data: { session } } = await supabase.auth.getSession();
+if (!session?.user) {
+  router.push(`/login?redirect=/booking?room=${roomId}`);
+}
+```
+
+Analisis:
+Halaman booking menunjukkan bagaimana fitur login dipakai untuk melindungi flow transaksi user.
+
+6.5 API DASHBOARD
+
+Folder: src/app/api | File: dashboard/route.ts | Baris: 11-37
+
+Potongan kode penting:
+
+```ts
+const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+if (!user) {
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+}
+
+const profile = await getProfileForUser(supabase, user.id);
+
+if (!isStaffRole(profile?.role)) {
+  query = query.eq("user_id", user.id);
+}
+```
+
+Analisis:
+API ini memakai hasil login untuk membatasi data dashboard. Jadi autentikasi tidak hanya dipakai di halaman, tetapi juga pada level API.
+
+6.6 HALAMAN DASHBOARD
+
+Folder: src/app | File: dashboard/page.tsx | Baris: 399-420
+
+Potongan kode penting:
+
+```tsx
+const res = await fetch("/api/dashboard", {
+  method: "GET",
+  cache: "no-store",
+})
+```
+
+Analisis:
+Halaman dashboard bergantung pada API yang membaca session login dan role user.
+
+======================================================================
+7. FILE DOKUMENTASI DAN DATABASE
+======================================================================
+
+7.1 README
+
+Folder: root project | File: README.md | Baris: 5-9
+
+Potongan kode penting:
+
+```md
+- Next.js App Router
+- Supabase Auth + Postgres + RLS
+```
+
+Analisis:
+README menegaskan bahwa autentikasi project ini dibangun di atas Supabase Auth dan PostgreSQL.
+
+Folder: root project | File: README.md | Baris: 87-100
+
+Potongan kode penting:
+
+```md
+Role resmi yang dipakai aplikasi:
+- `guest`
+- `admin`
+- `receptionist`
+
+## Kontrak Integrasi Supabase
+- Redirect pasca-auth membaca `public.profiles.role`, bukan `user_metadata.role`.
+- Setiap user auth harus punya row di `public.profiles`.
+```
+
+Analisis:
+Bagian ini sangat penting untuk memahami bahwa role user tidak diambil dari metadata biasa, tetapi dari tabel `profiles`.
+
+7.2 DATABASE PROFILE DAN ROLE
+
+Folder: root project | File: supabase_setup.sql | Baris: 66-72
+
+Potongan kode penting:
+
+```sql
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    role VARCHAR(50) DEFAULT 'guest',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+Analisis:
+Ini adalah fondasi utama role dan profile user yang dipakai di seluruh flow login project.
+
+Folder: root project | File: supabase_setup.sql | Baris: 74-92
+
+Potongan kode penting:
+
+```sql
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+...
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+```
+
+Analisis:
+Bagian ini memastikan setiap user baru di Supabase Auth otomatis memiliki row profile.
+
+======================================================================
+8. KESIMPULAN
+======================================================================
+
+Jika ditanya file mana saja yang membahas fitur login, maka jawaban intinya adalah:
+
+1. Folder `src/app/login` | File `page.tsx`
+   Fungsi: UI login utama
+
+2. Folder `src/app/auth` | File `actions.ts`
+   Fungsi: logika login, register, forgot password, reset password
+
+3. Folder `src/app/auth/callback` | File `route.ts`
+   Fungsi: callback OAuth dan magic link
+
+4. Folder `src/components` | File `GoogleAuthButton.tsx`
+   Fungsi: login Google OAuth
+
+5. Folder `src/lib` | File `auth.ts`
+   Fungsi: helper role, profile, redirect, dan auth error
+
+6. Folder `src/utils/supabase` | File `middleware.ts`
+   Fungsi: proteksi route dan redirect berbasis session
+
+7. Folder `src/utils/supabase` | File `server.ts` dan `client.ts`
+   Fungsi: client Supabase untuk server dan browser
+
+8. Folder `src/app/register`, `src/app/forgot-password`, `src/app/reset-password`
+   Fungsi: UI flow autentikasi pendukung
+
+9. Folder root project | File `README.md` dan `supabase_setup.sql`
+   Fungsi: dokumentasi dan fondasi database auth
+
+Dengan demikian, fitur login di project ini merupakan gabungan antara UI, server action, callback, middleware, session helper, dan database profile user.

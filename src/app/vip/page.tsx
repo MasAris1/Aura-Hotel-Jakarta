@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Thermometer, Wind, Coffee, Bed, ShieldCheck, Loader2 } from "lucide-react";
+import { Thermometer, Wind, Coffee, Bed, ShieldCheck } from "lucide-react";
+import {
+    CLIENT_WARMUP_KEYS,
+    readSessionCache,
+    writeSessionCache,
+    type UserProfile,
+} from "@/lib/clientWarmup";
 import { createClient } from "@/utils/supabase/client";
 
 const STORAGE_KEY = "aura_vip_preferences";
@@ -13,11 +19,6 @@ type Preferences = {
     drink: string;
 };
 
-type UserProfile = {
-    first_name?: string | null;
-    last_name?: string | null;
-};
-
 const defaultPrefs: Preferences = {
     climate: 22,
     aroma: "Sandalwood & Vanilla",
@@ -26,8 +27,10 @@ const defaultPrefs: Preferences = {
 };
 
 export default function VIPPortal() {
-    const [user, setUser] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<UserProfile | null>(() =>
+        readSessionCache<UserProfile>(CLIENT_WARMUP_KEYS.userProfile)
+    );
+    const [isRefreshingProfile, setIsRefreshingProfile] = useState(() => !readSessionCache<UserProfile>(CLIENT_WARMUP_KEYS.userProfile));
     const [saved, setSaved] = useState(false);
     const [prefs, setPrefs] = useState<Preferences>(() => {
         if (typeof window === "undefined") {
@@ -50,16 +53,19 @@ export default function VIPPortal() {
         // Fetch user data
         const fetchUser = async () => {
             const supabase = createClient();
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
                 const { data: profile } = await supabase
                     .from('profiles')
                     .select('first_name, last_name')
-                    .eq('id', user.id)
+                    .eq('id', session.user.id)
                     .single();
-                setUser(profile || { first_name: user.email?.split('@')[0], last_name: '' });
+
+                const nextUser = profile || { first_name: session.user.email?.split('@')[0], last_name: '' };
+                setUser(nextUser);
+                writeSessionCache(CLIENT_WARMUP_KEYS.userProfile, nextUser);
             }
-            setLoading(false);
+            setIsRefreshingProfile(false);
         };
 
         void fetchUser();
@@ -75,14 +81,6 @@ export default function VIPPortal() {
         setPrefs(p => ({ ...p, climate: Math.min(30, Math.max(16, p.climate + delta)) }));
     };
 
-    if (loading) {
-        return (
-            <main className="min-h-screen pt-32 pb-20 bg-background flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </main>
-        );
-    }
-
     const displayName = user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : 'Guest';
     const initials = displayName.charAt(0).toUpperCase();
 
@@ -96,7 +94,7 @@ export default function VIPPortal() {
                             {initials}
                         </div>
                         <div>
-                            <h2 className="font-serif text-xl text-foreground">{displayName}</h2>
+                            <h2 className={`font-serif text-xl text-foreground ${isRefreshingProfile && !user ? "animate-pulse" : ""}`}>{displayName}</h2>
                             <span className="text-xs font-sans tracking-widest uppercase text-primary flex items-center gap-1 mt-1">
                                 <ShieldCheck className="w-3 h-3" /> VIP Member
                             </span>

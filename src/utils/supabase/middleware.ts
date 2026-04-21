@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { getPostAuthRedirect, getProfileForUser, getRoleHomePath, isAdminRole } from '@/lib/auth'
 import { getRequiredEnv } from '@/lib/env'
 import type { Database } from '@/types/supabase'
 
@@ -36,44 +37,59 @@ export async function updateSession(request: NextRequest) {
     const {
         data: { user },
     } = await supabase.auth.getUser()
+    const pathname = request.nextUrl.pathname
+    const needsAuthentication =
+        pathname.startsWith('/dashboard') ||
+        pathname.startsWith('/vip') ||
+        pathname.startsWith('/booking') ||
+        pathname.startsWith('/checkout') ||
+        pathname.startsWith('/admin')
+    const isAuthPage =
+        pathname === '/login' || pathname === '/register'
 
     if (
         !user &&
-        (request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/vip') || request.nextUrl.pathname.startsWith('/booking') || request.nextUrl.pathname.startsWith('/checkout'))
+        needsAuthentication
     ) {
         // no user, potentially respond by redirecting the user to the login page
         const url = request.nextUrl.clone()
-        const redirectUrl = request.nextUrl.pathname + request.nextUrl.search
+        const redirectUrl = pathname + request.nextUrl.search
         url.pathname = '/login'
         url.search = `?redirect=${encodeURIComponent(redirectUrl)}`
         return NextResponse.redirect(url)
     }
 
+    const profile =
+        user && (isAuthPage || pathname.startsWith('/admin'))
+            ? await getProfileForUser(supabase, user.id)
+            : null
+
+    if (user && pathname.startsWith('/admin') && !isAdminRole(profile?.role)) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/dashboard'
+        url.search = ''
+        return NextResponse.redirect(url)
+    }
+
     if (
         user &&
-        (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register')
+        isAuthPage
     ) {
         const url = request.nextUrl.clone()
-        const role = user.user_metadata?.role || 'user'
+        const redirectTarget = getPostAuthRedirect(
+            profile?.role,
+            request.nextUrl.searchParams.get('redirect')
+        )
 
-        if (role === 'admin' || role === 'receptionist') {
-            url.pathname = '/dashboard'
-        } else {
-            const redirectParam = request.nextUrl.searchParams.get('redirect')
-            if (redirectParam) {
-                try {
-                    // Use URL constructor relative to request.url to parse correctly
-                    const redirectUrl = new URL(redirectParam, request.url)
-                    url.pathname = redirectUrl.pathname
-                    url.search = redirectUrl.search
-                } catch {
-                    url.pathname = '/vip'
-                    url.search = ''
-                }
-            } else {
-                url.pathname = '/vip'
-            }
+        try {
+            const redirectUrl = new URL(redirectTarget, request.url)
+            url.pathname = redirectUrl.pathname
+            url.search = redirectUrl.search
+        } catch {
+            url.pathname = getRoleHomePath(profile?.role)
+            url.search = ''
         }
+
         return NextResponse.redirect(url)
     }
 

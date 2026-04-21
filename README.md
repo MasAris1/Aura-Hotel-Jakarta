@@ -1,36 +1,148 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Aura Hotel Web
 
-## Getting Started
+Project reservasi hotel berbasis Next.js dengan integrasi Supabase, Midtrans, Resend, dan `shadcn/ui`.
 
-First, run the development server:
+## Stack
+- Next.js App Router
+- Supabase Auth + Postgres + RLS
+- Midtrans Snap + webhook server-side
+- Tailwind CSS + `shadcn/ui`
 
+## Environment
+Salin `.env.example` ke `.env.local`, lalu isi semua value yang dibutuhkan.
+
+Env wajib:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SITE_URL`
+- `MIDTRANS_SERVER_KEY`
+- `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY`
+- `RESEND_API_KEY`
+
+Catatan penting:
+- `SUPABASE_SERVICE_ROLE_KEY` wajib untuk route `src/app/api/webhook/midtrans/route.ts`, karena webhook datang tanpa user session dan harus bypass RLS.
+- Jangan pernah expose `SUPABASE_SERVICE_ROLE_KEY` ke client.
+
+## Local Development
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Audit live Supabase dari env aktif:
+```bash
+npm run audit:supabase
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Backup tabel legacy yang masih terisi sebelum cleanup:
+```bash
+npm run backup:legacy-supabase
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Backfill transaksi untuk booking lama yang belum punya row `transactions`:
+```bash
+npm run backfill:transactions
+```
 
-## Learn More
+## Setup Supabase
+Jalankan SQL melalui Supabase SQL Editor dengan urutan berikut:
 
-To learn more about Next.js, take a look at the following resources:
+1. `supabase_setup.sql`
+2. `supabase_reconcile.sql`
+3. `supabase_seed.sql`
+4. `supabase_cleanup_legacy.sql` jika ingin membersihkan tabel schema lama
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Tujuan tiap file:
+- `supabase_setup.sql`: bootstrap schema utama, trigger, cron, dan policy default.
+- `supabase_reconcile.sql`: script aman untuk rerun di project aktif agar trigger, backfill profile, function harga, cron, dan policy tetap sinkron dengan codebase.
+- `supabase_seed.sql`: seed kamar dan contoh promote staff.
+- `supabase_cleanup_legacy.sql`: backup ke schema `archive` dan drop tabel/view legacy yang tidak dipakai code aktif.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Objek schema yang dipakai codebase aktif:
+- `profiles`
+- `rooms`
+- `room_rates`
+- `bookings`
+- `transactions`
+- `audit_logs`
 
-## Deploy on Vercel
+Objek legacy yang terdeteksi tidak dipakai code aktif:
+- kosong dan aman dibersihkan lebih dulu: `hotel`, `kamar`, `notifikasi`, `pembayaran`, `reservasi`, `v_active_hotels`
+- masih berisi data legacy, jadi hanya diarsipkan dulu: `pengguna`, `reservations`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Promote Admin atau Receptionist
+Setelah user target selesai registrasi dan row `profiles` sudah ada, jalankan salah satu query yang ada di `supabase_seed.sql` atau `supabase_reconcile.sql`:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```sql
+UPDATE public.profiles
+SET role = 'admin'
+WHERE id = (
+    SELECT id
+    FROM auth.users
+    WHERE email = 'admin@your-domain.com'
+);
+```
+
+Role resmi yang dipakai aplikasi:
+- `guest`
+- `admin`
+- `receptionist`
+
+## Kontrak Integrasi Supabase
+- Redirect pasca-auth membaca `public.profiles.role`, bukan `user_metadata.role`.
+- Setiap user auth harus punya row di `public.profiles`.
+- Guest boleh:
+  - insert booking milik sendiri
+  - view booking milik sendiri
+  - cancel booking milik sendiri yang masih `UNPAID`
+- Staff (`admin` / `receptionist`) boleh view/update semua booking dan memproses refund secara server-side.
+- Webhook Midtrans menyimpan `transactions.midtrans_order_id` sebagai Midtrans `order_id`, yang sama dengan `bookings.id`.
+- Booking yang gagal dibayar atau dibatalkan tidak lagi dihapus; status diubah agar histori transaksi tetap tersimpan.
+
+## Sinkronisasi Type Supabase
+File `src/types/supabase.ts` adalah snapshot schema aplikasi saat ini dan sudah mencakup:
+- `rooms`
+- `room_rates`
+- `profiles`
+- `bookings`
+- `transactions`
+- `audit_logs`
+- function `get_dynamic_price`
+
+Jika schema live berubah lagi, regenerate type dan sinkronkan file ini sebelum merge perubahan yang menyentuh query Supabase.
+Schema live yang saat ini sudah saya audit memakai struktur:
+- `room_rates(room_id, rate_date, price)`
+- `audit_logs(..., performed_by, created_at)`
+
+## Post-deploy Checklist
+- Auth:
+  - guest login/password masuk ke area non-admin
+  - staff login diarahkan ke `/admin`
+  - protected route redirect ke `/login?redirect=...`
+- Profiles:
+  - signup user baru otomatis membuat row `profiles`
+  - user lama tanpa profile sudah ter-backfill
+- Bookings / RLS:
+  - guest hanya melihat booking sendiri
+  - guest bisa cancel booking `UNPAID`
+  - staff bisa melihat dan mengubah semua booking
+- Webhook:
+  - signature Midtrans valid diproses
+  - status booking berubah sesuai notifikasi
+  - row `transactions` ter-upsert dengan `midtrans_order_id = order_id`
+  - setiap booking punya row `transactions`
+ - Cleanup legacy:
+  - backup lokal `backups/supabase/...` berhasil dibuat
+  - tabel `archive.pengguna_20260324` dan `archive.reservations_20260324` ada di Supabase
+  - tabel/view kosong legacy sudah terhapus
+- Build:
+  - `npm run lint`
+  - `npm exec tsc -- --noEmit`
+  - `npm run build`
+  - `npm run audit:supabase`
+
+## Catatan Operasional
+- Checkout sekarang meminta quote server-side dari Supabase agar subtotal, pajak, dan total yang tampil sama dengan nilai yang diproses saat pembuatan booking.
+- `room_rates` dan function `get_dynamic_price` sudah aktif di schema live dan ikut dipakai dalam flow quote/booking.
+- Jika ingin audit project Supabase live, gunakan `supabase_reconcile.sql`, `supabase_cleanup_legacy.sql`, dan script verifikasi yang sudah disediakan di repo.

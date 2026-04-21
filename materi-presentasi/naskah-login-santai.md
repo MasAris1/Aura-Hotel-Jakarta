@@ -1,0 +1,201 @@
+# Naskah Presentasi Santai Akademik
+## Topik: Fitur User Login pada Project Aura Hotel Web
+
+### Pembuka
+Selamat pagi/siang semuanya. Di presentasi ini saya akan membahas fitur **user login** pada project **Aura Hotel Web**. Jadi yang saya jelaskan bukan cuma halaman login yang terlihat di depan, tapi juga cara sistem ini mengenali user, membuat session, menentukan role, lalu mengarahkan user ke halaman yang tepat.
+
+Kalau disederhanakan, login di project ini berfungsi sebagai gerbang utama. Dari proses login inilah sistem tahu apakah yang masuk itu guest biasa, receptionist, atau admin. Setelah tahu identitas dan role user, barulah aplikasi bisa menampilkan fitur yang sesuai.
+
+### Kenapa Fitur Login Penting
+Kalau sebuah aplikasi reservasi hotel tidak punya sistem login yang rapi, maka akan sulit membedakan hak akses antar pengguna. Misalnya, data booking user bisa tercampur, halaman admin bisa diakses sembarang orang, atau user kesulitan kembali ke halaman yang tadi ingin dibuka.
+
+Di project ini, login punya beberapa fungsi utama:
+
+- mengidentifikasi user
+- membuat session
+- melindungi halaman privat
+- mengatur hak akses berdasarkan role
+- memberi pengalaman masuk yang lebih nyaman lewat beberapa metode login
+
+Jadi, login di sini bukan sekadar form email dan password, tapi bagian dari arsitektur aplikasi.
+
+### Teknologi yang Dipakai
+Untuk fitur ini, project memakai:
+
+- **Next.js App Router**
+- **Supabase Auth**
+- **PostgreSQL**
+- **Row Level Security**
+
+Supabase Auth dipakai karena praktis dan lengkap. Kita bisa menangani login biasa, OAuth seperti Google, magic link, sampai session management dalam satu layanan. Lalu karena Supabase terhubung langsung dengan PostgreSQL, data user dan aturan aksesnya bisa dikelola dengan lebih rapi.
+
+### Metode Login yang Tersedia
+Di halaman login project ini, user diberi tiga pilihan cara masuk.
+
+Yang pertama adalah **login dengan Google**. Ini paling cepat karena user tinggal memakai akun Google yang sudah ada.
+
+Yang kedua adalah **magic link**. User cukup memasukkan email, lalu sistem mengirim link login ke email tersebut. Jadi user tidak perlu mengetik password.
+
+Yang ketiga adalah **email dan password**. Ini opsi yang paling familiar dan tetap disediakan untuk user yang ingin login secara konvensional.
+
+Menurut saya, adanya tiga metode ini jadi nilai plus karena aplikasi terasa lebih fleksibel dan user-friendly.
+
+### Halaman Login dan Pengalaman User
+Halaman login ada di route `/login`. Dari sisi tampilan, user bisa memilih tab antara **Magic Link** dan **Password**, lalu ada juga tombol **Continue with Google**.
+
+Halaman ini juga sudah menangani feedback ke user. Jadi kalau login gagal, user akan mendapat pesan error. Kalau magic link berhasil dikirim, user akan mendapat pesan sukses. Selain itu, dari halaman login user juga bisa lanjut ke:
+
+- halaman register
+- forgot password
+- reset password
+
+Artinya, flow autentikasi di project ini cukup lengkap dan realistis untuk aplikasi sungguhan.
+
+### Alur Login Secara Sederhana
+Kalau saya rangkum dengan bahasa yang paling sederhana, alurnya seperti ini:
+
+1. User membuka `/login`.
+2. User memilih metode login.
+3. Supabase memverifikasi identitas user.
+4. Jika berhasil, sistem membuat session.
+5. Sistem memastikan data profile user tersedia.
+6. Sistem membaca role user.
+7. User diarahkan ke halaman yang benar.
+
+Walaupun kelihatannya sederhana, di belakang layar ada beberapa lapisan yang bekerja bersama supaya proses login ini aman dan konsisten.
+
+### Alur Login dengan Email dan Password
+Kalau user memilih login dengan email dan password, sistem akan mengirim email dan password itu ke Supabase melalui fungsi `signInWithPassword`.
+
+Kalau data cocok, Supabase akan mengembalikan user yang valid. Setelah itu, aplikasi tidak langsung selesai. Sistem masih mengecek apakah user tersebut sudah punya data di tabel `profiles`. Kalau belum ada, aplikasi akan memastikan profile itu dibuat.
+
+Setelah profile tersedia, sistem akan melihat role user, lalu melakukan redirect ke halaman yang sesuai.
+
+Jadi, login sukses di project ini bukan hanya berarti password benar, tetapi juga berarti data user sudah siap dipakai oleh sistem.
+
+### Alur Login dengan Magic Link
+Kalau user memilih magic link, prosesnya sedikit berbeda. User hanya mengisi email. Setelah itu, Supabase akan mengirim email berisi link login.
+
+Saat user membuka link tersebut, user akan masuk ke route `/auth/callback`. Route ini penting karena berfungsi untuk menukar code dari Supabase menjadi session login yang sah.
+
+Sesudah session jadi, sistem kembali memastikan profile user ada, membaca role user, lalu melakukan redirect.
+
+Keunggulan magic link adalah user tidak perlu mengingat password. Cocok untuk pengalaman login yang cepat dan praktis.
+
+### Alur Login dengan Google OAuth
+Untuk login dengan Google, user menekan tombol login Google, lalu diarahkan ke halaman otorisasi Google.
+
+Kalau user berhasil memberi izin, Google dan Supabase akan mengarahkan user kembali ke route callback yang sama, yaitu `/auth/callback`.
+
+Di titik ini, prosesnya akan kembali seragam:
+
+- code ditukar menjadi session
+- profile dicek
+- role dibaca
+- user diarahkan ke halaman tujuan
+
+Jadi, walaupun pintu masuknya ada tiga, jalur akhirnya dibuat menyatu supaya logikanya tidak tercerai-berai.
+
+### Kenapa Ada Tabel Profiles
+Satu hal yang penting untuk dipahami adalah project ini tidak menyimpan semua logika user hanya di auth bawaan Supabase.
+
+Supabase memang punya `auth.users`, tetapi aplikasi ini juga punya tabel `public.profiles`. Tabel inilah yang menyimpan data tambahan seperti:
+
+- nama depan
+- nama belakang
+- role
+
+Kenapa ini penting? Karena keputusan setelah login, terutama redirect dan hak akses, ditentukan oleh `role` di tabel `profiles`.
+
+Jadi, setelah user berhasil login, sistem akan memastikan row profile-nya ada. Bahkan di level database pun sudah ada trigger otomatis untuk membuat profile saat ada user baru.
+
+### Role User di Project Ini
+Role yang dipakai dalam project ini ada tiga:
+
+- `guest`
+- `receptionist`
+- `admin`
+
+Masing-masing punya tujuan masuk yang berbeda.
+
+Guest diarahkan ke `/vip`.
+Receptionist diarahkan ke `/dashboard`.
+Admin diarahkan ke `/admin`.
+
+Ini menarik untuk dipresentasikan karena menunjukkan bahwa login di project ini sudah terhubung dengan sistem otorisasi, bukan hanya autentikasi.
+
+### Redirect Setelah Login
+Salah satu hal yang menurut saya bagus di project ini adalah mekanisme redirect setelah login.
+
+Misalnya, user awalnya ingin booking kamar dan membuka halaman `/booking`. Ternyata dia belum login. Sistem akan mengarahkan dia dulu ke `/login?redirect=/booking`.
+
+Setelah login berhasil, user tidak dibuang ke halaman umum, tetapi dikembalikan lagi ke `/booking`. Ini membuat pengalaman user terasa lebih mulus.
+
+Tetapi sistem ini tetap aman, karena redirect-nya disaring. Kalau ada redirect yang mengarah ke halaman tidak valid atau ke luar aplikasi, sistem akan menolaknya. Kalau user biasa mencoba akses area admin, sistem juga tidak akan membiarkan redirect ke `/admin`.
+
+### Proteksi Route dengan Middleware
+Project ini punya middleware yang bertugas menjaga route penting. Route yang diproteksi antara lain:
+
+- `/dashboard`
+- `/vip`
+- `/booking`
+- `/checkout`
+- `/admin`
+
+Kalau user belum login dan mencoba masuk ke salah satu route itu, middleware akan langsung melempar user ke halaman login.
+
+Kalau user sudah login tapi bukan admin, lalu mencoba masuk ke `/admin`, middleware akan mengarahkan dia ke `/dashboard`.
+
+Jadi middleware di sini berperan seperti petugas keamanan di gerbang. Sebelum user masuk ke area tertentu, sistem sudah mengecek dulu apakah dia punya izin atau tidak.
+
+### Keamanan Data dan Session
+Selain proteksi route, project ini juga punya beberapa lapisan keamanan lain.
+
+Pertama, session dikelola lewat Supabase SSR dan cookie, jadi login antara browser dan server tetap sinkron.
+
+Kedua, ada validasi redirect internal agar user tidak diarahkan ke URL sembarangan.
+
+Ketiga, database memakai Row Level Security. Ini penting karena walaupun user berhasil login, dia tetap hanya bisa mengakses data yang sesuai haknya. Misalnya guest hanya bisa melihat booking miliknya sendiri.
+
+Keempat, kunci sensitif seperti `SUPABASE_SERVICE_ROLE_KEY` hanya dipakai di sisi server dan tidak diekspos ke client.
+
+Kelima, ada rate limiter sederhana di proxy untuk mengurangi request berlebihan dalam waktu singkat.
+
+Jadi, keamanan login di project ini dibuat berlapis, bukan hanya mengandalkan form login.
+
+### Kelebihan Implementasi Login Ini
+Kalau saya simpulkan, ada beberapa kelebihan dari implementasi login di project ini.
+
+Pertama, user diberi pilihan beberapa metode login.
+
+Kedua, alur setelah login sudah cerdas karena memperhatikan role dan halaman tujuan awal.
+
+Ketiga, ada pemisahan yang jelas antara autentikasi dan otorisasi.
+
+Keempat, route penting sudah diproteksi lebih awal lewat middleware.
+
+Kelima, keamanan datanya diperkuat sampai level database lewat RLS.
+
+Ini menunjukkan bahwa fitur login pada project ini dibuat cukup serius dan tidak hanya fokus pada tampilan.
+
+### Penutup
+Sebagai penutup, fitur user login pada Aura Hotel Web dibuat menggunakan Supabase Auth dan Next.js dengan tiga metode login, yaitu Google OAuth, magic link, dan email-password. Setelah user berhasil login, sistem akan membuat session, memastikan profile user tersedia, membaca role user, lalu mengarahkan user ke halaman yang sesuai.
+
+Proteksi route dilakukan oleh middleware, sedangkan keamanan data dijaga lagi oleh validasi redirect, pengelolaan session berbasis cookie, rate limit sederhana, dan Row Level Security di database.
+
+Jadi, bisa disimpulkan bahwa fitur login di project ini bukan sekadar pintu masuk, tetapi merupakan dasar untuk keamanan, pengaturan hak akses, dan pengalaman pengguna yang lebih baik.
+
+Sekian presentasi saya. Terima kasih.
+
+### Cadangan Jawaban Singkat
+**Kalau ditanya kenapa pakai Supabase Auth**
+
+Karena lebih cepat diintegrasikan, mendukung OAuth, magic link, session management, dan cocok dengan PostgreSQL serta RLS.
+
+**Kalau ditanya beda authentication dan authorization**
+
+Authentication menjawab pertanyaan "siapa yang login", sedangkan authorization menjawab pertanyaan "apa yang boleh dia akses".
+
+**Kalau ditanya kenapa perlu middleware**
+
+Supaya pengecekan akses dilakukan sebelum halaman privat dibuka, jadi lebih aman dan pengalaman user juga lebih konsisten.

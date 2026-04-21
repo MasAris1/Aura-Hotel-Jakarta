@@ -2,6 +2,7 @@
 
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { getPublicAuthErrorMessage, sanitizeInternalRedirect } from "@/lib/auth";
 import { createClient } from "@/utils/supabase/client";
 
 type GoogleAuthButtonProps = {
@@ -13,7 +14,7 @@ type GoogleAuthButtonProps = {
 };
 
 export default function GoogleAuthButton({
-    next = "/vip",
+    next,
     label = "Continue with Google",
     disabled = false,
     className = "",
@@ -28,7 +29,11 @@ export default function GoogleAuthButton({
         try {
             const supabase = createClient();
             const redirectTo = new URL("/auth/callback", window.location.origin);
-            redirectTo.searchParams.set("next", next);
+            const safeNext = sanitizeInternalRedirect(next);
+
+            if (safeNext) {
+                redirectTo.searchParams.set("next", safeNext);
+            }
 
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: "google",
@@ -38,7 +43,7 @@ export default function GoogleAuthButton({
             });
 
             if (error) {
-                onError?.(error.message);
+                onError?.(getPublicAuthErrorMessage(error, "Unable to start Google sign-in."));
                 setIsLoading(false);
                 return;
             }
@@ -50,7 +55,7 @@ export default function GoogleAuthButton({
 
             onError?.("Unable to start Google sign-in.");
         } catch (error) {
-            onError?.(error instanceof Error ? error.message : "Unable to start Google sign-in.");
+            onError?.(getPublicAuthErrorMessage(error, "Unable to start Google sign-in."));
         }
 
         setIsLoading(false);
