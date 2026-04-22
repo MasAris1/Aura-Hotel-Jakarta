@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { getSupabaseAdmin } from "@/utils/supabase/admin";
-import { snap } from "@/lib/midtrans";
+import { buildRoomPaymentParameter, snap } from "@/lib/midtrans";
 import type { Database } from "@/types/supabase";
 import {
     TRANSACTION_STATUSES,
@@ -53,25 +53,18 @@ export async function POST(req: Request) {
 
         // Generate Midtrans token baru untuk booking yang sudah ada
         const totalPrice = Number(booking.total_price);
-        const pricePerItem = Math.round(totalPrice / durationInDays);
-
-        const parameter = {
-            transaction_details: {
-                order_id: booking.id,
-                gross_amount: totalPrice
+        const parameter = buildRoomPaymentParameter({
+            bookingId: booking.id,
+            roomId: booking.room_id,
+            roomName,
+            nights: durationInDays,
+            totalPrice,
+            customer: {
+                firstName: booking.first_name,
+                lastName: booking.last_name,
+                email: booking.email,
             },
-            customer_details: {
-                first_name: booking.first_name,
-                last_name: booking.last_name,
-                email: booking.email
-            },
-            item_details: [{
-                id: booking.room_id,
-                price: pricePerItem,
-                quantity: durationInDays,
-                name: `${roomName} (${durationInDays} Night${durationInDays > 1 ? 's' : ''})`
-            }]
-        };
+        });
 
         await upsertBookingTransaction(supabaseAdmin, {
             bookingId: booking.id,

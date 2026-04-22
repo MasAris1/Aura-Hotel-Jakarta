@@ -559,7 +559,13 @@ export default function DashboardPage() {
             }
 
             if (result.token) {
-                window.snap?.pay(result.token, {
+                if (!window.snap) {
+                    alert("Layanan pembayaran belum siap. Silakan refresh halaman atau coba lagi beberapa saat lagi.");
+                    setPayingBookingId(null);
+                    return;
+                }
+
+                window.snap.pay(result.token, {
                     onSuccess: function () {
                         setPayingBookingId(null);
                     },

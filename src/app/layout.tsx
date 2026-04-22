@@ -7,6 +7,7 @@ import { ButlerChat } from "@/components/ButlerChat";
 import { AppWarmup } from "@/components/AppWarmup";
 import Script from "next/script";
 import { getRequiredEnv } from "@/lib/env";
+import { getMidtransSnapScriptSrc } from "@/lib/midtransConfig";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -32,10 +33,9 @@ export default function RootLayout({
   const supabaseOrigin = new URL(
     getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
   ).origin;
-  const midtransScriptSrc =
-    process.env.NODE_ENV === "production"
-      ? "https://app.midtrans.com/snap/snap.js"
-      : "https://app.sandbox.midtrans.com/snap/snap.js";
+  const midtransScriptSrc = getMidtransSnapScriptSrc({
+    clientKey: midtransClientKey,
+  });
   const midtransOrigin = new URL(midtransScriptSrc).origin;
 
   return (

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { createClient } from "@/utils/supabase/server";
 import { getSupabaseAdmin } from "@/utils/supabase/admin";
 import { BookingQuoteError, getRoomQuote } from "@/lib/booking";
-import { snap } from "@/lib/midtrans";
+import { buildRoomPaymentParameter, snap } from "@/lib/midtrans";
 import type { Database } from "@/types/supabase";
 import {
     TRANSACTION_STATUSES,
@@ -85,29 +85,18 @@ export async function POST(req: Request) {
             });
 
             // == FASE 4: INTEGRASI MIDTRANS & GRACEFUL DEGRADATION ==
-            const parameter = {
-                transaction_details: {
-                    order_id: booking.id,
-                    gross_amount: quote.totalPrice
+            const parameter = buildRoomPaymentParameter({
+                bookingId: booking.id,
+                roomId: data.roomId,
+                roomName: quote.room.name,
+                nights: quote.nights,
+                totalPrice: quote.totalPrice,
+                customer: {
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    email: data.email,
                 },
-                customer_details: {
-                    first_name: data.firstName,
-                    last_name: data.lastName,
-                    email: data.email
-                },
-                item_details: [{
-                    id: data.roomId,
-                    price: quote.nights > 0 ? Math.round(quote.totalPrice / quote.nights) : quote.totalPrice,
-                    quantity: quote.nights,
-                    name: `${quote.room.name} (${quote.nights} Night${quote.nights > 1 ? 's' : ''})`
-                }]
-            };
-
-            // Pastikan total item_details.price * quantity = gross_amount (rounding fix)
-            const itemTotal = parameter.item_details[0].price * parameter.item_details[0].quantity;
-            if (itemTotal !== quote.totalPrice) {
-                parameter.item_details[0].price += (quote.totalPrice - itemTotal);
-            }
+            });
 
             const transaction = await snap.createTransaction(parameter);
             const token = transaction.token;

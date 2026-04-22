@@ -1,6 +1,16 @@
 import { createClient } from '@/utils/supabase/server'
 import { ensureProfileForUser, getPostAuthRedirect, getPublicAuthErrorMessage } from '@/lib/auth'
 import { getPublicSiteUrl, resolveTrustedRequestOrigin } from '@/lib/env'
+import {
+    createTwoFactorChallenge,
+    getExpiredTwoFactorCookieOptions,
+    getTwoFactorCookieOptions,
+    getTwoFactorRedirectPath,
+    TWO_FACTOR_CHALLENGE_COOKIE,
+    TWO_FACTOR_CODE_TTL_SECONDS,
+    TWO_FACTOR_VERIFIED_COOKIE,
+} from '@/lib/twoFactor'
+import { sendTwoFactorEmail } from '@/lib/twoFactorEmail'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -26,7 +36,37 @@ export async function GET(request: Request) {
             if (!error) {
                 const profile = data.user ? await ensureProfileForUser(supabase, data.user) : null
                 const destination = getPostAuthRedirect(profile?.role, next)
-                return NextResponse.redirect(new URL(destination, safeOrigin))
+
+                if (destination.startsWith('/reset-password')) {
+                    return NextResponse.redirect(new URL(destination, safeOrigin))
+                }
+
+                if (!data.user) {
+                    loginUrl.searchParams.set('error', 'We could not start two-factor verification. Please try again.')
+                    return NextResponse.redirect(loginUrl)
+                }
+
+                const challenge = await createTwoFactorChallenge({
+                    user: data.user,
+                    redirectTo: destination,
+                })
+                await sendTwoFactorEmail(data.user.email ?? '', challenge.code)
+                const response = NextResponse.redirect(
+                    new URL(getTwoFactorRedirectPath(destination), safeOrigin),
+                )
+
+                response.cookies.set(
+                    TWO_FACTOR_CHALLENGE_COOKIE,
+                    challenge.cookie,
+                    getTwoFactorCookieOptions(TWO_FACTOR_CODE_TTL_SECONDS),
+                )
+                response.cookies.set(
+                    TWO_FACTOR_VERIFIED_COOKIE,
+                    '',
+                    getExpiredTwoFactorCookieOptions(),
+                )
+
+                return response
             }
 
             loginUrl.searchParams.set('error', getPublicAuthErrorMessage(error, 'We could not complete sign-in. Please try again.'))

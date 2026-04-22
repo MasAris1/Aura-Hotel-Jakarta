@@ -18,11 +18,15 @@ Env wajib:
 - `NEXT_PUBLIC_SITE_URL`
 - `MIDTRANS_SERVER_KEY`
 - `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY`
+- `MIDTRANS_IS_PRODUCTION` (opsional; `false` untuk sandbox, `true` untuk live)
 - `RESEND_API_KEY`
+- `AUTH_2FA_SECRET` (opsional tapi direkomendasikan; fallback memakai secret server-side yang sudah ada)
 
 Catatan penting:
 - `SUPABASE_SERVICE_ROLE_KEY` wajib untuk route `src/app/api/webhook/midtrans/route.ts`, karena webhook datang tanpa user session dan harus bypass RLS.
 - Jangan pernah expose `SUPABASE_SERVICE_ROLE_KEY` ke client.
+- Vercel selalu menjalankan build/runtime sebagai production, jadi mode Midtrans tidak boleh bergantung pada `NODE_ENV`. Aplikasi otomatis memakai sandbox jika key diawali `SB-Mid-*`; gunakan `MIDTRANS_IS_PRODUCTION=true` hanya saat key Midtrans sudah live.
+- 2FA email wajib untuk semua login. Di production, `RESEND_API_KEY` harus tersedia agar kode OTP bisa dikirim.
 
 ## Local Development
 ```bash
@@ -119,6 +123,7 @@ Schema live yang saat ini sudah saya audit memakai struktur:
 - Auth:
   - guest login/password masuk ke area non-admin
   - staff login diarahkan ke `/admin`
+  - semua login melewati `/verify-2fa` dan kode OTP email sebelum membuka route terlindungi
   - protected route redirect ke `/login?redirect=...`
 - Profiles:
   - signup user baru otomatis membuat row `profiles`
@@ -128,6 +133,7 @@ Schema live yang saat ini sudah saya audit memakai struktur:
   - guest bisa cancel booking `UNPAID`
   - staff bisa melihat dan mengubah semua booking
 - Webhook:
+  - Payment Notification URL di dashboard Midtrans mengarah ke `/api/webhook/midtrans`
   - signature Midtrans valid diproses
   - status booking berubah sesuai notifikasi
   - row `transactions` ter-upsert dengan `midtrans_order_id = order_id`

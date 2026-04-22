@@ -239,7 +239,12 @@ function BookingForm() {
                 }
 
                 if (data.token) {
-                    window.snap?.pay(data.token, {
+                    if (!window.snap) {
+                        alert("Layanan pembayaran belum siap. Silakan refresh halaman atau coba lagi beberapa saat lagi.");
+                        return;
+                    }
+
+                    window.snap.pay(data.token, {
                         onSuccess: () => {
                             setBookingSuccess(true);
                         },

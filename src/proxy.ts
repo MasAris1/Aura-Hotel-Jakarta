@@ -12,6 +12,7 @@ const AUTH_RATE_LIMIT_PATHS = new Set([
     '/forgot-password',
     '/reset-password',
     '/auth/callback',
+    '/verify-2fa',
 ])
 
 function getClientIp(request: NextRequest) {

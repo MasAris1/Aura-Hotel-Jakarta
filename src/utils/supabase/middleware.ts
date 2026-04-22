@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getPostAuthRedirect, getProfileForUser, getRoleHomePath, isAdminRole } from '@/lib/auth'
 import { getRequiredEnv } from '@/lib/env'
+import { isTwoFactorVerifiedForUser, TWO_FACTOR_VERIFIED_COOKIE } from '@/lib/twoFactor'
 import type { Database } from '@/types/supabase'
 
 export async function updateSession(request: NextRequest) {
@@ -38,19 +39,32 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
     const pathname = request.nextUrl.pathname
-    const needsAuthentication =
+    const needsProtectedPageAuthentication =
         pathname.startsWith('/dashboard') ||
         pathname.startsWith('/vip') ||
         pathname.startsWith('/booking') ||
         pathname.startsWith('/checkout') ||
         pathname.startsWith('/admin')
+    const needsProtectedApiAuthentication =
+        pathname.startsWith('/api/dashboard') ||
+        pathname.startsWith('/api/checkout') ||
+        pathname.startsWith('/api/vouchers') ||
+        pathname.startsWith('/api/admin')
+    const needsAuthentication =
+        needsProtectedPageAuthentication ||
+        needsProtectedApiAuthentication
     const isAuthPage =
         pathname === '/login' || pathname === '/register'
+    const isTwoFactorPage = pathname === '/verify-2fa'
 
     if (
         !user &&
-        needsAuthentication
+        (needsAuthentication || isTwoFactorPage)
     ) {
+        if (needsProtectedApiAuthentication) {
+            return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+        }
+
         // no user, potentially respond by redirecting the user to the login page
         const url = request.nextUrl.clone()
         const redirectUrl = pathname + request.nextUrl.search
@@ -59,8 +73,53 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url)
     }
 
+    const hasCompletedTwoFactor = user
+        ? await isTwoFactorVerifiedForUser(
+            user,
+            request.cookies.get(TWO_FACTOR_VERIFIED_COOKIE)?.value,
+        )
+        : false
+
+    if (user && isTwoFactorPage && hasCompletedTwoFactor) {
+        const profile = await getProfileForUser(supabase, user.id)
+        const url = request.nextUrl.clone()
+        const redirectTarget = getPostAuthRedirect(
+            profile?.role,
+            request.nextUrl.searchParams.get('redirect'),
+        )
+
+        try {
+            const redirectUrl = new URL(redirectTarget, request.url)
+            url.pathname = redirectUrl.pathname
+            url.search = redirectUrl.search
+        } catch {
+            url.pathname = getRoleHomePath(profile?.role)
+            url.search = ''
+        }
+
+        return NextResponse.redirect(url)
+    }
+
+    if (user && !hasCompletedTwoFactor && (needsAuthentication || isAuthPage)) {
+        if (needsProtectedApiAuthentication) {
+            return NextResponse.json(
+                { error: 'Two-factor verification required' },
+                { status: 403 },
+            )
+        }
+
+        const url = request.nextUrl.clone()
+        const redirectUrl = isAuthPage
+            ? request.nextUrl.searchParams.get('redirect')
+            : pathname + request.nextUrl.search
+
+        url.pathname = '/verify-2fa'
+        url.search = `?redirect=${encodeURIComponent(redirectUrl || '/vip')}`
+        return NextResponse.redirect(url)
+    }
+
     const profile =
-        user && (isAuthPage || pathname.startsWith('/admin'))
+        user && hasCompletedTwoFactor && (isAuthPage || pathname.startsWith('/admin'))
             ? await getProfileForUser(supabase, user.id)
             : null
 
