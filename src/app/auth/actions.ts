@@ -6,20 +6,26 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import { z } from 'zod'
-import { ensureProfileForUser, getPostAuthRedirect, getPublicAuthErrorMessage, sanitizeInternalRedirect } from '@/lib/auth'
+import {
+    ensureProfileForUser,
+    getPostAuthRedirect,
+    getPublicAuthErrorMessage,
+    sanitizeInternalRedirect,
+} from '@/lib/auth'
 import { getPublicSiteUrl, resolveTrustedRequestOrigin } from '@/lib/env'
 import {
     createTwoFactorChallenge,
+    getStoredTwoFactorSecret,
+    getTwoFactorMetadataPatch,
     getExpiredTwoFactorCookieOptions,
     getTwoFactorCookieOptions,
-    getTwoFactorRedirectPath,
+    hasConfiguredTwoFactor,
     TWO_FACTOR_CHALLENGE_COOKIE,
-    TWO_FACTOR_CODE_TTL_SECONDS,
+    TWO_FACTOR_CHALLENGE_TTL_SECONDS,
     TWO_FACTOR_VERIFIED_COOKIE,
     TWO_FACTOR_VERIFIED_TTL_SECONDS,
     verifyTwoFactorChallenge,
 } from '@/lib/twoFactor'
-import { sendTwoFactorEmail } from '@/lib/twoFactorEmail'
 import { createClient } from '@/utils/supabase/server'
 
 const emailSchema = z
@@ -45,19 +51,20 @@ function readFormValue(formData: FormData, key: string) {
 
 async function prepareTwoFactorChallenge(options: {
     user: User
+    hasStoredSecret: boolean
     destination: string
 }) {
     const cookieStore = await cookies()
     const challenge = await createTwoFactorChallenge({
         user: options.user,
+        hasStoredSecret: options.hasStoredSecret,
         redirectTo: options.destination,
     })
-    await sendTwoFactorEmail(options.user.email ?? '', challenge.code)
 
     cookieStore.set(
         TWO_FACTOR_CHALLENGE_COOKIE,
         challenge.cookie,
-        getTwoFactorCookieOptions(TWO_FACTOR_CODE_TTL_SECONDS),
+        getTwoFactorCookieOptions(TWO_FACTOR_CHALLENGE_TTL_SECONDS),
     )
     cookieStore.set(
         TWO_FACTOR_VERIFIED_COOKIE,
@@ -65,7 +72,7 @@ async function prepareTwoFactorChallenge(options: {
         getExpiredTwoFactorCookieOptions(),
     )
 
-    return getTwoFactorRedirectPath(options.destination)
+    return challenge.redirectPath
 }
 
 async function getAuthCallbackUrl(nextPath?: string | null) {
@@ -134,10 +141,11 @@ export async function loginWithPassword(formData: FormData, redirectTo?: string)
     try {
         twoFactorRedirect = await prepareTwoFactorChallenge({
             user: signedInUser,
+            hasStoredSecret: hasConfiguredTwoFactor(getStoredTwoFactorSecret(signedInUser)),
             destination: getPostAuthRedirect(profile?.role, redirectTo),
         })
     } catch (error) {
-        return { error: getPublicAuthErrorMessage(error, 'Unable to send a verification code right now.') }
+        return { error: getPublicAuthErrorMessage(error, 'Unable to start authenticator verification right now.') }
     }
 
     revalidatePath('/', 'layout')
@@ -222,10 +230,11 @@ export async function signup(formData: FormData, redirectTo?: string) {
     try {
         twoFactorRedirect = await prepareTwoFactorChallenge({
             user: signedUpUser,
+            hasStoredSecret: hasConfiguredTwoFactor(getStoredTwoFactorSecret(signedUpUser)),
             destination: getPostAuthRedirect(profile?.role, redirectTo),
         })
     } catch (error) {
-        return { error: getPublicAuthErrorMessage(error, 'Unable to send a verification code right now.') }
+        return { error: getPublicAuthErrorMessage(error, 'Unable to start authenticator verification right now.') }
     }
 
     revalidatePath('/', 'layout')
@@ -249,6 +258,7 @@ export async function verifyTwoFactorLogin(formData: FormData, redirectTo?: stri
         user,
         code,
         challengeCookie: cookieStore.get(TWO_FACTOR_CHALLENGE_COOKIE)?.value,
+        storedSecret: getStoredTwoFactorSecret(user),
     })
 
     if (!result.ok) {
@@ -256,7 +266,7 @@ export async function verifyTwoFactorLogin(formData: FormData, redirectTo?: stri
             cookieStore.set(
                 TWO_FACTOR_CHALLENGE_COOKIE,
                 result.updatedChallengeCookie,
-                getTwoFactorCookieOptions(TWO_FACTOR_CODE_TTL_SECONDS),
+                getTwoFactorCookieOptions(TWO_FACTOR_CHALLENGE_TTL_SECONDS),
             )
         }
 
@@ -269,6 +279,35 @@ export async function verifyTwoFactorLogin(formData: FormData, redirectTo?: stri
         }
 
         return { error: result.error }
+    }
+
+    if (result.secretToStore) {
+        const { error: updateError } = await supabase.auth.updateUser({
+            data: {
+                ...user.user_metadata,
+                ...getTwoFactorMetadataPatch(result.secretToStore),
+            },
+        })
+
+        if (updateError) {
+            cookieStore.set(
+                TWO_FACTOR_VERIFIED_COOKIE,
+                '',
+                getExpiredTwoFactorCookieOptions(),
+            )
+            cookieStore.set(
+                TWO_FACTOR_CHALLENGE_COOKIE,
+                '',
+                getExpiredTwoFactorCookieOptions(),
+            )
+
+            return {
+                error: getPublicAuthErrorMessage(
+                    updateError,
+                    'Unable to finish authenticator setup right now.',
+                ),
+            }
+        }
     }
 
     cookieStore.set(
@@ -286,7 +325,7 @@ export async function verifyTwoFactorLogin(formData: FormData, redirectTo?: stri
     redirect(sanitizeInternalRedirect(redirectTo) ?? '/vip')
 }
 
-export async function resendTwoFactorLoginCode(redirectTo?: string) {
+export async function refreshTwoFactorSetup(redirectTo?: string) {
     const supabase = await createClient()
     const cookieStore = await cookies()
     const {
@@ -298,17 +337,21 @@ export async function resendTwoFactorLoginCode(redirectTo?: string) {
         return { error: 'Your sign-in session has expired. Please sign in again.' }
     }
 
+    if (hasConfiguredTwoFactor(getStoredTwoFactorSecret(user))) {
+        return { error: 'Authenticator is already configured. Enter your current app code to continue.' }
+    }
+
     try {
         const challenge = await createTwoFactorChallenge({
             user,
+            hasStoredSecret: false,
             redirectTo: sanitizeInternalRedirect(redirectTo) ?? '/vip',
         })
-        await sendTwoFactorEmail(user.email ?? '', challenge.code)
 
         cookieStore.set(
             TWO_FACTOR_CHALLENGE_COOKIE,
             challenge.cookie,
-            getTwoFactorCookieOptions(TWO_FACTOR_CODE_TTL_SECONDS),
+            getTwoFactorCookieOptions(TWO_FACTOR_CHALLENGE_TTL_SECONDS),
         )
         cookieStore.set(
             TWO_FACTOR_VERIFIED_COOKIE,
@@ -316,9 +359,9 @@ export async function resendTwoFactorLoginCode(redirectTo?: string) {
             getExpiredTwoFactorCookieOptions(),
         )
 
-        return { success: 'A new verification code has been sent to your email.' }
+        return { success: 'A new authenticator setup key is ready. Scan the refreshed QR code and enter the latest code from your app.' }
     } catch (error) {
-        return { error: getPublicAuthErrorMessage(error, 'Unable to send a verification code right now.') }
+        return { error: getPublicAuthErrorMessage(error, 'Unable to refresh authenticator setup right now.') }
     }
 }
 

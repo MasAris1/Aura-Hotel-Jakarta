@@ -1,16 +1,20 @@
 import { createClient } from '@/utils/supabase/server'
-import { ensureProfileForUser, getPostAuthRedirect, getPublicAuthErrorMessage } from '@/lib/auth'
+import {
+    ensureProfileForUser,
+    getPostAuthRedirect,
+    getPublicAuthErrorMessage,
+} from '@/lib/auth'
 import { getPublicSiteUrl, resolveTrustedRequestOrigin } from '@/lib/env'
 import {
     createTwoFactorChallenge,
+    getStoredTwoFactorSecret,
     getExpiredTwoFactorCookieOptions,
     getTwoFactorCookieOptions,
-    getTwoFactorRedirectPath,
+    hasConfiguredTwoFactor,
     TWO_FACTOR_CHALLENGE_COOKIE,
-    TWO_FACTOR_CODE_TTL_SECONDS,
+    TWO_FACTOR_CHALLENGE_TTL_SECONDS,
     TWO_FACTOR_VERIFIED_COOKIE,
 } from '@/lib/twoFactor'
-import { sendTwoFactorEmail } from '@/lib/twoFactorEmail'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -42,23 +46,23 @@ export async function GET(request: Request) {
                 }
 
                 if (!data.user) {
-                    loginUrl.searchParams.set('error', 'We could not start two-factor verification. Please try again.')
+                    loginUrl.searchParams.set('error', 'We could not start authenticator verification. Please try again.')
                     return NextResponse.redirect(loginUrl)
                 }
 
                 const challenge = await createTwoFactorChallenge({
                     user: data.user,
+                    hasStoredSecret: hasConfiguredTwoFactor(getStoredTwoFactorSecret(data.user)),
                     redirectTo: destination,
                 })
-                await sendTwoFactorEmail(data.user.email ?? '', challenge.code)
                 const response = NextResponse.redirect(
-                    new URL(getTwoFactorRedirectPath(destination), safeOrigin),
+                    new URL(challenge.redirectPath, safeOrigin),
                 )
 
                 response.cookies.set(
                     TWO_FACTOR_CHALLENGE_COOKIE,
                     challenge.cookie,
-                    getTwoFactorCookieOptions(TWO_FACTOR_CODE_TTL_SECONDS),
+                    getTwoFactorCookieOptions(TWO_FACTOR_CHALLENGE_TTL_SECONDS),
                 )
                 response.cookies.set(
                     TWO_FACTOR_VERIFIED_COOKIE,

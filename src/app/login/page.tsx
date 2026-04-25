@@ -87,7 +87,7 @@ function LoginPageContent() {
                 <div className="w-full max-w-sm">
                     <div className="text-center mb-12">
                         <h1 className="font-playfair text-3xl tracking-widest uppercase mb-2">Authentication</h1>
-                        <p className="font-inter text-sm text-foreground/50">Identify yourself to proceed.</p>
+                        <p className="font-inter text-sm text-foreground/50">Identify yourself to proceed. Authenticator verification is required after sign-in.</p>
                     </div>
 
                     <div className="flex border-b border-white/10 mb-8">

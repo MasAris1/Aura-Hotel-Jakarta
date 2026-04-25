@@ -69,7 +69,7 @@ function RegisterPageContent() {
                 <div className="w-full max-w-sm my-auto">
                     <div className="text-center mb-12">
                         <h1 className="font-playfair text-3xl tracking-widest uppercase mb-2">Registration</h1>
-                        <p className="font-inter text-sm text-foreground/50">Submit your credentials.</p>
+                        <p className="font-inter text-sm text-foreground/50">Submit your credentials. You will scan an authenticator QR code before first access.</p>
                     </div>
 
                     <div className="min-h-[220px]">
