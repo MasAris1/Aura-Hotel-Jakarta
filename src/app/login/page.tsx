@@ -68,10 +68,10 @@ function LoginPageContent() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                 </div>
                 <div className="relative z-10 w-full max-w-md">
-                    <h2 className="font-playfair text-4xl mb-4">The VIP Portal</h2>
+                    <h2 className="font-playfair text-4xl mb-4">Your Aura Profile</h2>
                     <p className="font-inter font-light text-foreground/70 text-sm leading-relaxed">
-                        Access your personalized sanctuary. Customize your suite&apos;s ambiance,
-                        request private charters, and communicate directly with The Royal Butler.
+                        Sign in to manage your profile, reservations, and account security
+                        before returning to the home experience.
                     </p>
                 </div>
             </div>
@@ -87,7 +87,7 @@ function LoginPageContent() {
                 <div className="w-full max-w-sm">
                     <div className="text-center mb-12">
                         <h1 className="font-playfair text-3xl tracking-widest uppercase mb-2">Authentication</h1>
-                        <p className="font-inter text-sm text-foreground/50">Identify yourself to proceed. Authenticator verification is required after sign-in.</p>
+                        <p className="font-inter text-sm text-foreground/50">Identify yourself to proceed. Accounts with 2FA enabled will verify an authenticator code.</p>
                     </div>
 
                     <div className="flex border-b border-white/10 mb-8">
@@ -224,10 +224,10 @@ function LoginPageFallback() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                 </div>
                 <div className="relative z-10 w-full max-w-md">
-                    <h2 className="font-playfair text-4xl mb-4">The VIP Portal</h2>
+                    <h2 className="font-playfair text-4xl mb-4">Your Aura Profile</h2>
                     <p className="font-inter font-light text-foreground/70 text-sm leading-relaxed">
-                        Access your personalized sanctuary. Customize your suite&apos;s ambiance,
-                        request private charters, and communicate directly with The Royal Butler.
+                        Sign in to manage your profile, reservations, and account security
+                        before returning to the home experience.
                     </p>
                 </div>
             </div>

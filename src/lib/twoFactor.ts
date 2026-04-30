@@ -11,6 +11,7 @@ export const TWO_FACTOR_TOTP_DIGITS = 6;
 export const TWO_FACTOR_ISSUER = "Aura Hotel Jakarta";
 export const TWO_FACTOR_SECRET_METADATA_KEY = "aura_two_factor_secret";
 export const TWO_FACTOR_ENABLED_AT_METADATA_KEY = "aura_two_factor_enabled_at";
+export const TWO_FACTOR_MANUAL_ENABLED_METADATA_KEY = "aura_two_factor_manual_enabled";
 
 type SignedCookie<T> = {
   payload: T;
@@ -93,7 +94,7 @@ export function getExpiredTwoFactorCookieOptions(): CookieOptions {
 }
 
 export function getTwoFactorRedirectPath(redirectTo?: string | null) {
-  const safeRedirect = sanitizeTwoFactorRedirect(redirectTo) ?? "/vip";
+  const safeRedirect = sanitizeTwoFactorRedirect(redirectTo) ?? "/";
   return `/verify-2fa?redirect=${encodeURIComponent(safeRedirect)}`;
 }
 
@@ -113,7 +114,7 @@ export async function createTwoFactorChallenge(options: {
   }
 
   const authBinding = getTwoFactorAuthBinding(options.user);
-  const redirectTo = sanitizeTwoFactorRedirect(options.redirectTo) ?? "/vip";
+  const redirectTo = sanitizeTwoFactorRedirect(options.redirectTo) ?? "/";
   const expiresAt = Date.now() + TWO_FACTOR_CHALLENGE_TTL_SECONDS * 1000;
   const payload: TwoFactorChallengePayload = {
     userId: options.user.id,
@@ -289,6 +290,13 @@ export function hasConfiguredTwoFactor(storedSecret?: string | null) {
   return Boolean(storedSecret && storedSecret.trim());
 }
 
+export function hasEnabledTwoFactor(user: TwoFactorMetadataUser) {
+  return (
+    hasConfiguredTwoFactor(getStoredTwoFactorSecret(user)) &&
+    user.user_metadata?.[TWO_FACTOR_MANUAL_ENABLED_METADATA_KEY] === true
+  );
+}
+
 export function getStoredTwoFactorSecret(user: TwoFactorMetadataUser) {
   const rawSecret = user.user_metadata?.[TWO_FACTOR_SECRET_METADATA_KEY];
 
@@ -301,6 +309,7 @@ export function getTwoFactorMetadataPatch(secret: string) {
   return {
     [TWO_FACTOR_SECRET_METADATA_KEY]: secret,
     [TWO_FACTOR_ENABLED_AT_METADATA_KEY]: new Date().toISOString(),
+    [TWO_FACTOR_MANUAL_ENABLED_METADATA_KEY]: true,
   };
 }
 
@@ -509,14 +518,11 @@ async function hmacHex(message: string) {
 }
 
 function getTwoFactorSecret() {
-  const secret =
-    process.env.AUTH_2FA_SECRET ??
-    process.env.SUPABASE_SERVICE_ROLE_KEY ??
-    process.env.MIDTRANS_SERVER_KEY;
+  const secret = process.env.AUTH_2FA_SECRET;
 
   if (!secret) {
     throw new Error(
-      "Missing server secret for two-factor verification. Set AUTH_2FA_SECRET or provide an existing server-side secret.",
+      "Missing server secret for two-factor verification. Set AUTH_2FA_SECRET.",
     );
   }
 

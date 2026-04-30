@@ -278,10 +278,10 @@ function BookingForm() {
                 </p>
                 <div className="flex flex-col gap-4">
                     <Link
-                        href="/vip"
+                        href="/profile"
                         className="bg-primary text-primary-foreground py-4 font-sans text-xs tracking-[0.2em] uppercase hover:bg-primary/90 transition-colors text-center"
                     >
-                        Ke Portal VIP
+                        Ke Profil
                     </Link>
                     <Link
                         href="/"

@@ -23,7 +23,7 @@ declare global {
   }
 }
 
-const CORE_ROUTES = ["/", "/booking", "/login", "/register", "/dashboard", "/vip"];
+const CORE_ROUTES = ["/", "/booking", "/login", "/register", "/dashboard", "/profile"];
 const ROOM_ROUTES = roomsData.map((room) => `/rooms/${room.id}`);
 const STATIC_IMAGE_TARGETS = [
   "/media/hero-bundaran-hi.webp",

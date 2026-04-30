@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { ChevronDown, Crown, LogOut, Menu, UserRound, X } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import {
   clearSessionCache,
@@ -12,7 +12,6 @@ import {
   CLIENT_WARMUP_KEYS,
   type UserProfile,
 } from "@/lib/clientWarmup";
-import { getRoleHomePath, isAdminRole, isStaffRole } from "@/lib/auth";
 import { createClient } from "@/utils/supabase/client";
 
 const navLinks = [
@@ -26,14 +25,15 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [userRole, setUserRole] = useState<string | null>(
-    () =>
-      readSessionCache<UserProfile>(CLIENT_WARMUP_KEYS.userProfile)?.role ?? null,
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(() =>
+    readSessionCache<UserProfile>(CLIENT_WARMUP_KEYS.userProfile),
   );
   const [visibleSection, setVisibleSection] = useState<string | null>(null);
   const [manualSection, setManualSection] = useState<string | null>(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
   const navDesktopRef = useRef<HTMLDivElement | null>(null);
+  const accountMenuRef = useRef<HTMLDivElement | null>(null);
   const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
   const releaseTimeoutRef = useRef<number | null>(null);
   const pathname = usePathname();
@@ -62,7 +62,7 @@ export function Navbar() {
 
     const syncUserRole = async (currentSession: Session | null) => {
       if (!currentSession?.user) {
-        setUserRole(null);
+        setUserProfile(null);
         return;
       }
 
@@ -70,8 +70,8 @@ export function Navbar() {
         CLIENT_WARMUP_KEYS.userProfile,
       );
 
-      if (cachedProfile?.role) {
-        setUserRole(cachedProfile.role);
+      if (cachedProfile) {
+        setUserProfile(cachedProfile);
       }
 
       const { data: profile } = await supabase
@@ -81,7 +81,12 @@ export function Navbar() {
         .single();
 
       if (!profile) {
-        setUserRole(cachedProfile?.role ?? null);
+        setUserProfile(
+          cachedProfile ?? {
+            first_name: currentSession.user.email?.split("@")[0] ?? "Guest",
+            last_name: "",
+          },
+        );
         return;
       }
 
@@ -96,7 +101,7 @@ export function Navbar() {
       };
 
       writeSessionCache(CLIENT_WARMUP_KEYS.userProfile, nextProfile);
-      setUserRole(profile.role ?? null);
+      setUserProfile(nextProfile);
     };
 
     const fetchSession = async () => {
@@ -119,7 +124,7 @@ export function Navbar() {
 
       if (!currentSession) {
         clearWarmCaches();
-        setUserRole(null);
+        setUserProfile(null);
         return;
       }
 
@@ -131,6 +136,27 @@ export function Navbar() {
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (!accountMenuOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (
+        accountMenuRef.current &&
+        !accountMenuRef.current.contains(event.target as Node)
+      ) {
+        setAccountMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [accountMenuOpen]);
 
   useEffect(() => {
     if (pathname !== "/") {
@@ -251,6 +277,8 @@ export function Navbar() {
     await supabase.auth.signOut();
     clearWarmCaches();
     setSession(null);
+    setUserProfile(null);
+    setAccountMenuOpen(false);
     setMobileMenuOpen(false);
   };
 
@@ -292,13 +320,7 @@ export function Navbar() {
   };
 
   const useHeroChrome = pathname === "/" && !isScrolled && !mobileMenuOpen;
-  const isStaffUser = isStaffRole(userRole);
-  const portalHref = session ? getRoleHomePath(userRole) : "/login";
-  const portalLabel = isAdminRole(userRole)
-    ? "Admin Panel"
-    : isStaffUser
-      ? "Ops Dashboard"
-      : "Guest Portal";
+  const greetingName = getGreetingName(userProfile, session);
   const shellClassName = useHeroChrome
     ? "border-white/10 bg-black/18 shadow-none"
     : "border-primary/12 bg-[#0f131b]/88 shadow-[0_24px_70px_rgba(0,0,0,0.38)]";
@@ -361,20 +383,48 @@ export function Navbar() {
 
         <div className="hidden items-center gap-3 lg:flex">
           {!authLoading && session ? (
-            <>
-              <Link
-                href={portalHref}
-                className={`rounded-full border border-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.26em] transition-colors duration-300 ${textClassName} hover:border-primary/35 hover:text-white`}
-              >
-                {portalLabel}
-              </Link>
+            <div ref={accountMenuRef} className="relative">
               <button
-                onClick={handleLogout}
-                className="rounded-full border border-transparent px-4 py-2 text-[11px] uppercase tracking-[0.26em] text-foreground/54 transition-colors duration-300 hover:text-destructive"
+                type="button"
+                onClick={() => setAccountMenuOpen((current) => !current)}
+                className={`flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.22em] transition-colors duration-300 ${textClassName} hover:border-primary/35 hover:text-white`}
+                aria-expanded={accountMenuOpen}
               >
-                Logout
+                Hai, {greetingName}
+                <ChevronDown
+                  className={`h-3.5 w-3.5 transition-transform ${accountMenuOpen ? "rotate-180" : ""}`}
+                />
               </button>
-            </>
+
+              {accountMenuOpen ? (
+                <div className="absolute right-0 mt-3 w-52 border border-white/10 bg-[#0f131b] p-2 shadow-[0_24px_70px_rgba(0,0,0,0.42)]">
+                  <Link
+                    href="/profile"
+                    onClick={() => setAccountMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 font-inter text-xs uppercase tracking-[0.22em] text-foreground/72 transition-colors hover:bg-white/6 hover:text-white"
+                  >
+                    <UserRound className="h-4 w-4" />
+                    Profil
+                  </Link>
+                  <Link
+                    href="/vip"
+                    onClick={() => setAccountMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 font-inter text-xs uppercase tracking-[0.22em] text-foreground/72 transition-colors hover:bg-white/6 hover:text-white"
+                  >
+                    <Crown className="h-4 w-4" />
+                    VIP
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left font-inter text-xs uppercase tracking-[0.22em] text-foreground/54 transition-colors hover:bg-red-500/10 hover:text-destructive"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                </div>
+              ) : null}
+            </div>
           ) : null}
 
           {!authLoading && !session ? (
@@ -431,12 +481,22 @@ export function Navbar() {
 
             {!authLoading && session ? (
               <>
+                <div className="px-2 pb-2 pt-1 font-inter text-xs uppercase tracking-[0.28em] text-primary">
+                  Hai, {greetingName}
+                </div>
                 <Link
-                  href={portalHref}
+                  href="/profile"
                   onClick={() => setMobileMenuOpen(false)}
                   className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] px-6 py-5 text-lg uppercase tracking-[0.28em] text-white/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-white"
                 >
-                  {portalLabel}
+                  Profil
+                </Link>
+                <Link
+                  href="/vip"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] px-6 py-5 text-lg uppercase tracking-[0.28em] text-white/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-white"
+                >
+                  VIP
                 </Link>
                 <button
                   type="button"
@@ -462,4 +522,23 @@ export function Navbar() {
       ) : null}
     </header>
   );
+}
+
+function getGreetingName(profile: UserProfile | null, session: Session | null) {
+  const firstName = profile?.first_name?.trim();
+
+  if (firstName) {
+    return firstName;
+  }
+
+  const metadataName =
+    typeof session?.user.user_metadata?.full_name === "string"
+      ? session.user.user_metadata.full_name.trim().split(/\s+/)[0]
+      : "";
+
+  if (metadataName) {
+    return metadataName;
+  }
+
+  return session?.user.email?.split("@")[0] ?? "User";
 }

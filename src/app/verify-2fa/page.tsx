@@ -4,8 +4,7 @@ import QRCode from "qrcode";
 import { sanitizeInternalRedirect } from "@/lib/auth";
 import {
   getTwoFactorChallengeState,
-  getStoredTwoFactorSecret,
-  hasConfiguredTwoFactor,
+  hasEnabledTwoFactor,
   TWO_FACTOR_CHALLENGE_COOKIE,
 } from "@/lib/twoFactor";
 import { createClient } from "@/utils/supabase/server";
@@ -30,7 +29,7 @@ export default async function VerifyTwoFactorPage({
     redirect("/login");
   }
 
-  const hasStoredSecret = hasConfiguredTwoFactor(getStoredTwoFactorSecret(user));
+  const hasStoredSecret = hasEnabledTwoFactor(user);
   const challengeState = await getTwoFactorChallengeState({
     user,
     challengeCookie: cookieStore.get(TWO_FACTOR_CHALLENGE_COOKIE)?.value,
@@ -40,7 +39,7 @@ export default async function VerifyTwoFactorPage({
   const rawRedirect = Array.isArray(params.redirect)
     ? params.redirect[0]
     : params.redirect;
-  const redirectTo = sanitizeInternalRedirect(rawRedirect) ?? "/vip";
+  const redirectTo = sanitizeInternalRedirect(rawRedirect) ?? "/";
   const setupState =
     !hasStoredSecret && challengeState?.mode === "setup"
       ? {

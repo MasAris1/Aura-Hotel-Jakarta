@@ -29,7 +29,7 @@ export function getRoleHomePath(role: ProfileRole | undefined | null) {
     return "/dashboard";
   }
 
-  return "/vip";
+  return "/profile";
 }
 
 export function sanitizeInternalRedirect(redirectTo?: string | null) {

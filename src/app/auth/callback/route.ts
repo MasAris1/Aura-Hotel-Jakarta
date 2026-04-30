@@ -1,16 +1,15 @@
 import { createClient } from '@/utils/supabase/server'
 import {
     ensureProfileForUser,
-    getPostAuthRedirect,
     getPublicAuthErrorMessage,
+    sanitizeInternalRedirect,
 } from '@/lib/auth'
 import { getPublicSiteUrl, resolveTrustedRequestOrigin } from '@/lib/env'
 import {
     createTwoFactorChallenge,
-    getStoredTwoFactorSecret,
+    hasEnabledTwoFactor,
     getExpiredTwoFactorCookieOptions,
     getTwoFactorCookieOptions,
-    hasConfiguredTwoFactor,
     TWO_FACTOR_CHALLENGE_COOKIE,
     TWO_FACTOR_CHALLENGE_TTL_SECONDS,
     TWO_FACTOR_VERIFIED_COOKIE,
@@ -38,8 +37,11 @@ export async function GET(request: Request) {
             const supabase = await createClient()
             const { data, error } = await supabase.auth.exchangeCodeForSession(code)
             if (!error) {
-                const profile = data.user ? await ensureProfileForUser(supabase, data.user) : null
-                const destination = getPostAuthRedirect(profile?.role, next)
+                if (data.user) {
+                    await ensureProfileForUser(supabase, data.user)
+                }
+                const safeNext = sanitizeInternalRedirect(next)
+                const destination = safeNext?.startsWith('/reset-password') ? safeNext : '/'
 
                 if (destination.startsWith('/reset-password')) {
                     return NextResponse.redirect(new URL(destination, safeOrigin))
@@ -50,9 +52,13 @@ export async function GET(request: Request) {
                     return NextResponse.redirect(loginUrl)
                 }
 
+                if (!hasEnabledTwoFactor(data.user)) {
+                    return NextResponse.redirect(new URL(destination, safeOrigin))
+                }
+
                 const challenge = await createTwoFactorChallenge({
                     user: data.user,
-                    hasStoredSecret: hasConfiguredTwoFactor(getStoredTwoFactorSecret(data.user)),
+                    hasStoredSecret: true,
                     redirectTo: destination,
                 })
                 const response = NextResponse.redirect(
