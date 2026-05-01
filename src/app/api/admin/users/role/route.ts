@@ -6,7 +6,7 @@ import { getProfileForUser, isAdminRole } from "@/lib/auth";
 
 const payloadSchema = z.object({
   targetUserId: z.string().uuid("Invalid user id"),
-  role: z.enum(["guest", "receptionist"]),
+  role: z.enum(["guest", "receptionist", "admin"]),
 });
 
 export async function PATCH(request: Request) {
@@ -51,10 +51,6 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "User profile not found" }, { status: 404 });
     }
 
-    if (targetProfile.role === "admin") {
-      return NextResponse.json({ error: "Admin role can only be managed manually" }, { status: 409 });
-    }
-
     const { data: updatedProfile, error: updateError } = await supabaseAdmin
       .from("profiles")
       .update({ role })
@@ -81,6 +77,9 @@ export async function PATCH(request: Request) {
       user: {
         ...updatedProfile,
         email: authUser.data.user?.email ?? "",
+        last_sign_in_at: authUser.data.user?.last_sign_in_at ?? null,
+        email_confirmed_at: authUser.data.user?.email_confirmed_at ?? null,
+        is_current_user: false,
       },
     });
   } catch {

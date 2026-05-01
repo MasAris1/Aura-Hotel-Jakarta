@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, LogOut, Menu, UserRound, X } from "lucide-react";
+import { ChevronDown, LayoutDashboard, LogOut, Menu, UserRound, X } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import {
   clearSessionCache,
@@ -322,6 +322,7 @@ export function Navbar() {
 
   const useHeroChrome = pathname === "/" && !isScrolled && !mobileMenuOpen;
   const greetingName = getGreetingName(userProfile, session);
+  const isAdmin = userProfile?.role === "admin";
   const shellClassName = useHeroChrome
     ? "border-white/10 bg-black/18 shadow-none"
     : "border-primary/12 bg-[#0f131b]/88 shadow-[0_24px_70px_rgba(0,0,0,0.38)]";
@@ -407,6 +408,16 @@ export function Navbar() {
                     <UserRound className="h-4 w-4" />
                     Profil
                   </Link>
+                  {isAdmin ? (
+                    <Link
+                      href="/admin"
+                      onClick={() => setAccountMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 font-inter text-xs uppercase tracking-[0.22em] text-foreground/72 transition-colors hover:bg-white/6 hover:text-white"
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  ) : null}
                   <button
                     type="button"
                     onClick={handleLogout}
@@ -484,6 +495,15 @@ export function Navbar() {
                 >
                   Profil
                 </Link>
+                {isAdmin ? (
+                  <Link
+                    href="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] px-6 py-5 text-lg uppercase tracking-[0.28em] text-white/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-white"
+                  >
+                    Dashboard
+                  </Link>
+                ) : null}
                 <button
                   type="button"
                   onClick={handleLogout}
