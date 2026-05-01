@@ -6,6 +6,27 @@ import { getProfileForUser, isAdminRole } from "@/lib/auth";
 import { resolveRoomDetails } from "@/lib/roomCatalog";
 
 type AdminPeriod = "month" | "3m" | "6m" | "1y";
+type BookingExportRow = {
+  id: string;
+  created_at: string | null;
+  room_id: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  check_in: string;
+  check_out: string;
+  total_price: number | null;
+  status: string | null;
+};
+type RoomExportRow = {
+  id: string;
+  name: string | null;
+  type: string | null;
+  images: unknown;
+  base_price: number | null;
+  description: string | null;
+  capacity: number | null;
+};
 
 const periodOptions: Array<{ value: AdminPeriod; months: number }> = [
   { value: "month", months: 1 },
@@ -106,7 +127,7 @@ export async function GET(request: Request) {
 
     let query = supabaseAdmin
       .from("bookings")
-      .select("id, created_at, room_id, first_name, last_name, email, check_in, check_out, total_price, status, rooms(*)")
+      .select("id, created_at, room_id, first_name, last_name, email, check_in, check_out, total_price, status")
       .order("created_at", { ascending: false });
 
     if (status && status !== "ALL") {
@@ -124,7 +145,31 @@ export async function GET(request: Request) {
     const { data: bookings, error } = await query;
 
     if (error) {
+      console.error("Failed to query booking export rows", error);
       return NextResponse.json({ error: "Failed to export bookings" }, { status: 500 });
+    }
+
+    const bookingRows = (bookings ?? []) as BookingExportRow[];
+    const roomIds = Array.from(
+      new Set(
+        bookingRows
+          .map((booking) => booking.room_id)
+          .filter((roomId): roomId is string => Boolean(roomId)),
+      ),
+    );
+    let roomMap = new Map<string, RoomExportRow>();
+
+    if (roomIds.length > 0) {
+      const { data: rooms, error: roomsError } = await supabaseAdmin
+        .from("rooms")
+        .select("id, name, type, images, base_price, description, capacity")
+        .in("id", roomIds);
+
+      if (roomsError) {
+        console.warn("Failed to query booking export room rows", roomsError);
+      } else {
+        roomMap = new Map(((rooms ?? []) as RoomExportRow[]).map((room) => [room.id, room]));
+      }
     }
 
     const header = [
@@ -140,23 +185,14 @@ export async function GET(request: Request) {
       "status",
     ];
 
-    const rows = (bookings ?? []).map((booking) => {
-      const bookingRoom = (booking.rooms ?? null) as {
-        name?: string | null;
-        type?: string | null;
-        images?: unknown;
-        image_url?: string | null;
-        base_price?: number | null;
-        description?: string | null;
-        capacity?: number | null;
-      } | null;
+    const rows = bookingRows.map((booking) => {
+      const bookingRoom = booking.room_id ? roomMap.get(booking.room_id) : null;
 
       const room = resolveRoomDetails(booking.room_id, {
         id: booking.room_id ?? "",
         name: bookingRoom?.name ?? null,
         type: bookingRoom?.type ?? "Room",
         images: bookingRoom?.images as string[] | null | undefined,
-        image_url: bookingRoom?.image_url ?? null,
         base_price: bookingRoom?.base_price ?? 0,
         description: bookingRoom?.description ?? null,
         capacity: bookingRoom?.capacity ?? 1,
@@ -179,11 +215,11 @@ export async function GET(request: Request) {
 
     if (format === "pdf") {
       const totalBookings = rows.length;
-      const grossValue = (bookings ?? []).reduce(
+      const grossValue = bookingRows.reduce(
         (sum, booking) => sum + Number(booking.total_price ?? 0),
         0,
       );
-      const realizedRevenue = (bookings ?? []).reduce((sum, booking) => {
+      const realizedRevenue = bookingRows.reduce((sum, booking) => {
         if (!settledStatuses.has(booking.status ?? "")) {
           return sum;
         }
@@ -192,7 +228,7 @@ export async function GET(request: Request) {
       }, 0);
       const statusMap = new Map<string, { count: number; amount: number }>();
 
-      for (const booking of bookings ?? []) {
+      for (const booking of bookingRows) {
         const bookingStatus = booking.status ?? "UNPAID";
         const current = statusMap.get(bookingStatus) ?? { count: 0, amount: 0 };
         current.count += 1;
@@ -300,7 +336,8 @@ export async function GET(request: Request) {
         "Content-Disposition": `attachment; filename="bookings-report-${new Date().toISOString().slice(0, 10)}.csv"`,
       },
     });
-  } catch {
+  } catch (error) {
+    console.error("Unexpected booking export failure", error);
     return NextResponse.json({ error: "Failed to export bookings" }, { status: 500 });
   }
 }
