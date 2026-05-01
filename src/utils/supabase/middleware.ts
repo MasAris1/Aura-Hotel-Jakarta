@@ -45,7 +45,6 @@ export async function updateSession(request: NextRequest) {
     } = await supabase.auth.getUser()
     const pathname = request.nextUrl.pathname
     const needsProtectedPageAuthentication =
-        pathname.startsWith('/dashboard') ||
         pathname.startsWith('/profile') ||
         pathname.startsWith('/booking') ||
         pathname.startsWith('/checkout') ||
@@ -143,7 +142,7 @@ export async function updateSession(request: NextRequest) {
 
     if (user && pathname.startsWith('/admin') && !isAdminRole(profile?.role)) {
         const url = request.nextUrl.clone()
-        url.pathname = '/dashboard'
+        url.pathname = '/'
         url.search = ''
         return NextResponse.redirect(url)
     }

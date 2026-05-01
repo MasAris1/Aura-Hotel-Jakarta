@@ -25,10 +25,6 @@ export function getRoleHomePath(role: ProfileRole | undefined | null) {
     return "/admin";
   }
 
-  if (isReceptionistRole(role)) {
-    return "/dashboard";
-  }
-
   return "/#collection";
 }
 
@@ -57,7 +53,11 @@ export function getPostAuthRedirect(
 
   if (safeRedirect) {
     if (safeRedirect.startsWith("/admin") && !isAdminRole(role)) {
-      return "/dashboard";
+      return "/";
+    }
+
+    if (safeRedirect.startsWith("/dashboard")) {
+      return isAdminRole(role) ? "/admin" : "/";
     }
 
     return safeRedirect;

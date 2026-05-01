@@ -23,7 +23,7 @@ declare global {
   }
 }
 
-const CORE_ROUTES = ["/", "/booking", "/login", "/register", "/dashboard", "/profile"];
+const CORE_ROUTES = ["/", "/booking", "/login", "/register", "/profile"];
 const ROOM_ROUTES = roomsData.map((room) => `/rooms/${room.id}`);
 const STATIC_IMAGE_TARGETS = [
   "/media/hero-bundaran-hi.webp",
@@ -114,8 +114,6 @@ export function AppWarmup() {
 
         if (isAdminRole(profile?.role)) {
           router.prefetch("/admin");
-        } else if (profile?.role === "receptionist") {
-          router.prefetch("/dashboard");
         }
 
         if (isConstrainedConnection) {

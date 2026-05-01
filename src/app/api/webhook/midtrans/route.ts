@@ -154,7 +154,7 @@ export async function POST(req: Request) {
                                 </table>
 
                                 <p style="margin-top: 30px;">
-                                    <a href="${getPublicSiteUrl()}/dashboard" style="background: #c9a25b; color: #fff; padding: 10px 20px; text-decoration: none; display: inline-block;">View e-Voucher</a>
+                                    <a href="${getPublicSiteUrl()}/profile" style="background: #c9a25b; color: #fff; padding: 10px 20px; text-decoration: none; display: inline-block;">View e-Voucher</a>
                                 </p>
                             </div>
                         `,

@@ -9,7 +9,7 @@ const footerLinks = {
   ],
   hospitality: [
     { label: "Reserve a Stay", href: "/booking" },
-    { label: "Guest Portal", href: "/dashboard" },
+    { label: "Guest Profile", href: "/profile" },
     { label: "Concierge Access", href: "/login" },
   ],
 };

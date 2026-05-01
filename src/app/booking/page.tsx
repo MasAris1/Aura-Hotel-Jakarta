@@ -249,7 +249,7 @@ function BookingForm() {
                             setBookingSuccess(true);
                         },
                         onPending: () => {
-                            router.push("/dashboard");
+                            router.push("/");
                         },
                         onError: () => {
                             alert("Pembayaran gagal. Silakan coba lagi.");

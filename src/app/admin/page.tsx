@@ -2,9 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   ArrowRight,
+  BarChart3,
   BedDouble,
   CircleDollarSign,
   Download,
+  FileText,
   Hotel,
   ShieldCheck,
   UserRound,
@@ -53,7 +55,13 @@ import {
 
 type BookingMetricsRow = Pick<
   Database["public"]["Tables"]["bookings"]["Row"],
-  "id" | "room_id" | "check_in" | "check_out" | "total_price" | "status"
+  | "id"
+  | "created_at"
+  | "room_id"
+  | "check_in"
+  | "check_out"
+  | "total_price"
+  | "status"
 >;
 
 type RoomSummaryRow = {
@@ -66,6 +74,7 @@ type RoomSummaryRow = {
 type RecentBookingRow = Pick<
   Database["public"]["Tables"]["bookings"]["Row"],
   | "id"
+  | "created_at"
   | "room_id"
   | "first_name"
   | "last_name"
@@ -75,6 +84,14 @@ type RecentBookingRow = Pick<
   | "total_price"
   | "status"
 >;
+
+type AdminPeriod = "month" | "3m" | "6m" | "1y";
+
+type AdminPageProps = {
+  searchParams?: Promise<{
+    period?: string;
+  }>;
+};
 
 type ProfileMetricRow = Pick<
   Database["public"]["Tables"]["profiles"]["Row"],
@@ -90,6 +107,13 @@ const bookingStatusOptions = [
   "EXPIRED",
   "REFUNDED",
 ] as const;
+
+const periodOptions: Array<{ value: AdminPeriod; label: string; months: number }> = [
+  { value: "month", label: "Bulan ini", months: 1 },
+  { value: "3m", label: "3 bulan", months: 3 },
+  { value: "6m", label: "6 bulan", months: 6 },
+  { value: "1y", label: "1 tahun", months: 12 },
+];
 
 const roleLabels: Record<string, string> = {
   admin: "Admin",
@@ -159,6 +183,35 @@ function getTodayInJakarta() {
   return new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
 }
 
+function normalizePeriod(period: string | undefined): AdminPeriod {
+  return periodOptions.some((option) => option.value === period)
+    ? (period as AdminPeriod)
+    : "month";
+}
+
+function getPeriodRange(period: AdminPeriod) {
+  const today = getTodayInJakarta();
+  const [year, month, day] = today.split("-").map(Number);
+  const option = periodOptions.find((item) => item.value === period) ?? periodOptions[0];
+  const fromDate =
+    period === "month"
+      ? new Date(Date.UTC(year, month - 1, 1))
+      : new Date(Date.UTC(year, month - option.months, day));
+  const toDate = new Date(Date.UTC(year, month - 1, day));
+  const from = fromDate.toISOString().slice(0, 10);
+  const to = toDate.toISOString().slice(0, 10);
+
+  return {
+    from,
+    to,
+    label: `${formatDate(from)} - ${formatDate(to)}`,
+  };
+}
+
+function getPeriodHref(period: AdminPeriod) {
+  return `/admin?period=${period}`;
+}
+
 function getRoleLabel(role: string | null) {
   return roleLabels[role ?? "guest"] ?? "Guest";
 }
@@ -191,7 +244,10 @@ function getStatusBadgeClassName(status: BookingStatus) {
   return "border-white/12 text-white/70";
 }
 
-export default async function AdminPage() {
+export default async function AdminPage({ searchParams }: AdminPageProps) {
+  const params = searchParams ? await searchParams : {};
+  const selectedPeriod = normalizePeriod(params.period);
+  const periodRange = getPeriodRange(selectedPeriod);
   const supabase = await createClient();
   const {
     data: { user },
@@ -204,7 +260,7 @@ export default async function AdminPage() {
   const profile = await getProfileForUser(supabase, user.id);
 
   if (!isAdminRole(profile?.role)) {
-    redirect("/dashboard");
+    redirect("/");
   }
 
   const supabaseAdmin = getSupabaseAdmin();
@@ -216,17 +272,25 @@ export default async function AdminPage() {
   ] = await Promise.all([
     supabaseAdmin
       .from("bookings")
-      .select("id, room_id, check_in, check_out, total_price, status")
+      .select("id, created_at, room_id, check_in, check_out, total_price, status")
+      .gte("created_at", `${periodRange.from}T00:00:00`)
+      .lte("created_at", `${periodRange.to}T23:59:59`)
       .order("created_at", { ascending: false }),
     supabaseAdmin
       .from("bookings")
       .select(
-        "id, room_id, first_name, last_name, email, check_in, check_out, total_price, status",
+        "id, created_at, room_id, first_name, last_name, email, check_in, check_out, total_price, status",
       )
+      .gte("created_at", `${periodRange.from}T00:00:00`)
+      .lte("created_at", `${periodRange.to}T23:59:59`)
       .order("created_at", { ascending: false })
       .limit(8),
     supabaseAdmin.from("rooms").select("id, name, base_price, deleted_at"),
-    supabaseAdmin.from("profiles").select("id, role, created_at"),
+    supabaseAdmin
+      .from("profiles")
+      .select("id, role, created_at")
+      .gte("created_at", `${periodRange.from}T00:00:00`)
+      .lte("created_at", `${periodRange.to}T23:59:59`),
   ]);
 
   const bookings = (metricsRows ?? []) as BookingMetricsRow[];
@@ -241,11 +305,41 @@ export default async function AdminPage() {
   const settledStatuses = new Set(["PAID", "CHECKED_IN", "CHECKED_OUT"]);
   const activeStatuses = new Set(["PAID", "CHECKED_IN"]);
   const statusCounts = new Map<BookingStatus, number>();
+  const statusAmountMap = new Map<BookingStatus, number>();
   const roleCounts = new Map<string, number>();
+  const roomReportMap = new Map<
+    string,
+    {
+      name: string;
+      bookings: number;
+      revenue: number;
+      gross: number;
+    }
+  >();
 
   bookings.forEach((booking) => {
     const status = (booking.status ?? "UNPAID") as BookingStatus;
+    const amount = Number(booking.total_price ?? 0);
+    const roomDetails = resolveRoomDetails(
+      booking.room_id,
+      booking.room_id ? roomMap.get(booking.room_id) : null,
+    );
+    const roomKey = booking.room_id || roomDetails.name;
+    const roomReport = roomReportMap.get(roomKey) ?? {
+      name: roomDetails.name || roomDetails.type || "Room pending",
+      bookings: 0,
+      revenue: 0,
+      gross: 0,
+    };
+
     statusCounts.set(status, (statusCounts.get(status) ?? 0) + 1);
+    statusAmountMap.set(status, (statusAmountMap.get(status) ?? 0) + amount);
+    roomReport.bookings += 1;
+    roomReport.gross += amount;
+    if (settledStatuses.has(status)) {
+      roomReport.revenue += amount;
+    }
+    roomReportMap.set(roomKey, roomReport);
   });
 
   profiles.forEach((entry) => {
@@ -262,6 +356,12 @@ export default async function AdminPage() {
   }, 0);
   const pendingPayments = statusCounts.get("UNPAID") ?? 0;
   const activeStays = statusCounts.get("CHECKED_IN") ?? 0;
+  const grossBookingValue = bookings.reduce(
+    (sum, booking) => sum + Number(booking.total_price ?? 0),
+    0,
+  );
+  const averageBookingValue =
+    bookings.length > 0 ? grossBookingValue / bookings.length : 0;
   const todayArrivals = bookings.filter(
     (booking) =>
       booking.check_in === today && activeStatuses.has(booking.status ?? ""),
@@ -285,12 +385,22 @@ export default async function AdminPage() {
     .map((status) => ({
       status: status as BookingStatus,
       count: statusCounts.get(status as BookingStatus) ?? 0,
+      amount: statusAmountMap.get(status as BookingStatus) ?? 0,
     }));
 
   const roleBreakdown = ["admin", "receptionist", "guest"].map((role) => ({
     role,
     count: roleCounts.get(role) ?? 0,
   }));
+  const topRoomReports = Array.from(roomReportMap.values())
+    .sort((left, right) => {
+      if (right.revenue !== left.revenue) {
+        return right.revenue - left.revenue;
+      }
+
+      return right.bookings - left.bookings;
+    })
+    .slice(0, 5);
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,_rgba(15,19,27,0.98)_0%,_rgba(9,12,18,1)_100%)] pb-16 pt-28 text-foreground">
@@ -311,7 +421,10 @@ export default async function AdminPage() {
                 </h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-white/62">
                   Ringkasan operasional, booking terbaru, role pengguna, kamar,
-                  dan audit dalam satu halaman yang lebih sederhana.
+                  reporting, dan audit dalam satu dashboard admin.
+                </p>
+                <p className="mt-2 text-sm text-white/46">
+                  Periode data: {periodRange.label}
                 </p>
               </div>
             </div>
@@ -320,14 +433,28 @@ export default async function AdminPage() {
               <div className="rounded-lg border border-white/10 bg-black/18 px-4 py-3 text-sm text-white/70">
                 Masuk sebagai <span className="font-medium text-white">{adminName}</span>
               </div>
-              <Link href="/dashboard" className={adminOutlineButtonClassName}>
-                Dashboard Operasional
-              </Link>
               <Link href="/#collection" className={adminPrimaryButtonClassName}>
                 Buat Booking
                 <ArrowRight className="size-4" />
               </Link>
             </div>
+          </div>
+
+          <div className="mt-6 flex flex-wrap gap-2 border-t border-white/10 pt-5">
+            {periodOptions.map((option) => (
+              <Link
+                key={option.value}
+                href={getPeriodHref(option.value)}
+                className={cn(
+                  "inline-flex h-10 items-center rounded-lg border px-3 text-sm font-medium transition-colors",
+                  selectedPeriod === option.value
+                    ? "border-primary/35 bg-primary text-primary-foreground"
+                    : "border-white/10 bg-black/18 text-white/70 hover:bg-white/[0.06] hover:text-white",
+                )}
+              >
+                {option.label}
+              </Link>
+            ))}
           </div>
         </section>
 
@@ -357,10 +484,10 @@ export default async function AdminPage() {
             <CardHeader>
               <div>
                 <CardDescription className="text-white/58">
-                  Booking aktif
+                  Total booking
                 </CardDescription>
                 <CardTitle className="mt-2 text-2xl text-white">
-                  {activeStays}
+                  {bookings.length}
                 </CardTitle>
               </div>
               <CardAction>
@@ -370,7 +497,7 @@ export default async function AdminPage() {
               </CardAction>
             </CardHeader>
             <CardFooter className="border-white/10 bg-white/[0.03] text-white/50">
-              {todayArrivals} kedatangan hari ini
+              {activeStays} sedang menginap, {todayArrivals} kedatangan hari ini
             </CardFooter>
           </Card>
 
@@ -399,7 +526,7 @@ export default async function AdminPage() {
             <CardHeader>
               <div>
                 <CardDescription className="text-white/58">
-                  User terdaftar
+                  User baru
                 </CardDescription>
                 <CardTitle className="mt-2 text-2xl text-white">
                   {profiles.length}
@@ -412,7 +539,7 @@ export default async function AdminPage() {
               </CardAction>
             </CardHeader>
             <CardFooter className="border-white/10 bg-white/[0.03] text-white/50">
-              Role dapat diubah dari tab User
+              Terdaftar pada periode ini
             </CardFooter>
           </Card>
         </section>
@@ -549,7 +676,10 @@ export default async function AdminPage() {
                     >
                       {item.status.replace("_", " ")}
                     </Badge>
-                    <span className="text-lg font-semibold text-white">{item.count}</span>
+                    <div className="text-right">
+                      <span className="block text-lg font-semibold text-white">{item.count}</span>
+                      <span className="text-xs text-white/42">{formatCurrency(item.amount)}</span>
+                    </div>
                   </div>
                 ))}
               </CardContent>
@@ -572,35 +702,54 @@ export default async function AdminPage() {
         </section>
 
         <section className="rounded-xl border border-white/10 bg-white/[0.04] p-5 text-white">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <h2 className="font-serif text-2xl text-white">Export laporan</h2>
-              <p className="mt-2 text-sm leading-6 text-white/58">
-                Unduh CSV booking untuk laporan operasional atau audit.
-              </p>
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg border border-primary/20 bg-primary/10 p-2 text-primary">
+                  <BarChart3 className="size-5" />
+                </div>
+                <div>
+                  <h2 className="font-serif text-2xl text-white">Reporting</h2>
+                  <p className="mt-1 text-sm leading-6 text-white/58">
+                    Laporan booking, pendapatan, status, kamar, dan user baru untuk periode aktif.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-lg border border-white/10 bg-black/16 p-4">
+                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">
+                    Gross booking
+                  </p>
+                  <p className="mt-2 text-xl font-semibold text-white">
+                    {formatCurrency(grossBookingValue)}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-white/10 bg-black/16 p-4">
+                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">
+                    Rata-rata booking
+                  </p>
+                  <p className="mt-2 text-xl font-semibold text-white">
+                    {formatCurrency(averageBookingValue)}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-white/10 bg-black/16 p-4">
+                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">
+                    Kamar tersedia
+                  </p>
+                  <p className="mt-2 text-xl font-semibold text-white">
+                    {availableRooms}/{activeCatalogRooms.length}
+                  </p>
+                </div>
+              </div>
             </div>
 
             <form
               action="/api/admin/bookings/export"
               method="get"
-              className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
+              className="grid gap-3 sm:grid-cols-[180px_1fr_1fr] lg:min-w-[520px]"
             >
-              <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-white/58">
-                Dari
-                <input
-                  type="date"
-                  name="dateFrom"
-                  className="h-10 rounded-lg border border-white/10 bg-black/20 px-3 text-sm tracking-normal text-white outline-none focus:border-primary/40"
-                />
-              </label>
-              <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-white/58">
-                Sampai
-                <input
-                  type="date"
-                  name="dateTo"
-                  className="h-10 rounded-lg border border-white/10 bg-black/20 px-3 text-sm tracking-normal text-white outline-none focus:border-primary/40"
-                />
-              </label>
+              <input type="hidden" name="period" value={selectedPeriod} />
               <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-white/58">
                 Status
                 <select
@@ -619,11 +768,94 @@ export default async function AdminPage() {
                   ))}
                 </select>
               </label>
-              <button type="submit" className={adminPrimaryButtonClassName}>
+              <button
+                type="submit"
+                name="format"
+                value="csv"
+                className={adminPrimaryButtonClassName}
+              >
                 <Download className="size-4" />
                 Export CSV
               </button>
+              <button
+                type="submit"
+                name="format"
+                value="pdf"
+                className={adminOutlineButtonClassName}
+              >
+                <FileText className="size-4" />
+                Export PDF
+              </button>
             </form>
+          </div>
+
+          <div className="mt-6 grid gap-6 xl:grid-cols-2">
+            <div className="rounded-lg border border-white/10 bg-black/12">
+              <div className="border-b border-white/10 px-4 py-3">
+                <h3 className="font-medium text-white">Laporan status booking</h3>
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-white/10 hover:bg-transparent">
+                    <TableHead className="text-white/55">Status</TableHead>
+                    <TableHead className="text-right text-white/55">Booking</TableHead>
+                    <TableHead className="text-right text-white/55">Nilai</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {statusBreakdown.map((item) => (
+                    <TableRow key={item.status} className="border-white/10 hover:bg-white/[0.03]">
+                      <TableCell>
+                        <Badge
+                          variant={getStatusBadgeVariant(item.status)}
+                          className={getStatusBadgeClassName(item.status)}
+                        >
+                          {item.status.replace("_", " ")}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right text-white">{item.count}</TableCell>
+                      <TableCell className="text-right font-medium text-white">
+                        {formatCurrency(item.amount)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            <div className="rounded-lg border border-white/10 bg-black/12">
+              <div className="border-b border-white/10 px-4 py-3">
+                <h3 className="font-medium text-white">Laporan kamar</h3>
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-white/10 hover:bg-transparent">
+                    <TableHead className="text-white/55">Kamar</TableHead>
+                    <TableHead className="text-right text-white/55">Booking</TableHead>
+                    <TableHead className="text-right text-white/55">Revenue</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {topRoomReports.length > 0 ? (
+                    topRoomReports.map((room) => (
+                      <TableRow key={room.name} className="border-white/10 hover:bg-white/[0.03]">
+                        <TableCell className="font-medium text-white">{room.name}</TableCell>
+                        <TableCell className="text-right text-white">{room.bookings}</TableCell>
+                        <TableCell className="text-right font-medium text-white">
+                          {formatCurrency(room.revenue)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow className="border-white/10 hover:bg-transparent">
+                      <TableCell colSpan={3} className="py-6 text-center text-white/48">
+                        Belum ada booking pada periode ini.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </section>
 
