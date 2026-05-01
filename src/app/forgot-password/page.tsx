@@ -114,7 +114,7 @@ function ForgotPasswordContent() {
                   type="email"
                   name="email"
                   required
-                  placeholder="vip@example.com"
+                  placeholder="user@example.com"
                   className="w-full bg-transparent border border-white/20 py-3 pl-12 pr-4 font-inter text-sm focus:outline-none focus:border-white transition-colors"
                 />
               </div>

@@ -60,7 +60,7 @@ function LoginPageContent() {
                 <div className="absolute inset-0 z-0">
                     <Image
                         src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=2940&auto=format&fit=crop"
-                        alt="VIP Lounge"
+                        alt="Hotel lounge"
                         fill
                         sizes="50vw"
                         className="object-cover opacity-60 mix-blend-luminosity"
@@ -160,7 +160,7 @@ function LoginPageContent() {
                                         type="email"
                                         name="email"
                                         required
-                                        placeholder="vip@example.com"
+                                        placeholder="user@example.com"
                                         className="w-full bg-transparent border border-white/20 py-3 pl-12 pr-4 font-inter text-sm focus:outline-none focus:border-white transition-colors"
                                     />
                                 </div>

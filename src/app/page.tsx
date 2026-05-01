@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -58,6 +64,23 @@ const facilityFeatures = [
 ];
 
 const heroMetaPlaceholderCount = 4;
+const HERO_VIDEO_SESSION_KEY = "aura-hero-video-seen-v1";
+
+function subscribeHeroVideoSession() {
+  return () => {};
+}
+
+function getHeroVideoSessionSnapshot() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  try {
+    return window.sessionStorage.getItem(HERO_VIDEO_SESSION_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 export default function Home() {
   const fallbackRooms = getStaticRooms().map((room) => resolveRoomDetails(room.id));
@@ -70,7 +93,13 @@ export default function Home() {
   const heroContentAnimatedRef = useRef(false);
   const heroWarmupEventSentRef = useRef(false);
 
-  const [hasVideoEnded, setHasVideoEnded] = useState(false);
+  const hasSeenHeroVideo = useSyncExternalStore(
+    subscribeHeroVideoSession,
+    getHeroVideoSessionSnapshot,
+    () => false,
+  );
+  const [hasVideoFinished, setHasVideoFinished] = useState(false);
+  const hasVideoEnded = hasSeenHeroVideo || hasVideoFinished;
   const [isFadingToBlack, setIsFadingToBlack] = useState(false);
   const [catalogRooms, setCatalogRooms] = useState<RoomCatalogItem[]>(fallbackRooms);
 
@@ -83,16 +112,25 @@ export default function Home() {
     window.dispatchEvent(new Event("aura:start-global-warmup"));
   };
 
+  const markHeroVideoSeen = () => {
+    try {
+      window.sessionStorage.setItem(HERO_VIDEO_SESSION_KEY, "1");
+    } catch {
+      // Session storage can be unavailable in restricted browser contexts.
+    }
+  };
+
   useEffect(() => {
     if (!heroVideoRef.current || hasVideoEnded) {
       return;
     }
 
+    markHeroVideoSeen();
     heroVideoRef.current.currentTime = 0;
 
     void heroVideoRef.current.play().catch(() => {
       dispatchWarmupEvent();
-      setHasVideoEnded(true);
+      setHasVideoFinished(true);
     });
   }, [hasVideoEnded]);
 
@@ -288,6 +326,7 @@ export default function Home() {
   }, []);
 
   const handleVideoEnd = () => {
+    markHeroVideoSeen();
     setIsFadingToBlack(true);
 
     if (fadeTimeoutRef.current) {
@@ -295,13 +334,14 @@ export default function Home() {
     }
 
     fadeTimeoutRef.current = window.setTimeout(() => {
-      setHasVideoEnded(true);
+      setHasVideoFinished(true);
       setIsFadingToBlack(false);
       fadeTimeoutRef.current = null;
     }, 1000);
   };
 
   const handleVideoPlaying = () => {
+    markHeroVideoSeen();
     dispatchWarmupEvent();
   };
 
@@ -383,7 +423,7 @@ export default function Home() {
               onEnded={handleVideoEnd}
               onError={() => {
                 dispatchWarmupEvent();
-                setHasVideoEnded(true);
+                setHasVideoFinished(true);
               }}
               aria-hidden="true"
             >

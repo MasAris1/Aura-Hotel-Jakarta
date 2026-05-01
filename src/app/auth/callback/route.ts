@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import {
     ensureProfileForUser,
+    getRoleHomePath,
     getPublicAuthErrorMessage,
     sanitizeInternalRedirect,
 } from '@/lib/auth'
@@ -37,11 +38,14 @@ export async function GET(request: Request) {
             const supabase = await createClient()
             const { data, error } = await supabase.auth.exchangeCodeForSession(code)
             if (!error) {
+                let profile = null
                 if (data.user) {
-                    await ensureProfileForUser(supabase, data.user)
+                    profile = await ensureProfileForUser(supabase, data.user)
                 }
                 const safeNext = sanitizeInternalRedirect(next)
-                const destination = safeNext?.startsWith('/reset-password') ? safeNext : '/'
+                const destination = safeNext?.startsWith('/reset-password')
+                    ? safeNext
+                    : getRoleHomePath(profile?.role)
 
                 if (destination.startsWith('/reset-password')) {
                     return NextResponse.redirect(new URL(destination, safeOrigin))

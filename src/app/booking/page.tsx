@@ -497,7 +497,7 @@ function BookingForm() {
                         <div className="flex items-start gap-3">
                             <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                             <div>
-                                <span className="block font-sans text-[10px] tracking-widest uppercase font-semibold text-primary mb-1">Jaminan Layanan VIP</span>
+                                <span className="block font-sans text-[10px] tracking-widest uppercase font-semibold text-primary mb-1">Jaminan Layanan Suite</span>
                                 <p className="font-sans text-[11px] text-foreground/60 leading-relaxed font-light">
                                     Akses langsung ke AI Butler 24/7 dan prioritas check-in tersedia untuk semua reservasi suite.
                                 </p>

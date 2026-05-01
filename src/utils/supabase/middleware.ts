@@ -108,9 +108,11 @@ export async function updateSession(request: NextRequest) {
             const redirectUrl = new URL(redirectTarget, request.url)
             url.pathname = redirectUrl.pathname
             url.search = redirectUrl.search
+            url.hash = redirectUrl.hash
         } catch {
             url.pathname = needsTwoFactor ? getRoleHomePath(profile?.role) : '/'
             url.search = ''
+            url.hash = ''
         }
 
         return NextResponse.redirect(url)
@@ -151,15 +153,17 @@ export async function updateSession(request: NextRequest) {
         isAuthPage
     ) {
         const url = request.nextUrl.clone()
-        const redirectTarget = '/'
+        const redirectTarget = getRoleHomePath(profile?.role)
 
         try {
             const redirectUrl = new URL(redirectTarget, request.url)
             url.pathname = redirectUrl.pathname
             url.search = redirectUrl.search
+            url.hash = redirectUrl.hash
         } catch {
             url.pathname = getRoleHomePath(profile?.role)
             url.search = ''
+            url.hash = ''
         }
 
         return NextResponse.redirect(url)

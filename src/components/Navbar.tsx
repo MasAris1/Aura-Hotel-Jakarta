@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Crown, LogOut, Menu, UserRound, X } from "lucide-react";
+import { ChevronDown, LogOut, Menu, UserRound, X } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import {
   clearSessionCache,
@@ -280,6 +280,7 @@ export function Navbar() {
     setUserProfile(null);
     setAccountMenuOpen(false);
     setMobileMenuOpen(false);
+    window.location.assign("/");
   };
 
   const handleDesktopNavClick = (
@@ -406,14 +407,6 @@ export function Navbar() {
                     <UserRound className="h-4 w-4" />
                     Profil
                   </Link>
-                  <Link
-                    href="/vip"
-                    onClick={() => setAccountMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 font-inter text-xs uppercase tracking-[0.22em] text-foreground/72 transition-colors hover:bg-white/6 hover:text-white"
-                  >
-                    <Crown className="h-4 w-4" />
-                    VIP
-                  </Link>
                   <button
                     type="button"
                     onClick={handleLogout}
@@ -490,13 +483,6 @@ export function Navbar() {
                   className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] px-6 py-5 text-lg uppercase tracking-[0.28em] text-white/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-white"
                 >
                   Profil
-                </Link>
-                <Link
-                  href="/vip"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] px-6 py-5 text-lg uppercase tracking-[0.28em] text-white/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-white"
-                >
-                  VIP
                 </Link>
                 <button
                   type="button"

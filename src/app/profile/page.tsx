@@ -81,7 +81,8 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
           <div
             className={`mb-8 border p-4 font-inter text-xs uppercase tracking-widest ${
               twoFactorStatus === "disable-error" ||
-              twoFactorStatus === "invalid-code"
+              twoFactorStatus === "invalid-code" ||
+              twoFactorStatus === "setup-error"
                 ? "border-red-500/25 bg-red-500/10 text-red-300"
                 : "border-green-500/25 bg-green-500/10 text-green-300"
             }`}
@@ -246,6 +247,10 @@ function getTwoFactorStatusMessage(status: string) {
 
   if (status === "invalid-code") {
     return "The authenticator code is incorrect. 2FA is still active.";
+  }
+
+  if (status === "setup-error") {
+    return "2FA setup is not ready on the server. Please set AUTH_2FA_SECRET in the deployment environment.";
   }
 
   return "2FA has been disabled.";

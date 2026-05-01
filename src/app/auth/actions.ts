@@ -8,6 +8,7 @@ import type { User } from '@supabase/supabase-js'
 import { z } from 'zod'
 import {
     ensureProfileForUser,
+    getRoleHomePath,
     getPublicAuthErrorMessage,
     sanitizeInternalRedirect,
 } from '@/lib/auth'
@@ -118,6 +119,7 @@ export async function loginWithPassword(formData: FormData, _redirectTo?: string
     }
 
     const { email, password } = parsedInput.data
+    let profile = null
     let signedInUser: User | null = null
 
     try {
@@ -132,7 +134,7 @@ export async function loginWithPassword(formData: FormData, _redirectTo?: string
 
         signedInUser = data.user
         if (data.user) {
-            await ensureProfileForUser(supabase, data.user)
+            profile = await ensureProfileForUser(supabase, data.user)
         }
     } catch (error) {
         return { error: getPublicAuthErrorMessage(error, 'Unable to sign in right now.') }
@@ -145,7 +147,7 @@ export async function loginWithPassword(formData: FormData, _redirectTo?: string
             twoFactorRedirect = await prepareTwoFactorChallenge({
                 user: signedInUser,
                 hasStoredSecret: true,
-                destination: '/',
+                destination: getRoleHomePath(profile?.role),
             })
         } catch (error) {
             return { error: getPublicAuthErrorMessage(error, 'Unable to start authenticator verification right now.') }
@@ -156,7 +158,7 @@ export async function loginWithPassword(formData: FormData, _redirectTo?: string
     }
 
     revalidatePath('/', 'layout')
-    redirect('/')
+    redirect(getRoleHomePath(profile?.role))
 }
 
 export async function loginWithMagicLink(formData: FormData, redirectTo?: string) {
@@ -203,6 +205,7 @@ export async function signup(formData: FormData, _redirectTo?: string) {
     }
 
     const { email, password, confirmPassword } = parsedInput.data
+    let profile = null
     let signedUpUser: User | null = null
 
     if (password !== confirmPassword) {
@@ -225,7 +228,7 @@ export async function signup(formData: FormData, _redirectTo?: string) {
 
         signedUpUser = data.user
         if (data.user) {
-            await ensureProfileForUser(supabase, data.user)
+            profile = await ensureProfileForUser(supabase, data.user)
         }
     } catch (error) {
         return { error: getPublicAuthErrorMessage(error, 'Unable to create your account right now.') }
@@ -238,7 +241,7 @@ export async function signup(formData: FormData, _redirectTo?: string) {
             twoFactorRedirect = await prepareTwoFactorChallenge({
                 user: signedUpUser,
                 hasStoredSecret: true,
-                destination: '/',
+                destination: getRoleHomePath(profile?.role),
             })
         } catch (error) {
             return { error: getPublicAuthErrorMessage(error, 'Unable to start authenticator verification right now.') }
@@ -249,7 +252,7 @@ export async function signup(formData: FormData, _redirectTo?: string) {
     }
 
     revalidatePath('/', 'layout')
-    redirect('/')
+    redirect(getRoleHomePath(profile?.role))
 }
 
 export async function verifyTwoFactorLogin(formData: FormData, redirectTo?: string) {
@@ -392,11 +395,17 @@ export async function startTwoFactorSetup() {
         redirect('/profile')
     }
 
-    const challenge = await createTwoFactorChallenge({
-        user,
-        hasStoredSecret: false,
-        redirectTo: '/profile',
-    })
+    let challenge
+
+    try {
+        challenge = await createTwoFactorChallenge({
+            user,
+            hasStoredSecret: false,
+            redirectTo: '/profile',
+        })
+    } catch {
+        redirect('/profile?twoFactor=setup-error')
+    }
 
     cookieStore.set(
         TWO_FACTOR_CHALLENGE_COOKIE,
