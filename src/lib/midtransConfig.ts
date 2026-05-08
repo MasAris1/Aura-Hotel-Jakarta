@@ -11,6 +11,18 @@ function normalizeMode(value?: string | null) {
   return value?.trim().toLowerCase() ?? "";
 }
 
+export function normalizeMidtransCredential(value?: string | null) {
+  const trimmed = value?.trim() ?? "";
+  const firstChar = trimmed[0];
+  const lastChar = trimmed[trimmed.length - 1];
+  const isWrappedInQuotes =
+    trimmed.length >= 2 &&
+    ((firstChar === '"' && lastChar === '"') ||
+      (firstChar === "'" && lastChar === "'"));
+
+  return isWrappedInQuotes ? trimmed.slice(1, -1).trim() : trimmed;
+}
+
 function parseExplicitMode(value?: string | null) {
   const normalized = normalizeMode(value);
 
@@ -32,15 +44,17 @@ function parseExplicitMode(value?: string | null) {
 }
 
 function inferModeFromKey(key?: string | null) {
-  if (!key) {
+  const normalizedKey = normalizeMidtransCredential(key);
+
+  if (!normalizedKey) {
     return null;
   }
 
-  if (key.startsWith("SB-Mid-")) {
+  if (normalizedKey.startsWith("SB-Mid-")) {
     return false;
   }
 
-  if (key.startsWith("Mid-")) {
+  if (normalizedKey.startsWith("Mid-")) {
     return true;
   }
 
@@ -81,4 +95,37 @@ export function getMidtransSnapScriptSrc(input: MidtransModeInput = {}) {
   return getMidtransIsProduction(input)
     ? "https://app.midtrans.com/snap/snap.js"
     : "https://app.sandbox.midtrans.com/snap/snap.js";
+}
+
+function summarizeCredential(value?: string | null) {
+  const rawValue = value ?? "";
+  const normalizedValue = normalizeMidtransCredential(value);
+  const mode = inferModeFromKey(normalizedValue);
+
+  return {
+    present: normalizedValue.length > 0,
+    family:
+      mode === false ? "sandbox" : mode === true ? "production" : "unknown",
+    length: normalizedValue.length,
+    rawLength: rawValue.length,
+    hadOuterWhitespace: rawValue !== rawValue.trim(),
+    hadWrappingQuotes: rawValue.trim() !== normalizedValue,
+  };
+}
+
+export function getMidtransConfigDiagnostics(input: MidtransModeInput = {}) {
+  return {
+    isProduction: getMidtransIsProduction(input),
+    explicitMode:
+      input.explicitMode ??
+      process.env.MIDTRANS_IS_PRODUCTION ??
+      process.env.MIDTRANS_ENV ??
+      null,
+    serverKey: summarizeCredential(
+      input.serverKey ?? process.env.MIDTRANS_SERVER_KEY,
+    ),
+    clientKey: summarizeCredential(
+      input.clientKey ?? process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY,
+    ),
+  };
 }

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { createClient } from "@/utils/supabase/server";
 import { getSupabaseAdmin } from "@/utils/supabase/admin";
 import { BookingQuoteError, getRoomQuote } from "@/lib/booking";
-import { buildRoomPaymentParameter, snap } from "@/lib/midtrans";
+import { buildRoomPaymentParameter, midtransConfigDiagnostics, snap } from "@/lib/midtrans";
 import type { Database } from "@/types/supabase";
 import {
     TRANSACTION_STATUSES,
@@ -112,6 +112,7 @@ export async function POST(req: Request) {
 
         } catch (midtransError: unknown) {
             console.error("Midtrans Error:", getErrorMessage(midtransError));
+            console.error("Midtrans Config Diagnostics:", midtransConfigDiagnostics);
 
             // Jangan hapus booking agar histori transaksi tetap utuh.
             await supabase

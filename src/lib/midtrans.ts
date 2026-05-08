@@ -1,11 +1,21 @@
 // src/lib/midtrans.ts
 import midtransClient from 'midtrans-client';
 import { getRequiredEnv } from '@/lib/env';
-import { getMidtransIsProduction } from '@/lib/midtransConfig';
+import {
+    getMidtransConfigDiagnostics,
+    getMidtransIsProduction,
+    normalizeMidtransCredential,
+} from '@/lib/midtransConfig';
 
-const serverKey = getRequiredEnv("MIDTRANS_SERVER_KEY");
-const clientKey = getRequiredEnv("NEXT_PUBLIC_MIDTRANS_CLIENT_KEY");
+const rawServerKey = getRequiredEnv("MIDTRANS_SERVER_KEY");
+const rawClientKey = getRequiredEnv("NEXT_PUBLIC_MIDTRANS_CLIENT_KEY");
+const serverKey = normalizeMidtransCredential(rawServerKey);
+const clientKey = normalizeMidtransCredential(rawClientKey);
 const isProduction = getMidtransIsProduction({ serverKey, clientKey });
+export const midtransConfigDiagnostics = getMidtransConfigDiagnostics({
+    serverKey: rawServerKey,
+    clientKey: rawClientKey,
+});
 
 // Midtrans Snap Client
 export const snap = new midtransClient.Snap({
