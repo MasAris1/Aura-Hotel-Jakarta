@@ -46,13 +46,13 @@ function ResetPasswordContent() {
             alt="Hotel suite"
             fill
             sizes="50vw"
-            className="object-cover opacity-60 mix-blend-luminosity"
+            className="object-cover dark:opacity-60 dark:mix-blend-luminosity"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-transparent dark:from-black dark:via-black/50" />
         </div>
-        <div className="relative z-10 w-full max-w-md">
+        <div className="relative z-10 w-full max-w-md text-white drop-shadow-[0_2px_18px_rgba(0,0,0,0.45)]">
           <h2 className="font-playfair text-4xl mb-4">Secure Your Return</h2>
-          <p className="font-inter font-light text-foreground/70 text-sm leading-relaxed">
+          <p className="font-inter font-light text-white/70 text-sm leading-relaxed">
             Set a new password to restore access to your guest portal and
             reservation history.
           </p>
@@ -113,7 +113,7 @@ function ResetPasswordContent() {
                   name="password"
                   required
                   placeholder="Enter your new password"
-                  className="w-full bg-transparent border border-white/20 py-3 pl-12 pr-4 font-inter text-sm focus:outline-none focus:border-white transition-colors"
+                  className="w-full bg-background/30 border border-input py-3 pl-12 pr-4 font-inter text-sm focus:outline-none focus:border-primary transition-colors"
                 />
               </div>
             </div>
@@ -129,7 +129,7 @@ function ResetPasswordContent() {
                   name="confirmPassword"
                   required
                   placeholder="Repeat your new password"
-                  className="w-full bg-transparent border border-white/20 py-3 pl-12 pr-4 font-inter text-sm focus:outline-none focus:border-white transition-colors"
+                  className="w-full bg-background/30 border border-input py-3 pl-12 pr-4 font-inter text-sm focus:outline-none focus:border-primary transition-colors"
                 />
               </div>
             </div>
@@ -137,7 +137,7 @@ function ResetPasswordContent() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-white text-black font-inter text-xs tracking-widest uppercase hover:bg-white/90 transition-colors disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-primary text-primary-foreground font-inter text-xs tracking-widest uppercase hover:bg-primary/90 transition-colors disabled:opacity-50"
             >
               {isPending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

@@ -106,6 +106,7 @@ export function AppWarmup() {
           .from("profiles")
           .select("first_name, last_name, role")
           .eq("id", session.user.id)
+          .is("deleted_at", null)
           .single();
 
         const userProfile =
@@ -123,6 +124,7 @@ export function AppWarmup() {
         let query = supabase
           .from("bookings")
           .select("*")
+          .is("deleted_at", null)
           .order("created_at", { ascending: false });
 
         if (!isStaffRole(profile?.role)) {

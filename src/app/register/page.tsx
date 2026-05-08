@@ -45,13 +45,13 @@ function RegisterPageContent() {
                         alt="Luxury Suite"
                         fill
                         sizes="50vw"
-                        className="object-cover opacity-60 mix-blend-luminosity"
+                        className="object-cover dark:opacity-60 dark:mix-blend-luminosity"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-transparent dark:from-black dark:via-black/50" />
                 </div>
-                <div className="relative z-10 w-full max-w-md mx-auto">
+                <div className="relative z-10 w-full max-w-md mx-auto text-white drop-shadow-[0_2px_18px_rgba(0,0,0,0.45)]">
                     <h2 className="font-playfair text-4xl mb-4">Membership Invitation</h2>
-                    <p className="font-inter font-light text-foreground/70 text-sm leading-relaxed">
+                    <p className="font-inter font-light text-white/70 text-sm leading-relaxed">
                         Join an exclusive circle of travelers. Experience unparalleled service
                         and sophisticated comfort.
                     </p>
@@ -87,12 +87,12 @@ function RegisterPageContent() {
                             label="Continue with Google"
                             disabled={isPending}
                             onError={(text) => setMessage(text ? { type: "error", text } : null)}
-                            className="mb-6 flex w-full items-center justify-center gap-3 border border-white/20 bg-white/5 px-4 py-4 font-inter text-xs tracking-widest uppercase transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="mb-6 flex w-full items-center justify-center gap-3 border border-border bg-background/40 px-4 py-4 font-inter text-xs tracking-widest uppercase transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
                         />
 
                         <div className="relative mb-6">
                             <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-white/10" />
+                                <div className="w-full border-t border-border" />
                             </div>
                             <div className="relative flex justify-center">
                                 <span className="bg-muted px-4 font-inter text-[10px] tracking-[0.3em] uppercase text-foreground/35">
@@ -116,7 +116,7 @@ function RegisterPageContent() {
                                         name="email"
                                         required
                                         placeholder="user@example.com"
-                                        className="w-full bg-transparent border border-white/20 py-3 pl-12 pr-4 font-inter text-sm focus:outline-none focus:border-white transition-colors"
+                                        className="w-full bg-background/30 border border-input py-3 pl-12 pr-4 font-inter text-sm focus:outline-none focus:border-primary transition-colors"
                                     />
                                 </div>
                             </div>
@@ -132,7 +132,7 @@ function RegisterPageContent() {
                                         name="password"
                                         required
                                         placeholder="Create a password"
-                                        className="w-full bg-transparent border border-white/20 py-3 pl-12 pr-4 font-inter text-sm focus:outline-none focus:border-white transition-colors"
+                                        className="w-full bg-background/30 border border-input py-3 pl-12 pr-4 font-inter text-sm focus:outline-none focus:border-primary transition-colors"
                                     />
                                 </div>
                             </div>
@@ -148,7 +148,7 @@ function RegisterPageContent() {
                                         name="confirmPassword"
                                         required
                                         placeholder="Confirm your password"
-                                        className="w-full bg-transparent border border-white/20 py-3 pl-12 pr-4 font-inter text-sm focus:outline-none focus:border-white transition-colors"
+                                        className="w-full bg-background/30 border border-input py-3 pl-12 pr-4 font-inter text-sm focus:outline-none focus:border-primary transition-colors"
                                     />
                                 </div>
                             </div>
@@ -156,7 +156,7 @@ function RegisterPageContent() {
                             <button
                                 type="submit"
                                 disabled={isPending}
-                                className="w-full flex items-center justify-center gap-2 py-4 mt-8 bg-white text-black font-inter text-xs tracking-widest uppercase hover:bg-white/90 transition-colors disabled:opacity-50"
+                                className="w-full flex items-center justify-center gap-2 py-4 mt-8 bg-primary text-primary-foreground font-inter text-xs tracking-widest uppercase hover:bg-primary/90 transition-colors disabled:opacity-50"
                             >
                                 {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Complete Registration"}
                                 {!isPending && <ArrowRight className="w-4 h-4" />}
@@ -181,12 +181,12 @@ function RegisterPageFallback() {
         <main className="min-h-screen flex text-foreground overflow-hidden bg-background">
             <div className="hidden lg:flex w-1/2 relative flex-col justify-center p-12">
                 <div className="absolute inset-0 z-0">
-                    <div className="w-full h-full bg-black/40" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                    <div className="w-full h-full bg-muted/40 dark:bg-black/40" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-transparent dark:from-black dark:via-black/50" />
                 </div>
-                <div className="relative z-10 w-full max-w-md mx-auto">
+                <div className="relative z-10 w-full max-w-md mx-auto text-white drop-shadow-[0_2px_18px_rgba(0,0,0,0.45)]">
                     <h2 className="font-playfair text-4xl mb-4">Membership Invitation</h2>
-                    <p className="font-inter font-light text-foreground/70 text-sm leading-relaxed">
+                    <p className="font-inter font-light text-white/70 text-sm leading-relaxed">
                         Join an exclusive circle of travelers. Experience unparalleled service
                         and sophisticated comfort.
                     </p>

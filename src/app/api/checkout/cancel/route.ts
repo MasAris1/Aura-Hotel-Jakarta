@@ -37,6 +37,7 @@ export async function POST(req: Request) {
             .eq('id', bookingId)
             .eq('user_id', user.id)
             .eq('status', 'UNPAID')
+            .is('deleted_at', null)
             .single();
         const booking = bookingData as Pick<BookingRow, "id" | "user_id" | "status" | "total_price"> | null;
 
@@ -51,7 +52,8 @@ export async function POST(req: Request) {
                 updated_at: new Date().toISOString(),
             })
             .eq('id', bookingId)
-            .eq('status', 'UNPAID');
+            .eq('status', 'UNPAID')
+            .is('deleted_at', null);
 
         if (updateError) {
             console.error("Cancel Booking Error:", updateError);

@@ -471,7 +471,7 @@ function BookingForm() {
                 <div className="sticky top-32 space-y-8">
                     {/* Room Summary */}
                     <div className="bg-background border border-border overflow-hidden">
-                        <div className="aspect-[16/9] overflow-hidden grayscale-[0.5] hover:grayscale-0 transition-all duration-700">
+                        <div className="aspect-[16/9] overflow-hidden transition-all duration-700 dark:grayscale-[0.5] dark:hover:grayscale-0">
                             <div className="relative h-full w-full">
                                 <Image
                                     src={room.images[0]}

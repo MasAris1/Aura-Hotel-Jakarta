@@ -69,7 +69,7 @@ export default function RoomDetailsPage({ params }: { params: Promise<{ id: stri
                     priority
                     className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-transparent dark:from-background dark:via-background/20" />
 
                 <div className="absolute bottom-0 left-0 w-full p-6 md:p-12 mb-8">
                     <div className="container mx-auto max-w-7xl">
@@ -120,7 +120,7 @@ export default function RoomDetailsPage({ params }: { params: Promise<{ id: stri
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {room.images.slice(1).map((img, idx) => (
                                     <div key={idx} className="relative h-64 md:h-80 overflow-hidden group">
-                                        <div className="absolute inset-0 bg-background/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
+                                        <div className="absolute inset-0 z-10 bg-transparent transition-colors duration-500 dark:bg-background/20 dark:group-hover:bg-transparent" />
                                         <Image
                                             src={img}
                                             alt={`${room.name} interior`}

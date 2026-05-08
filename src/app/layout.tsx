@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ButlerChat } from "@/components/ButlerChat";
 import { AppWarmup } from "@/components/AppWarmup";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import Script from "next/script";
 import { getRequiredEnv } from "@/lib/env";
 import { getMidtransSnapScriptSrc } from "@/lib/midtransConfig";
@@ -39,7 +40,12 @@ export default function RootLayout({
   const midtransOrigin = new URL(midtransScriptSrc).origin;
 
   return (
-    <html lang="en" className="dark" data-scroll-behavior="smooth">
+    <html
+      lang="en"
+      className="dark"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <head>
         <link rel="preconnect" href={supabaseOrigin} crossOrigin="" />
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="" />
@@ -56,11 +62,13 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} antialiased bg-background text-foreground min-h-screen selection:bg-primary/20`}
       >
-        <AppWarmup />
-        <Navbar />
-        {children}
-        <Footer />
-        <ButlerChat />
+        <ThemeProvider>
+          <AppWarmup />
+          <Navbar />
+          {children}
+          <Footer />
+          <ButlerChat />
+        </ThemeProvider>
       </body>
     </html>
   );

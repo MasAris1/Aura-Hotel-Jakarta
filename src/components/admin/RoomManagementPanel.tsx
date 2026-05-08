@@ -80,6 +80,7 @@ export function RoomManagementPanel() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const editingRoom = useMemo(
@@ -205,6 +206,48 @@ export function RoomManagementPanel() {
     });
   };
 
+  const uploadImages = async (files: FileList | null) => {
+    if (!files?.length) {
+      return;
+    }
+
+    setIsUploading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const uploadedUrls: string[] = [];
+
+      for (const file of Array.from(files)) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("folder", "rooms");
+
+        const response = await fetch("/api/admin/uploads", {
+          method: "POST",
+          body: formData,
+        });
+        const result = (await response.json()) as { url?: string; error?: string };
+
+        if (!response.ok || !result.url) {
+          throw new Error(result.error ?? "Failed to upload image.");
+        }
+
+        uploadedUrls.push(result.url);
+      }
+
+      setForm((prev) => ({
+        ...prev,
+        imagesText: [...prev.imagesText.split("\n").filter(Boolean), ...uploadedUrls].join("\n"),
+      }));
+      setSuccess(`${uploadedUrls.length} image uploaded successfully.`);
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : "Failed to upload image.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {error ? (
@@ -303,11 +346,22 @@ export function RoomManagementPanel() {
           </label>
           <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-white/55 md:col-span-2">
             Images
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/avif"
+              multiple
+              disabled={isUploading}
+              onChange={(event) => {
+                void uploadImages(event.target.files);
+                event.target.value = "";
+              }}
+              className="rounded-xl border border-dashed border-white/10 bg-black/20 px-4 py-3 text-sm tracking-normal text-white file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-sm file:font-medium file:text-primary-foreground disabled:opacity-60"
+            />
             <textarea
               value={form.imagesText}
               onChange={(event) => setForm((prev) => ({ ...prev, imagesText: event.target.value }))}
               rows={4}
-              placeholder="One image URL per line"
+              placeholder={isUploading ? "Uploading image..." : "One image URL per line"}
               className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm tracking-normal text-white outline-none transition-colors focus:border-primary/40"
             />
           </label>

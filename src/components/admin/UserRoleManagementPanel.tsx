@@ -19,6 +19,7 @@ type AdminUser = {
   first_name: string | null;
   last_name: string | null;
   role: string | null;
+  deleted_at: string | null;
   created_at: string | null;
   last_sign_in_at: string | null;
   email_confirmed_at: string | null;
@@ -27,6 +28,23 @@ type AdminUser = {
 
 type UsersResponse = {
   users: AdminUser[];
+};
+
+type UserFormState = {
+  id?: string;
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  role: AdminRole;
+};
+
+const emptyForm: UserFormState = {
+  email: "",
+  password: "",
+  first_name: "",
+  last_name: "",
+  role: "guest",
 };
 
 const roleOptions: Array<{ value: AdminRole; label: string; description: string }> = [
@@ -94,18 +112,30 @@ function getRoleBadgeClassName(role: string | null) {
   return "border-white/12 bg-white/[0.04] text-white/72";
 }
 
+function toPayload(form: UserFormState) {
+  return {
+    email: form.email,
+    password: form.password,
+    first_name: form.first_name,
+    last_name: form.last_name || null,
+    role: form.role,
+  };
+}
+
 export function UserRoleManagementPanel() {
   const [users, setUsers] = useState<AdminUser[]>([]);
+  const [form, setForm] = useState<UserFormState>(emptyForm);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  const editingUser = users.find((user) => user.id === form.id) ?? null;
   const roleCounts = useMemo(
     () =>
       roleOptions.map((option) => ({
         ...option,
-        count: users.filter((user) => (user.role ?? "guest") === option.value).length,
+        count: users.filter((user) => !user.deleted_at && (user.role ?? "guest") === option.value).length,
       })),
     [users],
   );
@@ -134,45 +164,86 @@ export function UserRoleManagementPanel() {
     loadUsers();
   }, [loadUsers]);
 
-  const updateRole = (targetUserId: string, role: AdminRole) => {
-    const targetUser = users.find((user) => user.id === targetUserId);
+  const resetForm = () => {
+    setForm(emptyForm);
+  };
 
-    if (!targetUser || targetUser.role === role) {
-      return;
-    }
+  const saveUser = () => {
+    setError(null);
+    setSuccess(null);
 
+    startTransition(async () => {
+      try {
+        const isEdit = Boolean(form.id);
+        const response = await fetch(isEdit ? `/api/admin/users/${form.id}` : "/api/admin/users", {
+          method: isEdit ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(toPayload(form)),
+        });
+        const result = (await response.json()) as { error?: string; user?: AdminUser };
+
+        if (!response.ok || !result.user) {
+          setError(result.error ?? "Failed to save user.");
+          return;
+        }
+
+        setUsers((prev) =>
+          isEdit
+            ? prev.map((user) => (user.id === result.user?.id ? result.user : user))
+            : [result.user!, ...prev],
+        );
+        setSuccess(isEdit ? "User diperbarui." : "User dibuat.");
+        resetForm();
+      } catch {
+        setError("Failed to save user.");
+      }
+    });
+  };
+
+  const archiveUser = (targetUserId: string) => {
     setActiveUserId(targetUserId);
     setError(null);
     setSuccess(null);
 
     startTransition(async () => {
       try {
-        const response = await fetch("/api/admin/users/role", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ targetUserId, role }),
-        });
+        const response = await fetch(`/api/admin/users/${targetUserId}`, { method: "DELETE" });
         const result = (await response.json()) as { error?: string; user?: AdminUser };
 
         if (!response.ok || !result.user) {
-          setError(result.error ?? "Failed to update role.");
-          setActiveUserId(null);
+          setError(result.error ?? "Failed to archive user.");
           return;
         }
 
-        setUsers((prev) =>
-          prev.map((user) =>
-            user.id === result.user?.id
-              ? {
-                  ...user,
-                  ...result.user,
-                }
-              : user,
-          ),
-        );
-        setSuccess(`Role ${getFullName(targetUser)} diubah menjadi ${getRoleLabel(role)}.`);
+        setUsers((prev) => prev.map((user) => (user.id === result.user?.id ? result.user : user)));
+        setSuccess(`${getFullName(result.user)} diarsipkan.`);
       } catch {
-        setError("Failed to update role.");
+        setError("Failed to archive user.");
+      } finally {
+        setActiveUserId(null);
+      }
+    });
+  };
+
+  const restoreUser = (targetUserId: string) => {
+    setActiveUserId(targetUserId);
+    setError(null);
+    setSuccess(null);
+
+    startTransition(async () => {
+      try {
+        const response = await fetch(`/api/admin/users/${targetUserId}/restore`, { method: "POST" });
+        const result = (await response.json()) as { error?: string; user?: AdminUser };
+
+        if (!response.ok || !result.user) {
+          setError(result.error ?? "Failed to restore user.");
+          return;
+        }
+
+        setUsers((prev) => prev.map((user) => (user.id === result.user?.id ? result.user : user)));
+        setSuccess(`${getFullName(result.user)} dipulihkan.`);
+      } catch {
+        setError("Failed to restore user.");
       } finally {
         setActiveUserId(null);
       }
@@ -180,7 +251,7 @@ export function UserRoleManagementPanel() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-3">
         {roleCounts.map((item) => (
           <div
@@ -201,12 +272,109 @@ export function UserRoleManagementPanel() {
           {error}
         </div>
       ) : null}
-
       {success ? (
         <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/10 p-4 text-sm text-emerald-100">
           {success}
         </div>
       ) : null}
+
+      <div className="rounded-lg border border-white/10 bg-black/16 p-5">
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.18em] text-primary/70">
+              {editingUser ? "Edit user" : "Tambah user"}
+            </p>
+            <h3 className="mt-2 font-serif text-2xl text-white">
+              {editingUser ? getFullName(editingUser) : "Akun admin baru"}
+            </h3>
+          </div>
+          {editingUser ? (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] px-4 text-sm font-medium text-white transition-colors hover:bg-white/[0.06]"
+            >
+              Batal
+            </button>
+          ) : null}
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.18em] text-white/55">
+            Nama depan
+            <input
+              value={form.first_name}
+              onChange={(event) => setForm((prev) => ({ ...prev, first_name: event.target.value }))}
+              className="h-11 rounded-lg border border-white/10 bg-black/25 px-3 text-sm tracking-normal text-white outline-none focus:border-primary/40"
+            />
+          </label>
+          <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.18em] text-white/55">
+            Nama belakang
+            <input
+              value={form.last_name}
+              onChange={(event) => setForm((prev) => ({ ...prev, last_name: event.target.value }))}
+              className="h-11 rounded-lg border border-white/10 bg-black/25 px-3 text-sm tracking-normal text-white outline-none focus:border-primary/40"
+            />
+          </label>
+          <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.18em] text-white/55">
+            Email
+            <input
+              type="email"
+              value={form.email}
+              onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
+              className="h-11 rounded-lg border border-white/10 bg-black/25 px-3 text-sm tracking-normal text-white outline-none focus:border-primary/40"
+            />
+          </label>
+          <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.18em] text-white/55">
+            Password
+            <input
+              type="password"
+              value={form.password}
+              onChange={(event) => setForm((prev) => ({ ...prev, password: event.target.value }))}
+              placeholder={editingUser ? "Kosongkan jika tidak diganti" : "Minimal 8 karakter"}
+              className="h-11 rounded-lg border border-white/10 bg-black/25 px-3 text-sm tracking-normal text-white outline-none placeholder:text-white/30 focus:border-primary/40"
+            />
+          </label>
+          <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.18em] text-white/55">
+            Role
+            <select
+              value={form.role}
+              disabled={editingUser?.is_current_user}
+              onChange={(event) => setForm((prev) => ({ ...prev, role: event.target.value as AdminRole }))}
+              className="h-11 rounded-lg border border-white/10 bg-black/25 px-3 text-sm tracking-normal text-white outline-none focus:border-primary/40 disabled:opacity-45"
+            >
+              {roleOptions.map((option) => (
+                <option key={option.value} value={option.value} className="bg-slate-950 text-white">
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={saveUser}
+            disabled={
+              isPending ||
+              !form.first_name ||
+              !form.email ||
+              (!editingUser && form.password.length < 8)
+            }
+            className="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground transition-all hover:shadow-[0_16px_36px_rgba(198,155,73,0.35)] disabled:opacity-60"
+          >
+            {isPending ? "Menyimpan..." : editingUser ? "Update User" : "Tambah User"}
+          </button>
+          <button
+            type="button"
+            onClick={loadUsers}
+            className="inline-flex h-11 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] px-5 text-sm font-medium text-white transition-colors hover:bg-white/[0.06]"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
 
       {users.length === 0 && !isPending ? (
         <div className="rounded-lg border border-dashed border-white/10 bg-black/15 p-5 text-sm text-white/55">
@@ -221,7 +389,7 @@ export function UserRoleManagementPanel() {
       ) : null}
 
       {users.length > 0 ? (
-        <div className="rounded-lg border border-white/10">
+        <div className="overflow-hidden rounded-lg border border-white/10">
           <Table>
             <TableHeader>
               <TableRow className="border-white/10 hover:bg-transparent">
@@ -237,6 +405,7 @@ export function UserRoleManagementPanel() {
                 const currentRole = (user.role ?? "guest") as AdminRole;
                 const isBusy = activeUserId === user.id;
                 const isVerified = Boolean(user.email_confirmed_at);
+                const isArchived = Boolean(user.deleted_at);
 
                 return (
                   <TableRow
@@ -264,6 +433,9 @@ export function UserRoleManagementPanel() {
                       {user.is_current_user ? (
                         <p className="mt-2 text-xs text-primary">Akun Anda</p>
                       ) : null}
+                      {isArchived ? (
+                        <p className="mt-2 text-xs text-red-200">Archived</p>
+                      ) : null}
                     </TableCell>
                     <TableCell className="align-top">
                       <div className="min-w-[220px] space-y-1 text-sm">
@@ -280,36 +452,43 @@ export function UserRoleManagementPanel() {
                       {formatDate(user.created_at)}
                     </TableCell>
                     <TableCell className="align-top">
-                      <label className="sr-only" htmlFor={`role-${user.id}`}>
-                        Ubah role {getFullName(user)}
-                      </label>
-                      <select
-                        id={`role-${user.id}`}
-                        value={currentRole}
-                        disabled={isBusy || user.is_current_user}
-                        onChange={(event) =>
-                          updateRole(user.id, event.target.value as AdminRole)
-                        }
-                        className="h-10 rounded-lg border border-white/10 bg-black/25 px-3 text-sm text-white outline-none transition-colors focus:border-primary/40 disabled:opacity-45"
-                      >
-                        {roleOptions.map((option) => (
-                          <option
-                            key={option.value}
-                            value={option.value}
-                            className="bg-slate-950 text-white"
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setForm({
+                              id: user.id,
+                              email: user.email,
+                              password: "",
+                              first_name: user.first_name ?? "",
+                              last_name: user.last_name ?? "",
+                              role: currentRole,
+                            })
+                          }
+                          className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] px-4 text-sm font-medium text-white transition-colors hover:bg-white/[0.06]"
+                        >
+                          Edit
+                        </button>
+                        {isArchived ? (
+                          <button
+                            type="button"
+                            disabled={isBusy}
+                            onClick={() => restoreUser(user.id)}
+                            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-60"
                           >
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                      {isBusy ? (
-                        <p className="mt-2 text-xs text-white/45">Menyimpan...</p>
-                      ) : null}
-                      {user.is_current_user ? (
-                        <p className="mt-2 text-xs text-white/45">
-                          Role akun sendiri tidak bisa diubah di sini.
-                        </p>
-                      ) : null}
+                            {isBusy ? "Memulihkan..." : "Restore"}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={isBusy || user.is_current_user}
+                            onClick={() => archiveUser(user.id)}
+                            className="inline-flex h-10 items-center justify-center rounded-lg border border-red-500/20 bg-red-500/10 px-4 text-sm font-medium text-red-200 transition-colors hover:bg-red-500/20 disabled:opacity-45"
+                          >
+                            {isBusy ? "Mengarsipkan..." : "Archive"}
+                          </button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 );

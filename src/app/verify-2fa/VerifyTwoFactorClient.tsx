@@ -94,18 +94,18 @@ export function VerifyTwoFactorClient({
       <section className="mx-auto flex min-h-screen w-full max-w-6xl items-center px-6 py-16">
         <div className="grid w-full gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div className="space-y-7">
-            <div className="flex h-14 w-14 items-center justify-center border border-white/15 bg-white/5">
+            <div className="flex h-14 w-14 items-center justify-center border border-border bg-card">
               {isSetupMode ? (
-                <Smartphone className="h-6 w-6 text-white" />
+                <Smartphone className="h-6 w-6 text-foreground" />
               ) : (
-                <ShieldCheck className="h-6 w-6 text-white" />
+                <ShieldCheck className="h-6 w-6 text-foreground" />
               )}
             </div>
             <div>
               <p className="mb-4 font-inter text-xs uppercase tracking-[0.32em] text-foreground/45">
                 Secure sign-in
               </p>
-              <h1 className="font-playfair text-4xl uppercase tracking-widest text-white sm:text-5xl">
+              <h1 className="font-playfair text-4xl uppercase tracking-widest text-foreground sm:text-5xl">
                 {isSetupMode ? "Set Up Authenticator" : "Verify Access"}
               </h1>
             </div>
@@ -116,9 +116,9 @@ export function VerifyTwoFactorClient({
             </p>
           </div>
 
-          <div className="w-full border border-white/10 bg-muted p-6 sm:p-8">
-            <div className="mb-8 flex items-start gap-4 border-b border-white/10 pb-6">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-white/15 bg-white/5">
+          <div className="w-full border border-border bg-card p-6 sm:p-8">
+            <div className="mb-8 flex items-start gap-4 border-b border-border pb-6">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-border bg-muted/70">
                 {isSetupMode ? (
                   <QrCode className="h-5 w-5 text-foreground/75" />
                 ) : (
@@ -126,7 +126,7 @@ export function VerifyTwoFactorClient({
                 )}
               </div>
               <div>
-                <h2 className="font-inter text-sm uppercase tracking-[0.24em] text-white">
+                <h2 className="font-inter text-sm uppercase tracking-[0.24em] text-foreground">
                   {isSetupMode ? "Authenticator setup" : "Authenticator code"}
                 </h2>
                 <p className="mt-2 font-inter text-xs leading-6 text-foreground/50">
@@ -155,7 +155,7 @@ export function VerifyTwoFactorClient({
               <div className="mb-8 space-y-5">
                 {setupState ? (
                   <>
-                    <div className="flex justify-center border border-white/10 bg-black/30 p-5">
+                    <div className="flex justify-center border border-border bg-muted/70 p-5">
                       <Image
                         src={setupState.qrCodeDataUrl}
                         alt="Authenticator QR code"
@@ -165,17 +165,17 @@ export function VerifyTwoFactorClient({
                         unoptimized
                       />
                     </div>
-                    <div className="border border-white/10 bg-black/20 p-4">
+                    <div className="border border-border bg-muted/60 p-4">
                       <p className="mb-3 font-inter text-[11px] uppercase tracking-[0.28em] text-foreground/45">
                         Manual setup key
                       </p>
-                      <code className="block break-all font-inter text-sm tracking-[0.24em] text-white">
+                      <code className="block break-all font-inter text-sm tracking-[0.24em] text-foreground">
                         {setupState.secretDisplay}
                       </code>
                     </div>
                   </>
                 ) : (
-                  <div className="border border-dashed border-white/15 bg-black/20 p-6 font-inter text-sm leading-7 text-foreground/55">
+                  <div className="border border-dashed border-border bg-muted/60 p-6 font-inter text-sm leading-7 text-foreground/55">
                     Your authenticator setup cookie is no longer valid, so the QR code cannot
                     be shown until a new setup session is created.
                   </div>
@@ -198,14 +198,14 @@ export function VerifyTwoFactorClient({
                   maxLength={6}
                   placeholder="000000"
                   disabled={setupExpired || isPending}
-                  className="w-full border border-white/20 bg-transparent px-4 py-4 text-center font-inter text-2xl tracking-[0.35em] text-white transition-colors placeholder:text-foreground/20 focus:border-white focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full border border-input bg-background/40 px-4 py-4 text-center font-inter text-2xl tracking-[0.35em] text-foreground transition-colors placeholder:text-foreground/20 focus:border-primary focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={setupExpired || isPending}
-                className="flex w-full items-center justify-center gap-2 bg-white px-4 py-4 font-inter text-xs uppercase tracking-widest text-black transition-colors hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex w-full items-center justify-center gap-2 bg-primary px-4 py-4 font-inter text-xs uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -224,13 +224,13 @@ export function VerifyTwoFactorClient({
                   type="button"
                   onClick={handleRefreshSetup}
                   disabled={isPending}
-                  className="flex items-center justify-center gap-2 border border-white/15 px-4 py-3 font-inter text-xs uppercase tracking-widest text-foreground/70 transition-colors hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 border border-border px-4 py-3 font-inter text-xs uppercase tracking-widest text-foreground/70 transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <RefreshCw className="h-4 w-4" />
                   Refresh QR Code
                 </button>
               ) : (
-                <div className="flex items-center justify-center border border-white/10 px-4 py-3 font-inter text-[11px] uppercase tracking-[0.28em] text-foreground/45">
+                <div className="flex items-center justify-center border border-border px-4 py-3 font-inter text-[11px] uppercase tracking-[0.28em] text-foreground/45">
                   Authenticator required
                 </div>
               )}
@@ -238,7 +238,7 @@ export function VerifyTwoFactorClient({
                 type="button"
                 onClick={handleCancel}
                 disabled={isPending}
-                className="border border-white/10 px-4 py-3 font-inter text-xs uppercase tracking-widest text-foreground/45 transition-colors hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                className="border border-border px-4 py-3 font-inter text-xs uppercase tracking-widest text-foreground/45 transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Use Another Account
               </button>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, LayoutDashboard, LogOut, Menu, UserRound, X } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import type { Session } from "@supabase/supabase-js";
 import {
   clearSessionCache,
@@ -78,6 +79,7 @@ export function Navbar() {
         .from("profiles")
         .select("first_name, last_name, role")
         .eq("id", currentSession.user.id)
+        .is("deleted_at", null)
         .single();
 
       if (!profile) {
@@ -324,10 +326,12 @@ export function Navbar() {
   const greetingName = getGreetingName(userProfile, session);
   const isAdmin = userProfile?.role === "admin";
   const shellClassName = useHeroChrome
-    ? "border-white/10 bg-black/18 shadow-none"
-    : "border-primary/12 bg-[#0f131b]/88 shadow-[0_24px_70px_rgba(0,0,0,0.38)]";
-  const textClassName = useHeroChrome ? "text-white/82" : "text-foreground/78";
-  const mutedTextClassName = useHeroChrome ? "text-white/58" : "text-foreground/56";
+    ? "border-border/85 bg-card/92 shadow-[0_18px_50px_rgba(82,62,32,0.16)] dark:border-white/10 dark:bg-black/18 dark:shadow-none"
+    : "border-border/80 bg-card/88 shadow-[0_24px_70px_rgba(0,0,0,0.16)]";
+  const brandClassName = useHeroChrome ? "text-foreground dark:text-white" : "text-foreground";
+  const textClassName = useHeroChrome ? "text-foreground/78 dark:text-white/82" : "text-foreground/78";
+  const hoverTextClassName = useHeroChrome ? "hover:text-foreground dark:hover:text-white" : "hover:text-foreground";
+  const mutedTextClassName = useHeroChrome ? "text-foreground/56 dark:text-white/58" : "text-foreground/56";
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 py-3 sm:px-5 lg:px-8">
@@ -336,7 +340,7 @@ export function Navbar() {
       >
         <Link href="/" className="group flex min-w-0 items-center gap-3">
           <div className="min-w-0">
-            <p className="font-serif text-xl uppercase tracking-[0.34em] text-white sm:text-2xl">
+            <p className={`font-serif text-xl uppercase tracking-[0.34em] sm:text-2xl ${brandClassName}`}>
               Aura
             </p>
             <p className={`hidden text-[10px] uppercase tracking-[0.28em] sm:block ${mutedTextClassName}`}>
@@ -348,7 +352,7 @@ export function Navbar() {
         <nav className="hidden items-center gap-2 lg:flex">
           <div
             ref={navDesktopRef}
-            className="relative flex items-center rounded-full border border-white/10 bg-white/[0.03] p-1.5"
+            className="relative flex items-center rounded-full border border-border/70 bg-background/35 p-1.5"
           >
             <span
               aria-hidden="true"
@@ -373,7 +377,7 @@ export function Navbar() {
                   className={`relative z-10 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.28em] transition-all duration-300 ${
                     isActive
                       ? "text-primary-foreground"
-                      : `${textClassName} hover:bg-white/6 hover:text-white`
+                      : `${textClassName} hover:bg-foreground/6 ${hoverTextClassName}`
                   }`}
                 >
                   {link.name}
@@ -384,12 +388,20 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <ThemeToggle
+            className={
+              useHeroChrome
+                ? "dark:border-white/10 dark:bg-black/16 dark:text-white/78 dark:hover:border-primary/40 dark:hover:text-white"
+                : undefined
+            }
+          />
+
           {!authLoading && session ? (
             <div ref={accountMenuRef} className="relative">
               <button
                 type="button"
                 onClick={() => setAccountMenuOpen((current) => !current)}
-                className={`flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.22em] transition-colors duration-300 ${textClassName} hover:border-primary/35 hover:text-white`}
+                className={`flex items-center gap-2 rounded-full border border-border/70 px-4 py-2 text-[11px] uppercase tracking-[0.22em] transition-colors duration-300 ${textClassName} hover:border-primary/35 ${hoverTextClassName}`}
                 aria-expanded={accountMenuOpen}
               >
                 Hai, {greetingName}
@@ -399,11 +411,11 @@ export function Navbar() {
               </button>
 
               {accountMenuOpen ? (
-                <div className="absolute right-0 mt-3 w-52 border border-white/10 bg-[#0f131b] p-2 shadow-[0_24px_70px_rgba(0,0,0,0.42)]">
+                <div className="absolute right-0 mt-3 w-52 border border-border bg-popover p-2 text-popover-foreground shadow-[0_24px_70px_rgba(0,0,0,0.18)]">
                   <Link
                     href="/profile"
                     onClick={() => setAccountMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 font-inter text-xs uppercase tracking-[0.22em] text-foreground/72 transition-colors hover:bg-white/6 hover:text-white"
+                    className="flex items-center gap-3 px-4 py-3 font-inter text-xs uppercase tracking-[0.22em] text-foreground/72 transition-colors hover:bg-muted hover:text-foreground"
                   >
                     <UserRound className="h-4 w-4" />
                     Profil
@@ -412,7 +424,7 @@ export function Navbar() {
                     <Link
                       href="/admin"
                       onClick={() => setAccountMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 font-inter text-xs uppercase tracking-[0.22em] text-foreground/72 transition-colors hover:bg-white/6 hover:text-white"
+                      className="flex items-center gap-3 px-4 py-3 font-inter text-xs uppercase tracking-[0.22em] text-foreground/72 transition-colors hover:bg-muted hover:text-foreground"
                     >
                       <LayoutDashboard className="h-4 w-4" />
                       Dashboard
@@ -434,7 +446,7 @@ export function Navbar() {
           {!authLoading && !session ? (
             <Link
               href="/login"
-              className={`rounded-full border border-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.26em] transition-colors duration-300 ${textClassName} hover:border-primary/35 hover:text-white`}
+              className={`rounded-full border border-border/70 px-4 py-2 text-[11px] uppercase tracking-[0.26em] transition-colors duration-300 ${textClassName} hover:border-primary/35 ${hoverTextClassName}`}
             >
               Login
             </Link>
@@ -443,7 +455,7 @@ export function Navbar() {
 
         <button
           type="button"
-          className={`inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 transition-colors duration-300 lg:hidden ${textClassName} hover:border-primary/40 hover:text-white`}
+          className={`inline-flex h-11 w-11 items-center justify-center rounded-full border border-border/70 transition-colors duration-300 lg:hidden ${textClassName} hover:border-primary/40 ${hoverTextClassName}`}
           onClick={() => setMobileMenuOpen(true)}
           aria-label="Open navigation menu"
         >
@@ -452,32 +464,37 @@ export function Navbar() {
       </div>
 
       {mobileMenuOpen ? (
-        <div className="fixed inset-0 z-50 bg-[#090b10]/92 px-4 pb-8 pt-5 backdrop-blur-2xl">
-          <div className="mx-auto flex max-w-2xl items-center justify-between rounded-full border border-primary/18 bg-white/[0.03] px-4 py-3">
+        <div className="fixed inset-0 z-50 bg-background/94 px-4 pb-8 pt-5 text-foreground backdrop-blur-2xl">
+          <div className="mx-auto flex max-w-2xl items-center justify-between rounded-full border border-border bg-card/70 px-4 py-3">
             <div>
-              <p className="font-serif text-xl uppercase tracking-[0.3em] text-white">Aura</p>
-              <p className="text-[10px] uppercase tracking-[0.26em] text-white/52">
+              <p className="font-serif text-xl uppercase tracking-[0.3em] text-foreground">Aura</p>
+              <p className="text-[10px] uppercase tracking-[0.26em] text-foreground/52">
                 Curated luxury stays
               </p>
             </div>
 
-            <button
-              type="button"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-white/78 transition-colors duration-300 hover:border-primary/40 hover:text-white"
-              onClick={() => setMobileMenuOpen(false)}
-              aria-label="Close navigation menu"
-            >
-              <X className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <button
+                type="button"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border/70 text-foreground/78 transition-colors duration-300 hover:border-primary/40 hover:text-foreground"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close navigation menu"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
           </div>
 
           <div className="mx-auto mt-10 flex max-w-2xl flex-col gap-4">
+            <ThemeToggle expanded className="justify-start rounded-[1.75rem] py-5" />
+
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] px-6 py-5 text-lg uppercase tracking-[0.28em] text-white/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-white"
+                className="rounded-[1.75rem] border border-border bg-card/55 px-6 py-5 text-lg uppercase tracking-[0.28em] text-foreground/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-foreground"
               >
                 {link.name}
               </Link>
@@ -491,7 +508,7 @@ export function Navbar() {
                 <Link
                   href="/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] px-6 py-5 text-lg uppercase tracking-[0.28em] text-white/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-white"
+                  className="rounded-[1.75rem] border border-border bg-card/55 px-6 py-5 text-lg uppercase tracking-[0.28em] text-foreground/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-foreground"
                 >
                   Profil
                 </Link>
@@ -499,7 +516,7 @@ export function Navbar() {
                   <Link
                     href="/admin"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] px-6 py-5 text-lg uppercase tracking-[0.28em] text-white/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-white"
+                    className="rounded-[1.75rem] border border-border bg-card/55 px-6 py-5 text-lg uppercase tracking-[0.28em] text-foreground/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-foreground"
                   >
                     Dashboard
                   </Link>
@@ -507,7 +524,7 @@ export function Navbar() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] px-6 py-5 text-left text-lg uppercase tracking-[0.28em] text-white/58 transition-all duration-300 hover:border-destructive/35 hover:text-destructive"
+                  className="rounded-[1.75rem] border border-border bg-card/55 px-6 py-5 text-left text-lg uppercase tracking-[0.28em] text-foreground/58 transition-all duration-300 hover:border-destructive/35 hover:text-destructive"
                 >
                   Logout
                 </button>
@@ -518,7 +535,7 @@ export function Navbar() {
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] px-6 py-5 text-lg uppercase tracking-[0.28em] text-white/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-white"
+                className="rounded-[1.75rem] border border-border bg-card/55 px-6 py-5 text-lg uppercase tracking-[0.28em] text-foreground/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-foreground"
               >
                 Login
               </Link>

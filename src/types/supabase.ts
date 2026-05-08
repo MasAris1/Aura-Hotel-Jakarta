@@ -65,6 +65,7 @@ export type Database = {
           room_id: string | null;
           rate_date: string;
           price: number;
+          deleted_at: string | null;
           created_at: string | null;
         };
         Insert: {
@@ -72,6 +73,7 @@ export type Database = {
           room_id?: string | null;
           rate_date: string;
           price: number;
+          deleted_at?: string | null;
           created_at?: string | null;
         };
         Update: {
@@ -79,6 +81,7 @@ export type Database = {
           room_id?: string | null;
           rate_date?: string;
           price?: number;
+          deleted_at?: string | null;
           created_at?: string | null;
         };
         Relationships: [
@@ -97,6 +100,7 @@ export type Database = {
           first_name: string | null;
           last_name: string | null;
           role: string | null;
+          deleted_at: string | null;
           created_at: string | null;
         };
         Insert: {
@@ -104,6 +108,7 @@ export type Database = {
           first_name?: string | null;
           last_name?: string | null;
           role?: string | null;
+          deleted_at?: string | null;
           created_at?: string | null;
         };
         Update: {
@@ -111,6 +116,7 @@ export type Database = {
           first_name?: string | null;
           last_name?: string | null;
           role?: string | null;
+          deleted_at?: string | null;
           created_at?: string | null;
         };
         Relationships: [];
@@ -128,6 +134,7 @@ export type Database = {
           check_out: string;
           total_price: number;
           status: string | null;
+          deleted_at: string | null;
           created_at: string | null;
           updated_at: string | null;
         };
@@ -143,6 +150,7 @@ export type Database = {
           check_out: string;
           total_price: number;
           status?: string | null;
+          deleted_at?: string | null;
           created_at?: string | null;
           updated_at?: string | null;
         };
@@ -158,6 +166,7 @@ export type Database = {
           check_out?: string;
           total_price?: number;
           status?: string | null;
+          deleted_at?: string | null;
           created_at?: string | null;
           updated_at?: string | null;
         };

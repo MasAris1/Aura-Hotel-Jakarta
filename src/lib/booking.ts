@@ -115,6 +115,7 @@ export async function getRoomQuote(
     .from("room_rates")
     .select("rate_date, price")
     .eq("room_id", roomId)
+    .is("deleted_at", null)
     .gte("rate_date", checkIn)
     .lt("rate_date", checkOut);
 

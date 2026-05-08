@@ -128,6 +128,7 @@ export async function GET(request: Request) {
     let query = supabaseAdmin
       .from("bookings")
       .select("id, created_at, room_id, first_name, last_name, email, check_in, check_out, total_price, status")
+      .is("deleted_at", null)
       .order("created_at", { ascending: false });
 
     if (status && status !== "ALL") {

@@ -3,7 +3,7 @@ import type { Database } from "@/types/supabase";
 
 export type ProfileRow = Pick<
   Database["public"]["Tables"]["profiles"]["Row"],
-  "id" | "first_name" | "last_name" | "role"
+  "id" | "first_name" | "last_name" | "role" | "deleted_at"
 >;
 
 export type ProfileRole = ProfileRow["role"];
@@ -95,12 +95,16 @@ export async function getProfileForUser(
 ) {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, first_name, last_name, role")
+    .select("id, first_name, last_name, role, deleted_at")
     .eq("id", userId)
     .maybeSingle();
 
   if (error) {
     throw new Error("Failed to load user profile");
+  }
+
+  if (data?.deleted_at) {
+    return null;
   }
 
   return data;

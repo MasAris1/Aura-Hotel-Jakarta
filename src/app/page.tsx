@@ -396,7 +396,7 @@ export default function Home() {
 
       <section
         id="home"
-        className="ux-hero-stack-target hero-section relative z-0 flex min-h-[100svh] w-full scroll-mt-28 items-center justify-center overflow-hidden bg-[#050505] md:sticky md:top-0 md:h-screen"
+        className="ux-hero-stack-target hero-section relative z-0 flex min-h-[100svh] w-full scroll-mt-28 items-center justify-center overflow-hidden bg-muted dark:bg-[#050505] md:sticky md:top-0 md:h-screen"
       >
         <div className="absolute inset-0 z-0">
           <Image
@@ -414,7 +414,7 @@ export default function Home() {
           {!hasVideoEnded ? (
             <video
               ref={heroVideoRef}
-              className="hero-video absolute inset-0 z-[1] bg-[#050505]"
+              className="hero-video absolute inset-0 z-[1] bg-muted dark:bg-[#050505]"
               autoPlay
               muted
               playsInline
@@ -431,11 +431,11 @@ export default function Home() {
             </video>
           ) : null}
 
-          <div className="absolute inset-0 z-[2] bg-black/45" />
+          <div className="absolute inset-0 z-[2] bg-black/18 dark:bg-black/45" />
           <div className="hero-vignette" />
           <div className="hero-grid" />
           <div
-            className={`absolute inset-0 z-20 bg-black transition-opacity duration-1000 ${
+            className={`absolute inset-0 z-20 bg-background transition-opacity duration-1000 dark:bg-black ${
               isFadingToBlack ? "opacity-100" : "opacity-0"
             }`}
           />
@@ -466,20 +466,20 @@ export default function Home() {
           </div>
 
           <div className="grid gap-10 sm:gap-12 lg:grid-cols-[minmax(0,1.15fr)_280px] lg:items-end">
-            <div className="max-w-5xl">
-              <span className="ux-hero-kicker block text-[10px] uppercase tracking-[0.28em] text-white/56 sm:tracking-[0.4em]">
+            <div className="ux-hero-readable max-w-5xl text-foreground dark:text-white">
+              <span className="ux-hero-kicker block text-[10px] uppercase tracking-[0.28em] text-black sm:tracking-[0.4em] dark:text-white/56">
                 Editorial luxury / landmark arrival
               </span>
-              <h1 className="ux-hero-main mt-5 font-serif text-[clamp(3.6rem,19vw,7rem)] uppercase leading-[0.82] tracking-[0.04em] text-white sm:mt-6 md:text-[clamp(4.8rem,15vw,10rem)]">
+              <h1 className="ux-hero-main mt-5 font-serif text-[clamp(3.6rem,19vw,7rem)] uppercase leading-[0.82] tracking-[0.04em] text-black sm:mt-6 md:text-[clamp(4.8rem,15vw,10rem)] dark:text-white">
                 Aura
               </h1>
-              <p className="ux-hero-sub mt-4 max-w-2xl font-serif text-[clamp(0.95rem,4vw,1.2rem)] italic leading-tight text-white/82 md:text-[clamp(1rem,2vw,1.3rem)]">
+              <p className="ux-hero-sub mt-4 max-w-2xl font-serif text-[clamp(0.95rem,4vw,1.2rem)] italic leading-tight text-black md:text-[clamp(1rem,2vw,1.3rem)] dark:text-white/82">
                 Bundaran HI edition,
               </p>
-              <p className="ux-hero-sub mt-3 max-w-2xl font-serif text-[clamp(0.95rem,4vw,1.2rem)] italic leading-tight text-white/82 md:mt-4 md:text-[clamp(1rem,2vw,1.3rem)]">
+              <p className="ux-hero-sub mt-3 max-w-2xl font-serif text-[clamp(0.95rem,4vw,1.2rem)] italic leading-tight text-black md:mt-4 md:text-[clamp(1rem,2vw,1.3rem)] dark:text-white/82">
                 designed to feel quieter than the city below.
               </p>
-              <p className="ux-hero-copy mt-6 max-w-2xl text-sm leading-6 tracking-[0.18em] text-white/54 sm:tracking-[0.24em] md:tracking-[0.28em]">
+              <p className="ux-hero-copy mt-6 max-w-xl text-sm leading-6 tracking-[0.18em] text-black sm:tracking-[0.24em] md:tracking-[0.28em] dark:max-w-2xl dark:text-white/54">
                 private butler service, seamless digital booking, and skyline
                 suites for slow evenings in the capital.
               </p>
@@ -583,14 +583,14 @@ export default function Home() {
               {catalogRooms.map((room, index) => (
                 <article
                   key={room.id}
-                  className="ux-collection-card group overflow-hidden rounded-[1.75rem] border border-white/8 bg-[linear-gradient(180deg,rgba(28,31,42,0.96)_0%,rgba(18,21,30,0.98)_100%)] transition-all duration-500 transform-gpu hover:-translate-y-1.5 hover:border-primary/28 hover:shadow-[0_28px_60px_rgba(255,215,0,0.36)]"
+                  className="ux-collection-card group overflow-hidden rounded-[1.75rem] border border-border/80 bg-card transition-all duration-500 transform-gpu hover:-translate-y-1.5 hover:border-primary/28 hover:shadow-[0_24px_54px_rgba(95,72,38,0.16)] dark:border-white/8 dark:bg-[linear-gradient(180deg,rgba(28,31,42,0.96)_0%,rgba(18,21,30,0.98)_100%)] dark:hover:shadow-[0_28px_60px_rgba(255,215,0,0.36)]"
                 >
                   <div className="grid h-full sm:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[240px_minmax(0,1fr)]">
                     <Link
                       href={`/rooms/${room.id}`}
-                      className="relative min-h-[220px] overflow-hidden bg-[#0d1118] sm:min-h-full"
+                      className="relative min-h-[220px] overflow-hidden bg-muted sm:min-h-full dark:bg-[#0d1118]"
                     >
-                      <div className="absolute inset-0 z-10 bg-black/24 transition-colors duration-500 group-hover:bg-black/8" />
+                      <div className="absolute inset-0 z-10 bg-transparent transition-colors duration-500 dark:bg-black/24 dark:group-hover:bg-black/8" />
                       <Image
                         src={room.images[0]}
                         alt={room.name}
@@ -611,23 +611,23 @@ export default function Home() {
                             {room.type}
                           </span>
                           {room.isFeatured ? (
-                            <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] uppercase tracking-[0.26em] text-white/58">
+                            <span className="rounded-full border border-border bg-muted/70 px-3 py-1 text-[10px] uppercase tracking-[0.26em] text-foreground/58 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/58">
                               Signature pick
                             </span>
                           ) : null}
                         </div>
 
                         <Link href={`/rooms/${room.id}`}>
-                          <h3 className="mt-5 font-serif text-[1.55rem] leading-tight text-white transition-colors duration-300 group-hover:text-primary sm:text-[1.75rem] xl:text-[1.9rem]">
+                          <h3 className="mt-5 font-serif text-[1.55rem] leading-tight text-foreground transition-colors duration-300 group-hover:text-primary dark:text-white sm:text-[1.75rem] xl:text-[1.9rem]">
                             {room.name}
                           </h3>
                         </Link>
 
-                        <p className="mt-4 line-clamp-3 text-sm leading-7 text-white/58">
+                        <p className="mt-4 line-clamp-3 text-sm leading-7 text-foreground/62 dark:text-white/58">
                           {room.description}
                         </p>
 
-                        <div className="mt-7 flex flex-wrap gap-6 text-[11px] uppercase tracking-[0.24em] text-white/46">
+                        <div className="mt-7 flex flex-wrap gap-6 text-[11px] uppercase tracking-[0.24em] text-foreground/48 dark:text-white/46">
                           <span className="inline-flex items-center gap-2">
                             <Users className="h-4 w-4 text-primary" />
                             {room.capacity} Guests
@@ -639,12 +639,12 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="mt-8 flex flex-col gap-4 border-t border-white/8 pt-6 sm:gap-5 lg:flex-row lg:items-end lg:justify-between">
+                      <div className="mt-8 flex flex-col gap-4 border-t border-border pt-6 sm:gap-5 lg:flex-row lg:items-end lg:justify-between dark:border-white/8">
                         <div>
-                          <span className="block text-[10px] uppercase tracking-[0.26em] text-white/42">
+                          <span className="block text-[10px] uppercase tracking-[0.26em] text-foreground/44 dark:text-white/42">
                             Per night
                           </span>
-                          <span className="mt-2 block font-serif text-2xl text-white">
+                          <span className="mt-2 block font-serif text-2xl text-foreground dark:text-white">
                             IDR {room.basePrice.toLocaleString("id-ID")}
                           </span>
                         </div>
@@ -652,7 +652,7 @@ export default function Home() {
                         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                           <Link
                             href={`/rooms/${room.id}`}
-                            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.26em] text-white/72 transition-all duration-300 hover:border-primary/35 hover:text-primary sm:w-auto"
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border px-4 py-2 text-[11px] uppercase tracking-[0.26em] text-foreground/72 transition-all duration-300 hover:border-primary/35 hover:text-primary dark:border-white/10 dark:text-white/72 sm:w-auto"
                           >
                             View details
                           </Link>

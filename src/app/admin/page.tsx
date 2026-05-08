@@ -25,6 +25,8 @@ import {
   resolveRoomDetails,
 } from "@/lib/roomCatalog";
 import { AuditLogsPanel } from "@/components/admin/AuditLogsPanel";
+import { BookingManagementPanel } from "@/components/admin/BookingManagementPanel";
+import { RoomRateManagementPanel } from "@/components/admin/RoomRateManagementPanel";
 import { RoomManagementPanel } from "@/components/admin/RoomManagementPanel";
 import { UserRoleManagementPanel } from "@/components/admin/UserRoleManagementPanel";
 import { Badge } from "@/components/ui/badge";
@@ -273,6 +275,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     supabaseAdmin
       .from("bookings")
       .select("id, created_at, room_id, check_in, check_out, total_price, status")
+      .is("deleted_at", null)
       .gte("created_at", `${periodRange.from}T00:00:00`)
       .lte("created_at", `${periodRange.to}T23:59:59`)
       .order("created_at", { ascending: false }),
@@ -281,6 +284,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       .select(
         "id, created_at, room_id, first_name, last_name, email, check_in, check_out, total_price, status",
       )
+      .is("deleted_at", null)
       .gte("created_at", `${periodRange.from}T00:00:00`)
       .lte("created_at", `${periodRange.to}T23:59:59`)
       .order("created_at", { ascending: false })
@@ -289,6 +293,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     supabaseAdmin
       .from("profiles")
       .select("id, role, created_at")
+      .is("deleted_at", null)
       .gte("created_at", `${periodRange.from}T00:00:00`)
       .lte("created_at", `${periodRange.to}T23:59:59`),
   ]);
@@ -403,7 +408,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     .slice(0, 5);
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_rgba(15,19,27,0.98)_0%,_rgba(9,12,18,1)_100%)] pb-16 pt-28 text-foreground">
+    <main className="theme-aware-admin min-h-screen bg-[linear-gradient(180deg,_rgba(15,19,27,0.98)_0%,_rgba(9,12,18,1)_100%)] pb-16 pt-28 text-foreground">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 sm:px-6">
         <section className="rounded-xl border border-white/10 bg-white/[0.04] p-5 text-white shadow-[0_20px_70px_rgba(0,0,0,0.26)] sm:p-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -864,15 +869,21 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             <div>
               <h2 className="font-serif text-2xl text-white">Kelola admin</h2>
               <p className="mt-1 text-sm text-white/58">
-                Data user, role, kamar, dan audit log.
+                Data user, booking, kamar, harga harian, dan audit log.
               </p>
             </div>
             <TabsList variant="line" className="border-b border-white/10 px-0">
               <TabsTrigger value="users" className="px-4 text-white/65 data-active:text-white">
                 User
               </TabsTrigger>
+              <TabsTrigger value="bookings" className="px-4 text-white/65 data-active:text-white">
+                Booking
+              </TabsTrigger>
               <TabsTrigger value="rooms" className="px-4 text-white/65 data-active:text-white">
                 Kamar
+              </TabsTrigger>
+              <TabsTrigger value="rates" className="px-4 text-white/65 data-active:text-white">
+                Harga
               </TabsTrigger>
               <TabsTrigger value="audit" className="px-4 text-white/65 data-active:text-white">
                 Audit
@@ -886,7 +897,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                 <div>
                   <CardTitle className="text-white">User dan role</CardTitle>
                   <CardDescription className="text-white/60">
-                    Lihat detail akun dan ubah role admin, resepsionis, atau guest.
+                    Tambah, ubah, arsipkan, pulihkan akun, dan atur role.
                   </CardDescription>
                 </div>
                 <CardAction>
@@ -895,6 +906,22 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               </CardHeader>
               <CardContent className="pt-6">
                 <UserRoleManagementPanel />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="bookings">
+            <Card className="border border-white/10 bg-white/[0.04] text-white ring-0">
+              <CardHeader className="border-b border-white/10">
+                <div>
+                  <CardTitle className="text-white">Manajemen booking</CardTitle>
+                  <CardDescription className="text-white/60">
+                    Tambah, ubah, arsipkan, dan pulihkan data reservasi tanpa mengelola transaksi.
+                  </CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <BookingManagementPanel />
               </CardContent>
             </Card>
           </TabsContent>
@@ -911,6 +938,22 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               </CardHeader>
               <CardContent className="pt-6">
                 <RoomManagementPanel />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="rates">
+            <Card className="border border-white/10 bg-white/[0.04] text-white ring-0">
+              <CardHeader className="border-b border-white/10">
+                <div>
+                  <CardTitle className="text-white">Harga harian kamar</CardTitle>
+                  <CardDescription className="text-white/60">
+                    Kelola override harga per tanggal dengan soft delete.
+                  </CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <RoomRateManagementPanel />
               </CardContent>
             </Card>
           </TabsContent>
