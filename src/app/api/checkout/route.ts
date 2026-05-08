@@ -133,7 +133,11 @@ export async function POST(req: Request) {
             }
 
             return NextResponse.json({
-                error: "Sistem pembayaran sedang tidak tersedia. Pemesanan ditandai gagal agar histori tetap tercatat. Silakan coba membuat reservasi baru beberapa saat lagi."
+                error: "Sistem pembayaran sedang tidak tersedia. Pemesanan ditandai gagal agar histori tetap tercatat. Silakan coba membuat reservasi baru beberapa saat lagi.",
+                diagnostics: {
+                    midtrans: midtransConfigDiagnostics,
+                    message: getErrorMessage(midtransError),
+                },
             }, { status: 503 });
         }
 
