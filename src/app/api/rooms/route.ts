@@ -7,8 +7,7 @@ export async function GET() {
     const supabaseAdmin = getSupabaseAdmin();
     const { data: rooms, error } = await supabaseAdmin
       .from("rooms")
-      .select("*")
-      .is("deleted_at", null);
+      .select("*");
 
     if (error) {
       return NextResponse.json({ error: "Failed to load rooms" }, { status: 500 });

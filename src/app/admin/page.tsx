@@ -293,7 +293,6 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     supabaseAdmin
       .from("profiles")
       .select("id, role, created_at")
-      .is("deleted_at", null)
       .gte("created_at", `${periodRange.from}T00:00:00`)
       .lte("created_at", `${periodRange.to}T23:59:59`),
   ]);

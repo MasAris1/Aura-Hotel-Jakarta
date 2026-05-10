@@ -110,12 +110,17 @@ export function resolveRoomDetails(
 }
 
 export function mergeRoomCatalogRooms(rooms: LiveRoomLookup[]) {
+  const hiddenRoomIds = new Set(
+    rooms
+      .filter((room) => room.deleted_at || room.status === "UNAVAILABLE")
+      .map((room) => room.id),
+  );
   const liveRooms = rooms
-    .filter((room) => !room.deleted_at)
+    .filter((room) => !room.deleted_at && room.status !== "UNAVAILABLE")
     .map((room) => resolveRoomDetails(room.id, room));
-  const mergedRoomIds = new Set(liveRooms.map((room) => room.id));
+  const mergedRoomIds = new Set(rooms.map((room) => room.id));
   const fallbackRooms = staticRooms
-    .filter((room) => !mergedRoomIds.has(room.id))
+    .filter((room) => !mergedRoomIds.has(room.id) && !hiddenRoomIds.has(room.id))
     .map((room) => resolveRoomDetails(room.id));
 
   return [...liveRooms, ...fallbackRooms].sort((left, right) => {

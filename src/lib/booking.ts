@@ -2,8 +2,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/supabase";
 import { resolveRoomDetails } from "@/lib/roomCatalog";
 
-export const BOOKING_TAX_RATE = 0.21;
-
 type PublicSupabaseClient = SupabaseClient<Database>;
 
 type RoomRateRow = Database["public"]["Tables"]["room_rates"]["Row"];
@@ -33,7 +31,6 @@ export type RoomQuote = {
     price: number;
   }>;
   subtotal: number;
-  taxAmount: number;
   totalPrice: number;
 };
 
@@ -119,19 +116,24 @@ export async function getRoomQuote(
     .gte("rate_date", checkIn)
     .lt("rate_date", checkOut);
 
-  if (roomRatesError) {
-    throw new BookingQuoteError("Failed to load room pricing", 500);
-  }
-
-  const roomRateMap = buildRoomRateMap(roomRates);
   const roomDetails = resolveRoomDetails(room.id, room);
   const basePrice = Number(room.base_price ?? roomDetails.basePrice ?? 0);
+
+  if (!Number.isFinite(basePrice) || basePrice <= 0) {
+    throw new BookingQuoteError("Harga kamar belum tersedia di Supabase", 500);
+  }
+
+  if (roomRatesError) {
+    console.warn("Room rate overrides unavailable; using room base price.", roomRatesError);
+  }
+
+  const roomRateMap = buildRoomRateMap(roomRatesError ? null : roomRates);
   const nightlyRates = stayDates.map((date) => ({
     date,
     price: roomRateMap.get(date) ?? basePrice,
   }));
   const subtotal = nightlyRates.reduce((sum, nightlyRate) => sum + nightlyRate.price, 0);
-  const totalPrice = Math.round(subtotal * (1 + BOOKING_TAX_RATE));
+  const totalPrice = subtotal;
 
   return {
     room: {
@@ -144,7 +146,6 @@ export async function getRoomQuote(
     nights: stayDates.length,
     nightlyRates,
     subtotal,
-    taxAmount: totalPrice - subtotal,
     totalPrice,
   } satisfies RoomQuote;
 }

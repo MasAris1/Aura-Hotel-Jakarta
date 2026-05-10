@@ -11,7 +11,7 @@ const userSchema = z.object({
   role: z.enum(["guest", "receptionist", "admin"]),
 });
 
-const profileSelect = "id, first_name, last_name, role, deleted_at, created_at";
+const profileSelect = "id, first_name, last_name, role, created_at";
 
 async function getAuthShape(
   supabaseAdmin: ReturnType<typeof getSupabaseAdmin>,
@@ -112,6 +112,7 @@ export async function PATCH(
     return NextResponse.json({
       user: {
         ...profile,
+        deleted_at: null,
         ...authShape,
         is_current_user: id === access.user.id,
       },

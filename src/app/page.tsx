@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type ChangeEvent,
   type CSSProperties,
 } from "react";
 import Image from "next/image";
@@ -14,11 +15,17 @@ import {
   BellRing,
   Building2,
   Dumbbell,
+  Edit3,
+  ImagePlus,
   LayoutDashboard,
+  Plus,
+  Save,
   Sparkles,
+  Trash2,
   Users,
   UtensilsCrossed,
   Waves,
+  X,
 } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -27,44 +34,92 @@ import {
   resolveRoomDetails,
   type RoomCatalogItem,
 } from "@/lib/roomCatalog";
+import {
+  getStaticFacilities,
+  type FacilityCatalogItem,
+} from "@/lib/facilityCatalog";
+import { createClient } from "@/utils/supabase/client";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const facilityFeatures = [
-  {
-    title: "Skyline Fitness Club",
-    desc: "A fully equipped gym with Technogym stations, sunrise yoga corners, and sweeping city views to start the day in rhythm.",
-    icon: <Dumbbell className="h-5 w-5" />,
-  },
-  {
-    title: "Infinity Pool Deck",
-    desc: "An elevated pool lined with cabanas, evening lighting, and soft skyline reflections for slow afternoons above Jakarta.",
-    icon: <Waves className="h-5 w-5" />,
-  },
-  {
-    title: "Panoramic City View",
-    desc: "Floor-to-ceiling vantage points frame Bundaran HI, golden-hour traffic trails, and the capital's most cinematic nightscape.",
-    icon: <Building2 className="h-5 w-5" />,
-  },
-  {
-    title: "Signature Restaurant",
-    desc: "A destination dining room serving refined Indonesian and international plates with a late-night ambience shaped by live jazz.",
-    icon: <UtensilsCrossed className="h-5 w-5" />,
-  },
-  {
-    title: "Spa & Wellness Rituals",
-    desc: "Private treatment suites, aromatherapy journeys, and restorative massage programs designed to quiet the pace of the city.",
-    icon: <Sparkles className="h-5 w-5" />,
-  },
-  {
-    title: "Concierge Lounge",
-    desc: "A discreet lounge for bespoke itineraries, priority transfers, and private check-in guided by our round-the-clock concierge team.",
-    icon: <BellRing className="h-5 w-5" />,
-  },
-];
-
 const heroMetaPlaceholderCount = 4;
 const HERO_VIDEO_SESSION_KEY = "aura-hero-video-seen-v1";
+const roomPlaceholderImage =
+  "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop";
+const facilityIconOptions = [
+  { value: "fitness", label: "Fitness" },
+  { value: "pool", label: "Pool" },
+  { value: "view", label: "City View" },
+  { value: "restaurant", label: "Restaurant" },
+  { value: "spa", label: "Spa" },
+  { value: "concierge", label: "Concierge" },
+];
+
+type StatusValue = "AVAILABLE" | "UNAVAILABLE";
+
+type RoomFormState = {
+  id?: string;
+  name: string;
+  type: string;
+  base_price: string;
+  capacity: string;
+  imagesText: string;
+  description: string;
+  status: StatusValue;
+};
+
+type FacilityFormState = {
+  id?: string;
+  title: string;
+  description: string;
+  icon: string;
+  image_url: string;
+  status: StatusValue;
+  sort_order: string;
+};
+
+type CrudModalState =
+  | { kind: "room"; mode: "create" | "edit"; form: RoomFormState }
+  | { kind: "facility"; mode: "create" | "edit"; form: FacilityFormState }
+  | null;
+
+const emptyRoomForm: RoomFormState = {
+  name: "",
+  type: "Suite",
+  base_price: "",
+  capacity: "2",
+  imagesText: "",
+  description: "",
+  status: "AVAILABLE",
+};
+
+const emptyFacilityForm: FacilityFormState = {
+  title: "",
+  description: "",
+  icon: "concierge",
+  image_url: "",
+  status: "AVAILABLE",
+  sort_order: "70",
+};
+
+function renderFacilityIcon(icon: string) {
+  const className = "h-5 w-5";
+
+  switch (icon) {
+    case "fitness":
+      return <Dumbbell className={className} />;
+    case "pool":
+      return <Waves className={className} />;
+    case "view":
+      return <Building2 className={className} />;
+    case "restaurant":
+      return <UtensilsCrossed className={className} />;
+    case "spa":
+      return <Sparkles className={className} />;
+    default:
+      return <BellRing className={className} />;
+  }
+}
 
 function subscribeHeroVideoSession() {
   return () => {};
@@ -84,6 +139,7 @@ function getHeroVideoSessionSnapshot() {
 
 export default function Home() {
   const fallbackRooms = getStaticRooms().map((room) => resolveRoomDetails(room.id));
+  const fallbackFacilities = getStaticFacilities();
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
   const pageRef = useRef<HTMLElement | null>(null);
   const progressRef = useRef<HTMLDivElement | null>(null);
@@ -102,6 +158,14 @@ export default function Home() {
   const hasVideoEnded = hasSeenHeroVideo || hasVideoFinished;
   const [isFadingToBlack, setIsFadingToBlack] = useState(false);
   const [catalogRooms, setCatalogRooms] = useState<RoomCatalogItem[]>(fallbackRooms);
+  const [catalogFacilities, setCatalogFacilities] =
+    useState<FacilityCatalogItem[]>(fallbackFacilities);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [crudModal, setCrudModal] = useState<CrudModalState>(null);
+  const [crudError, setCrudError] = useState<string | null>(null);
+  const [crudSuccess, setCrudSuccess] = useState<string | null>(null);
+  const [activeCrudId, setActiveCrudId] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const dispatchWarmupEvent = () => {
     if (heroWarmupEventSentRef.current) {
@@ -134,34 +198,101 @@ export default function Home() {
     });
   }, [hasVideoEnded]);
 
+  const loadRooms = async (signal?: AbortSignal) => {
+    try {
+      const response = await fetch("/api/rooms", {
+        cache: "no-store",
+        signal,
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const result = (await response.json()) as { rooms?: RoomCatalogItem[] };
+
+      if (result.rooms) {
+        setCatalogRooms(result.rooms);
+      }
+    } catch {
+      // Fallback to static catalog when live data is unavailable.
+    }
+  };
+
+  const loadFacilities = async (signal?: AbortSignal) => {
+    try {
+      const response = await fetch("/api/facilities", {
+        cache: "no-store",
+        signal,
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const result = (await response.json()) as { facilities?: FacilityCatalogItem[] };
+
+      if (result.facilities) {
+        setCatalogFacilities(result.facilities);
+      }
+    } catch {
+      // Fallback to static facilities when live data is unavailable.
+    }
+  };
+
+  const refreshPublicContent = async () => {
+    await Promise.all([loadRooms(), loadFacilities()]);
+  };
+
   useEffect(() => {
     const controller = new AbortController();
 
-    const loadRooms = async () => {
-      try {
-        const response = await fetch("/api/rooms", {
-          cache: "no-store",
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          return;
-        }
-
-        const result = (await response.json()) as { rooms?: RoomCatalogItem[] };
-
-        if (result.rooms?.length) {
-          setCatalogRooms(result.rooms);
-        }
-      } catch {
-        // Fallback to static catalog when live data is unavailable.
-      }
-    };
-
-    void loadRooms();
+    void loadRooms(controller.signal);
+    void loadFacilities(controller.signal);
 
     return () => {
       controller.abort();
+    };
+  }, []);
+
+  useEffect(() => {
+    const supabase = createClient();
+    let isMounted = true;
+
+    const syncAdminRole = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.user) {
+        if (isMounted) {
+          setIsAdmin(false);
+        }
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+      if (isMounted) {
+        setIsAdmin(profile?.role === "admin");
+      }
+    };
+
+    void syncAdminRole();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      void syncAdminRole();
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -383,11 +514,258 @@ export default function Home() {
     };
   }, [hasVideoEnded]);
 
+  const openCreateRoomModal = () => {
+    setCrudError(null);
+    setCrudSuccess(null);
+    setCrudModal({ kind: "room", mode: "create", form: emptyRoomForm });
+  };
+
+  const openEditRoomModal = (room: RoomCatalogItem) => {
+    setCrudError(null);
+    setCrudSuccess(null);
+    setCrudModal({
+      kind: "room",
+      mode: "edit",
+      form: {
+        id: room.id,
+        name: room.name,
+        type: room.type,
+        base_price: String(room.basePrice),
+        capacity: String(room.capacity),
+        imagesText: room.images.join("\n"),
+        description: room.description,
+        status: room.status === "UNAVAILABLE" ? "UNAVAILABLE" : "AVAILABLE",
+      },
+    });
+  };
+
+  const openCreateFacilityModal = () => {
+    setCrudError(null);
+    setCrudSuccess(null);
+    setCrudModal({ kind: "facility", mode: "create", form: emptyFacilityForm });
+  };
+
+  const openEditFacilityModal = (facility: FacilityCatalogItem) => {
+    setCrudError(null);
+    setCrudSuccess(null);
+    setCrudModal({
+      kind: "facility",
+      mode: "edit",
+      form: {
+        id: facility.id,
+        title: facility.title,
+        description: facility.description,
+        icon: facility.icon,
+        image_url: facility.imageUrl ?? "",
+        status: facility.status === "UNAVAILABLE" ? "UNAVAILABLE" : "AVAILABLE",
+        sort_order: String(facility.sortOrder),
+      },
+    });
+  };
+
+  const updateRoomForm = (field: keyof RoomFormState, value: string) => {
+    setCrudModal((current) => {
+      if (!current || current.kind !== "room") {
+        return current;
+      }
+
+      return {
+        ...current,
+        form: {
+          ...current.form,
+          [field]: value,
+        },
+      };
+    });
+  };
+
+  const updateFacilityForm = (field: keyof FacilityFormState, value: string) => {
+    setCrudModal((current) => {
+      if (!current || current.kind !== "facility") {
+        return current;
+      }
+
+      return {
+        ...current,
+        form: {
+          ...current.form,
+          [field]: value,
+        },
+      };
+    });
+  };
+
+  const uploadCrudImage = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file || !crudModal) {
+      return;
+    }
+
+    setIsUploading(true);
+    setCrudError(null);
+    setCrudSuccess(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", crudModal.kind === "room" ? "rooms" : "facilities");
+
+      const response = await fetch("/api/admin/uploads", {
+        method: "POST",
+        body: formData,
+      });
+      const result = (await response.json()) as { url?: string; error?: string };
+
+      if (!response.ok || !result.url) {
+        throw new Error(result.error ?? "Failed to upload image.");
+      }
+
+      if (crudModal.kind === "room") {
+        setCrudModal((current) => {
+          if (!current || current.kind !== "room") {
+            return current;
+          }
+
+          return {
+            ...current,
+            form: {
+              ...current.form,
+              imagesText: [...current.form.imagesText.split("\n").filter(Boolean), result.url!].join("\n"),
+            },
+          };
+        });
+      } else {
+        setCrudModal((current) => {
+          if (!current || current.kind !== "facility") {
+            return current;
+          }
+
+          return {
+            ...current,
+            form: {
+              ...current.form,
+              image_url: result.url!,
+            },
+          };
+        });
+      }
+
+      setCrudSuccess("Image uploaded.");
+    } catch (uploadError) {
+      setCrudError(uploadError instanceof Error ? uploadError.message : "Failed to upload image.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const saveCrudItem = async () => {
+    if (!crudModal) {
+      return;
+    }
+
+    setActiveCrudId("saving");
+    setCrudError(null);
+    setCrudSuccess(null);
+
+    try {
+      const isEdit = crudModal.mode === "edit";
+      const endpoint =
+        crudModal.kind === "room"
+          ? isEdit
+            ? `/api/admin/rooms/${crudModal.form.id}`
+            : "/api/admin/rooms"
+          : isEdit
+            ? `/api/admin/facilities/${crudModal.form.id}`
+            : "/api/admin/facilities";
+      const payload =
+        crudModal.kind === "room"
+          ? {
+              name: crudModal.form.name.trim(),
+              type: crudModal.form.type.trim(),
+              base_price: Number(crudModal.form.base_price),
+              capacity: Number(crudModal.form.capacity),
+              images: crudModal.form.imagesText
+                .split("\n")
+                .map((value) => value.trim())
+                .filter(Boolean),
+              description: crudModal.form.description.trim() || null,
+              status: crudModal.form.status,
+            }
+          : {
+              title: crudModal.form.title.trim(),
+              description: crudModal.form.description.trim(),
+              icon: crudModal.form.icon,
+              image_url: crudModal.form.image_url.trim() || null,
+              status: crudModal.form.status,
+              sort_order: crudModal.form.sort_order ? Number(crudModal.form.sort_order) : null,
+            };
+      const response = await fetch(endpoint, {
+        method: isEdit ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(result.error ?? "Failed to save content.");
+      }
+
+      await refreshPublicContent();
+      setCrudSuccess(isEdit ? "Content updated." : "Content created.");
+      setCrudModal(null);
+    } catch (saveError) {
+      setCrudError(saveError instanceof Error ? saveError.message : "Failed to save content.");
+    } finally {
+      setActiveCrudId(null);
+    }
+  };
+
+  const deleteCrudItem = async (kind: "room" | "facility", id: string, label: string) => {
+    const confirmed = window.confirm(`Archive "${label}" from the public page?`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    setActiveCrudId(id);
+    setCrudError(null);
+    setCrudSuccess(null);
+
+    try {
+      const response = await fetch(
+        kind === "room" ? `/api/admin/rooms/${id}` : `/api/admin/facilities/${id}`,
+        { method: "DELETE" },
+      );
+      const result = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(result.error ?? "Failed to archive content.");
+      }
+
+      await refreshPublicContent();
+      setCrudSuccess("Content archived.");
+    } catch (deleteError) {
+      setCrudError(deleteError instanceof Error ? deleteError.message : "Failed to archive content.");
+    } finally {
+      setActiveCrudId(null);
+    }
+  };
+
   return (
     <main
       ref={pageRef}
       className="relative min-h-screen overflow-hidden bg-background selection:bg-primary/20"
     >
+      {isAdmin && (crudError || crudSuccess) ? (
+        <div className="fixed bottom-6 left-1/2 z-[70] w-[min(92vw,32rem)] -translate-x-1/2 rounded-xl border border-border bg-card px-4 py-3 text-sm shadow-[0_20px_70px_rgba(0,0,0,0.24)]">
+          <p className={crudError ? "text-destructive" : "text-primary"}>
+            {crudError ?? crudSuccess}
+          </p>
+        </div>
+      ) : null}
+
       <div className="pointer-events-none fixed right-6 top-1/2 z-30 hidden h-40 -translate-y-1/2 lg:flex">
         <div className="ux-scroll-rail">
           <div ref={progressRef} className="ux-scroll-progress" />
@@ -533,19 +911,64 @@ export default function Home() {
               your stay feel quieter, warmer, and unmistakably elevated.
             </p>
 
+            {isAdmin ? (
+              <div className="mt-8 flex justify-center">
+                <button
+                  type="button"
+                  onClick={openCreateFacilityModal}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-[11px] uppercase tracking-[0.24em] text-primary-foreground transition-all hover:shadow-[0_14px_32px_rgba(198,155,73,0.28)]"
+                >
+                  <Plus className="h-4 w-4" />
+                  Facility
+                </button>
+              </div>
+            ) : null}
+
             <div className="ux-philosophy-grid mt-12 grid grid-cols-1 gap-5 pb-8 text-left sm:mt-16 sm:gap-6 md:mt-20 md:grid-cols-2 xl:grid-cols-3">
-              {facilityFeatures.map((feature, index) => (
+              {catalogFacilities.map((feature, index) => (
                 <div
-                  key={feature.title}
-                  className="ux-philosophy-card ux-glass-card rounded-[1.5rem] border-border/80 p-6 sm:p-8"
+                  key={feature.id}
+                  className="ux-philosophy-card ux-glass-card group relative overflow-hidden rounded-[1.5rem] border-border/80 p-6 sm:p-8"
                   style={{ "--card-delay": `${index * 140}ms` } as CSSProperties}
                 >
+                  {isAdmin ? (
+                    <div className="absolute right-4 top-4 z-20 flex gap-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
+                      <button
+                        type="button"
+                        onClick={() => openEditFacilityModal(feature)}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card/90 text-foreground shadow-sm transition-colors hover:border-primary/40 hover:text-primary"
+                        aria-label={`Edit ${feature.title}`}
+                      >
+                        <Edit3 className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={activeCrudId === feature.id}
+                        onClick={() => void deleteCrudItem("facility", feature.id, feature.title)}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-red-500/25 bg-red-500/10 text-red-200 shadow-sm transition-colors hover:bg-red-500/18 disabled:opacity-60"
+                        aria-label={`Archive ${feature.title}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : null}
+                  {feature.imageUrl ? (
+                    <div className="-mx-6 -mt-6 mb-6 h-40 overflow-hidden bg-muted sm:-mx-8 sm:-mt-8">
+                      <Image
+                        src={feature.imageUrl}
+                        alt={feature.title}
+                        width={720}
+                        height={420}
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    </div>
+                  ) : null}
                   <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    {feature.icon}
+                    {renderFacilityIcon(feature.icon)}
                   </div>
                   <h3 className="font-serif text-xl text-foreground">{feature.title}</h3>
                   <p className="mt-4 text-sm font-light leading-relaxed text-foreground/62">
-                    {feature.desc}
+                    {feature.description}
                   </p>
                   <div className="mt-8 h-px w-full bg-gradient-to-r from-primary/40 via-border to-transparent" />
                 </div>
@@ -577,14 +1000,45 @@ export default function Home() {
                   into the reservation flow.
                 </p>
               </div>
+              {isAdmin ? (
+                <button
+                  type="button"
+                  onClick={openCreateRoomModal}
+                  className="inline-flex h-11 w-fit items-center justify-center gap-2 rounded-full bg-primary px-5 text-[11px] uppercase tracking-[0.24em] text-primary-foreground transition-all hover:shadow-[0_14px_32px_rgba(198,155,73,0.28)]"
+                >
+                  <Plus className="h-4 w-4" />
+                  Suite
+                </button>
+              ) : null}
             </div>
 
             <div className="ux-collection-grid mt-10 grid grid-cols-1 gap-5 pb-8 sm:mt-14 sm:gap-6 lg:grid-cols-2">
               {catalogRooms.map((room, index) => (
                 <article
                   key={room.id}
-                  className="ux-collection-card group overflow-hidden rounded-[1.75rem] border border-border/80 bg-card transition-all duration-500 transform-gpu hover:-translate-y-1.5 hover:border-primary/28 hover:shadow-[0_24px_54px_rgba(95,72,38,0.16)] dark:border-white/8 dark:bg-[linear-gradient(180deg,rgba(28,31,42,0.96)_0%,rgba(18,21,30,0.98)_100%)] dark:hover:shadow-[0_28px_60px_rgba(255,215,0,0.36)]"
+                  className="ux-collection-card group relative overflow-hidden rounded-[1.75rem] border border-border/80 bg-card transition-all duration-500 transform-gpu hover:-translate-y-1.5 hover:border-primary/28 hover:shadow-[0_24px_54px_rgba(95,72,38,0.16)] dark:border-white/8 dark:bg-[linear-gradient(180deg,rgba(28,31,42,0.96)_0%,rgba(18,21,30,0.98)_100%)] dark:hover:shadow-[0_28px_60px_rgba(255,215,0,0.36)]"
                 >
+                  {isAdmin ? (
+                    <div className="absolute right-4 top-4 z-20 flex gap-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
+                      <button
+                        type="button"
+                        onClick={() => openEditRoomModal(room)}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card/90 text-foreground shadow-sm transition-colors hover:border-primary/40 hover:text-primary"
+                        aria-label={`Edit ${room.name}`}
+                      >
+                        <Edit3 className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={activeCrudId === room.id}
+                        onClick={() => void deleteCrudItem("room", room.id, room.name)}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-red-500/25 bg-red-500/10 text-red-200 shadow-sm transition-colors hover:bg-red-500/18 disabled:opacity-60"
+                        aria-label={`Archive ${room.name}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : null}
                   <div className="grid h-full sm:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[240px_minmax(0,1fr)]">
                     <Link
                       href={`/rooms/${room.id}`}
@@ -592,7 +1046,7 @@ export default function Home() {
                     >
                       <div className="absolute inset-0 z-10 bg-transparent transition-colors duration-500 dark:bg-black/24 dark:group-hover:bg-black/8" />
                       <Image
-                        src={room.images[0]}
+                        src={room.images[0] ?? roomPlaceholderImage}
                         alt={room.name}
                         fill
                         quality={92}
@@ -673,6 +1127,234 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {isAdmin && crudModal ? (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/62 px-4 py-6 backdrop-blur-sm">
+          <div className="max-h-[88svh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card p-5 shadow-[0_32px_90px_rgba(0,0,0,0.36)] sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.28em] text-primary">
+                  {crudModal.mode === "edit" ? "Edit" : "Create"}{" "}
+                  {crudModal.kind === "room" ? "Suite" : "Facility"}
+                </p>
+                <h3 className="mt-2 font-serif text-2xl text-foreground">
+                  {crudModal.kind === "room"
+                    ? crudModal.form.name || "New suite"
+                    : crudModal.form.title || "New facility"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCrudModal(null)}
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border text-foreground/70 transition-colors hover:border-primary/40 hover:text-primary"
+                aria-label="Close editor"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="mt-6 grid gap-4">
+              {crudModal.kind === "room" ? (
+                <>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-foreground/55">
+                      Name
+                      <input
+                        value={crudModal.form.name}
+                        onChange={(event) => updateRoomForm("name", event.target.value)}
+                        className="h-11 rounded-xl border border-border bg-background px-4 text-sm normal-case tracking-normal text-foreground outline-none transition-colors focus:border-primary/40"
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-foreground/55">
+                      Type
+                      <input
+                        value={crudModal.form.type}
+                        onChange={(event) => updateRoomForm("type", event.target.value)}
+                        className="h-11 rounded-xl border border-border bg-background px-4 text-sm normal-case tracking-normal text-foreground outline-none transition-colors focus:border-primary/40"
+                      />
+                    </label>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-foreground/55">
+                      Price
+                      <input
+                        type="number"
+                        min="0"
+                        value={crudModal.form.base_price}
+                        onChange={(event) => updateRoomForm("base_price", event.target.value)}
+                        className="h-11 rounded-xl border border-border bg-background px-4 text-sm normal-case tracking-normal text-foreground outline-none transition-colors focus:border-primary/40"
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-foreground/55">
+                      Guests
+                      <input
+                        type="number"
+                        min="1"
+                        value={crudModal.form.capacity}
+                        onChange={(event) => updateRoomForm("capacity", event.target.value)}
+                        className="h-11 rounded-xl border border-border bg-background px-4 text-sm normal-case tracking-normal text-foreground outline-none transition-colors focus:border-primary/40"
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-foreground/55">
+                      Status
+                      <select
+                        value={crudModal.form.status}
+                        onChange={(event) => updateRoomForm("status", event.target.value)}
+                        className="h-11 rounded-xl border border-border bg-background px-4 text-sm normal-case tracking-normal text-foreground outline-none transition-colors focus:border-primary/40"
+                      >
+                        <option value="AVAILABLE">AVAILABLE</option>
+                        <option value="UNAVAILABLE">UNAVAILABLE</option>
+                      </select>
+                    </label>
+                  </div>
+                  <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-foreground/55">
+                    Description
+                    <textarea
+                      value={crudModal.form.description}
+                      onChange={(event) => updateRoomForm("description", event.target.value)}
+                      rows={4}
+                      className="rounded-xl border border-border bg-background px-4 py-3 text-sm normal-case tracking-normal text-foreground outline-none transition-colors focus:border-primary/40"
+                    />
+                  </label>
+                  <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-foreground/55">
+                    Images
+                    <span className="flex flex-wrap items-center gap-3">
+                      <span className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-primary/35 bg-primary/10 px-4 text-xs text-primary transition-colors hover:bg-primary/15">
+                        <ImagePlus className="h-4 w-4" />
+                        Upload
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/avif"
+                          disabled={isUploading}
+                          onChange={(event) => void uploadCrudImage(event)}
+                          className="sr-only"
+                        />
+                      </span>
+                      {isUploading ? (
+                        <span className="text-xs normal-case tracking-normal text-foreground/55">
+                          Uploading image...
+                        </span>
+                      ) : null}
+                    </span>
+                    <textarea
+                      value={crudModal.form.imagesText}
+                      onChange={(event) => updateRoomForm("imagesText", event.target.value)}
+                      rows={4}
+                      placeholder="One image URL per line"
+                      className="rounded-xl border border-border bg-background px-4 py-3 text-sm normal-case tracking-normal text-foreground outline-none transition-colors focus:border-primary/40"
+                    />
+                  </label>
+                </>
+              ) : (
+                <>
+                  <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_180px]">
+                    <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-foreground/55">
+                      Title
+                      <input
+                        value={crudModal.form.title}
+                        onChange={(event) => updateFacilityForm("title", event.target.value)}
+                        className="h-11 rounded-xl border border-border bg-background px-4 text-sm normal-case tracking-normal text-foreground outline-none transition-colors focus:border-primary/40"
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-foreground/55">
+                      Icon
+                      <select
+                        value={crudModal.form.icon}
+                        onChange={(event) => updateFacilityForm("icon", event.target.value)}
+                        className="h-11 rounded-xl border border-border bg-background px-4 text-sm normal-case tracking-normal text-foreground outline-none transition-colors focus:border-primary/40"
+                      >
+                        {facilityIconOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-foreground/55">
+                      Status
+                      <select
+                        value={crudModal.form.status}
+                        onChange={(event) => updateFacilityForm("status", event.target.value)}
+                        className="h-11 rounded-xl border border-border bg-background px-4 text-sm normal-case tracking-normal text-foreground outline-none transition-colors focus:border-primary/40"
+                      >
+                        <option value="AVAILABLE">AVAILABLE</option>
+                        <option value="UNAVAILABLE">UNAVAILABLE</option>
+                      </select>
+                    </label>
+                    <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-foreground/55">
+                      Order
+                      <input
+                        type="number"
+                        min="0"
+                        value={crudModal.form.sort_order}
+                        onChange={(event) => updateFacilityForm("sort_order", event.target.value)}
+                        className="h-11 rounded-xl border border-border bg-background px-4 text-sm normal-case tracking-normal text-foreground outline-none transition-colors focus:border-primary/40"
+                      />
+                    </label>
+                  </div>
+                  <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-foreground/55">
+                    Description
+                    <textarea
+                      value={crudModal.form.description}
+                      onChange={(event) => updateFacilityForm("description", event.target.value)}
+                      rows={4}
+                      className="rounded-xl border border-border bg-background px-4 py-3 text-sm normal-case tracking-normal text-foreground outline-none transition-colors focus:border-primary/40"
+                    />
+                  </label>
+                  <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-foreground/55">
+                    Image
+                    <span className="flex flex-wrap items-center gap-3">
+                      <span className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-primary/35 bg-primary/10 px-4 text-xs text-primary transition-colors hover:bg-primary/15">
+                        <ImagePlus className="h-4 w-4" />
+                        Upload
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/avif"
+                          disabled={isUploading}
+                          onChange={(event) => void uploadCrudImage(event)}
+                          className="sr-only"
+                        />
+                      </span>
+                      {isUploading ? (
+                        <span className="text-xs normal-case tracking-normal text-foreground/55">
+                          Uploading image...
+                        </span>
+                      ) : null}
+                    </span>
+                    <input
+                      value={crudModal.form.image_url}
+                      onChange={(event) => updateFacilityForm("image_url", event.target.value)}
+                      placeholder="Image URL"
+                      className="h-11 rounded-xl border border-border bg-background px-4 text-sm normal-case tracking-normal text-foreground outline-none transition-colors focus:border-primary/40"
+                    />
+                  </label>
+                </>
+              )}
+            </div>
+
+            <div className="mt-6 flex flex-wrap justify-end gap-3 border-t border-border pt-5">
+              <button
+                type="button"
+                onClick={() => setCrudModal(null)}
+                className="inline-flex h-11 items-center justify-center rounded-xl border border-border px-4 text-sm font-medium text-foreground/72 transition-colors hover:border-primary/35 hover:text-primary"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => void saveCrudItem()}
+                disabled={activeCrudId === "saving" || isUploading}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition-all hover:shadow-[0_14px_32px_rgba(198,155,73,0.28)] disabled:opacity-60"
+              >
+                <Save className="h-4 w-4" />
+                {activeCrudId === "saving" ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

@@ -106,8 +106,7 @@ export function AppWarmup() {
           .from("profiles")
           .select("first_name, last_name, role")
           .eq("id", session.user.id)
-          .is("deleted_at", null)
-          .single();
+          .maybeSingle();
 
         const userProfile =
           profile || ({ first_name: guestIdentity.firstName, last_name: guestIdentity.lastName } satisfies UserProfile);

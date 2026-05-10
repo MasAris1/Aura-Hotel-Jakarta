@@ -21,7 +21,7 @@ export async function GET() {
       await Promise.all([
         access.supabaseAdmin
           .from("profiles")
-          .select("id, first_name, last_name, role, deleted_at, created_at")
+          .select("id, first_name, last_name, role, created_at")
           .order("created_at", { ascending: false }),
         access.supabaseAdmin.auth.admin.listUsers({
           page: 1,
@@ -47,7 +47,7 @@ export async function GET() {
         created_at: profile?.created_at ?? authUser.created_at ?? null,
         last_sign_in_at: authUser.last_sign_in_at ?? null,
         email_confirmed_at: authUser.email_confirmed_at ?? null,
-        deleted_at: profile?.deleted_at ?? null,
+        deleted_at: null,
         is_current_user: authUser.id === access.user.id,
       };
     });
@@ -58,6 +58,7 @@ export async function GET() {
         email: "",
         last_sign_in_at: null,
         email_confirmed_at: null,
+        deleted_at: null,
         is_current_user: entry.id === access.user.id,
       }));
 
@@ -109,12 +110,11 @@ export async function POST(request: Request) {
       first_name,
       last_name: last_name ?? "",
       role,
-      deleted_at: null,
     };
     const { data: profile, error: profileError } = await access.supabaseAdmin
       .from("profiles")
       .upsert(profilePayload, { onConflict: "id" })
-      .select("id, first_name, last_name, role, deleted_at, created_at")
+      .select("id, first_name, last_name, role, created_at")
       .single();
 
     if (profileError || !profile) {
@@ -132,6 +132,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       user: {
         ...profile,
+        deleted_at: null,
         email: createdUser.user.email ?? email,
         last_sign_in_at: createdUser.user.last_sign_in_at ?? null,
         email_confirmed_at: createdUser.user.email_confirmed_at ?? null,

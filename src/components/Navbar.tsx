@@ -79,8 +79,7 @@ export function Navbar() {
         .from("profiles")
         .select("first_name, last_name, role")
         .eq("id", currentSession.user.id)
-        .is("deleted_at", null)
-        .single();
+        .maybeSingle();
 
       if (!profile) {
         setUserProfile(
@@ -411,7 +410,7 @@ export function Navbar() {
               </button>
 
               {accountMenuOpen ? (
-                <div className="absolute right-0 mt-3 w-52 border border-border bg-popover p-2 text-popover-foreground shadow-[0_24px_70px_rgba(0,0,0,0.18)]">
+                <div className="absolute right-0 mt-3 w-60 border border-border bg-popover p-2 text-popover-foreground shadow-[0_24px_70px_rgba(0,0,0,0.18)]">
                   <Link
                     href="/profile"
                     onClick={() => setAccountMenuOpen(false)}
@@ -427,7 +426,7 @@ export function Navbar() {
                       className="flex items-center gap-3 px-4 py-3 font-inter text-xs uppercase tracking-[0.22em] text-foreground/72 transition-colors hover:bg-muted hover:text-foreground"
                     >
                       <LayoutDashboard className="h-4 w-4" />
-                      Dashboard
+                      Dashboard Admin
                     </Link>
                   ) : null}
                   <button
@@ -518,7 +517,7 @@ export function Navbar() {
                     onClick={() => setMobileMenuOpen(false)}
                     className="rounded-[1.75rem] border border-border bg-card/55 px-6 py-5 text-lg uppercase tracking-[0.28em] text-foreground/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-foreground"
                   >
-                    Dashboard
+                    Dashboard Admin
                   </Link>
                 ) : null}
                 <button

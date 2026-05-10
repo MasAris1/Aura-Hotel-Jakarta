@@ -148,6 +148,6 @@ Schema live yang saat ini sudah saya audit memakai struktur:
   - `npm run audit:supabase`
 
 ## Catatan Operasional
-- Checkout sekarang meminta quote server-side dari Supabase agar subtotal, pajak, dan total yang tampil sama dengan nilai yang diproses saat pembuatan booking.
+- Checkout sekarang meminta quote server-side dari Supabase agar subtotal dan total yang tampil sama dengan nilai yang diproses saat pembuatan booking.
 - `room_rates` dan function `get_dynamic_price` sudah aktif di schema live dan ikut dipakai dalam flow quote/booking.
 - Jika ingin audit project Supabase live, gunakan `supabase_reconcile.sql`, `supabase_cleanup_legacy.sql`, dan script verifikasi yang sudah disediakan di repo.

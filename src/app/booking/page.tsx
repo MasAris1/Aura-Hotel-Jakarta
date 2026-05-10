@@ -38,6 +38,12 @@ function isValidDateRange(checkIn: string, checkOut: string) {
     return new Date(`${checkOut}T00:00:00`) > new Date(`${checkIn}T00:00:00`);
 }
 
+function formatRupiah(value?: number | null) {
+    return typeof value === "number" && Number.isFinite(value)
+        ? `IDR ${value.toLocaleString("id-ID")}`
+        : "Menunggu harga";
+}
+
 function BookingForm() {
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -143,6 +149,7 @@ function BookingForm() {
         const loadQuote = async () => {
             setIsQuoteLoading(true);
             setQuoteError(null);
+            setQuote(null);
 
             try {
                 const params = new URLSearchParams({
@@ -190,9 +197,8 @@ function BookingForm() {
 
     const nextStep = () => setStep(prev => (prev + 1) as Step);
     const prevStep = () => setStep(prev => (prev - 1) as Step);
-    const displayedSubtotal = quote?.subtotal ?? room.basePrice;
-    const displayedTaxAmount = quote?.taxAmount ?? 0;
-    const displayedTotal = quote?.totalPrice ?? room.basePrice;
+    const displayedSubtotal = quote?.subtotal ?? null;
+    const displayedTotal = quote?.totalPrice ?? null;
     const displayedNights = quote?.nights ?? (checkIn && checkOut
         ? Math.max(1, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)))
         : 1);
@@ -429,15 +435,11 @@ function BookingForm() {
                             </div>
                             <div className="flex justify-between items-center pb-4 border-b border-border">
                                 <span className="font-sans text-sm text-foreground/60">Subtotal</span>
-                                <span className="font-serif text-lg text-foreground">IDR {displayedSubtotal.toLocaleString('id-ID')}</span>
-                            </div>
-                            <div className="flex justify-between items-center pb-4 border-b border-border">
-                                <span className="font-sans text-sm text-foreground/60">Pajak &amp; biaya</span>
-                                <span className="font-serif text-lg text-foreground">IDR {displayedTaxAmount.toLocaleString('id-ID')}</span>
+                                <span className="font-serif text-lg text-foreground">{formatRupiah(displayedSubtotal)}</span>
                             </div>
                             <div className="flex justify-between items-center pt-2">
                                 <span className="font-sans text-xs tracking-widest uppercase font-semibold text-primary">Total Pembayaran</span>
-                                <span className="font-serif text-2xl text-foreground">IDR {displayedTotal.toLocaleString('id-ID')}</span>
+                                <span className="font-serif text-2xl text-foreground">{formatRupiah(displayedTotal)}</span>
                             </div>
                             {isQuoteLoading ? (
                                 <p className="text-xs font-sans uppercase tracking-[0.18em] text-foreground/40">
@@ -455,7 +457,7 @@ function BookingForm() {
                             </button>
                             <button
                                 onClick={handleCheckout}
-                                disabled={isPending || isAuthorizing || !user || !quote || !!quoteError || !hasValidDateRange}
+                                disabled={isPending || isAuthorizing || isQuoteLoading || !user || !quote || !!quoteError || !hasValidDateRange}
                                 className="flex-[2] bg-primary text-primary-foreground py-5 flex items-center justify-center gap-3 font-sans text-xs tracking-[0.2em] uppercase hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed group text-center"
                             >
                                 {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Bayar Sekarang"}

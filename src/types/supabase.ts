@@ -59,6 +59,45 @@ export type Database = {
         };
         Relationships: [];
       };
+      facilities: {
+        Row: {
+          id: string;
+          title: string;
+          description: string;
+          icon: string | null;
+          image_url: string | null;
+          status: string | null;
+          sort_order: number | null;
+          deleted_at: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          description: string;
+          icon?: string | null;
+          image_url?: string | null;
+          status?: string | null;
+          sort_order?: number | null;
+          deleted_at?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          description?: string;
+          icon?: string | null;
+          image_url?: string | null;
+          status?: string | null;
+          sort_order?: number | null;
+          deleted_at?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
       room_rates: {
         Row: {
           id: string;
