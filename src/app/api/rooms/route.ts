@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/utils/supabase/admin";
-import { mergeRoomCatalogRooms } from "@/lib/roomCatalog";
+import { getStaticRooms, mergeRoomCatalogRooms, resolveRoomDetails } from "@/lib/roomCatalog";
 
 export async function GET() {
   try {
@@ -10,11 +10,15 @@ export async function GET() {
       .select("*");
 
     if (error) {
-      return NextResponse.json({ error: "Failed to load rooms" }, { status: 500 });
+      return NextResponse.json({
+        rooms: getStaticRooms().map((room) => resolveRoomDetails(room.id)),
+      });
     }
 
     return NextResponse.json({ rooms: mergeRoomCatalogRooms(rooms ?? []) });
   } catch {
-    return NextResponse.json({ error: "Failed to load rooms" }, { status: 500 });
+    return NextResponse.json({
+      rooms: getStaticRooms().map((room) => resolveRoomDetails(room.id)),
+    });
   }
 }

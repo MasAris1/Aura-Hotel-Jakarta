@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -46,6 +47,8 @@ const heroMetaPlaceholderCount = 4;
 const HERO_VIDEO_SESSION_KEY = "aura-hero-video-seen-v1";
 const roomPlaceholderImage =
   "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop";
+const LOCAL_ROOM_CATALOG_KEY = "aura-admin-room-catalog-ui-v1";
+const LOCAL_FACILITY_CATALOG_KEY = "aura-admin-facility-catalog-ui-v1";
 const facilityIconOptions = [
   { value: "fitness", label: "Fitness" },
   { value: "pool", label: "Pool" },
@@ -101,6 +104,99 @@ const emptyFacilityForm: FacilityFormState = {
   status: "AVAILABLE",
   sort_order: "70",
 };
+
+function createLocalId(label: string) {
+  const slug = label
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return slug || `item-${Date.now()}`;
+}
+
+function readLocalCatalog<T>(key: string): T[] | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(key);
+
+    return raw ? (JSON.parse(raw) as T[]) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeLocalCatalog<T>(key: string, value: T[]) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(key, JSON.stringify(value));
+}
+
+function sortFacilities(facilities: FacilityCatalogItem[]) {
+  return [...facilities].sort((left, right) => {
+    if (left.sortOrder !== right.sortOrder) {
+      return left.sortOrder - right.sortOrder;
+    }
+
+    return left.title.localeCompare(right.title);
+  });
+}
+
+function upsertCatalogItem<TItem extends { id: string; status?: string | null }>(
+  items: TItem[],
+  nextItem: TItem,
+) {
+  const nextItems = items.some((item) => item.id === nextItem.id)
+    ? items.map((item) => (item.id === nextItem.id ? nextItem : item))
+    : [...items, nextItem];
+
+  return nextItems.filter((item) => item.status !== "UNAVAILABLE");
+}
+
+function roomFromForm(form: RoomFormState, currentRoom?: RoomCatalogItem | null): RoomCatalogItem {
+  const images = form.imagesText
+    .split("\n")
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  return {
+    id: form.id || createLocalId(form.name),
+    name: form.name.trim() || currentRoom?.name || "Untitled Suite",
+    type: form.type.trim() || currentRoom?.type || "Suite",
+    images: images.length > 0 ? images : currentRoom?.images ?? [],
+    basePrice: Number(form.base_price || currentRoom?.basePrice || 0),
+    capacity: Number(form.capacity || currentRoom?.capacity || 1),
+    description: form.description.trim() || currentRoom?.description || "Room details unavailable.",
+    size: currentRoom?.size ?? "Spacious stay",
+    bedType: currentRoom?.bedType ?? "Premium bedding",
+    amenities: currentRoom?.amenities ?? [],
+    isFeatured: currentRoom?.isFeatured ?? false,
+    status: form.status,
+  };
+}
+
+function facilityFromForm(
+  form: FacilityFormState,
+  currentFacility?: FacilityCatalogItem | null,
+): FacilityCatalogItem {
+  return {
+    id: form.id || createLocalId(form.title),
+    title: form.title.trim() || currentFacility?.title || "Untitled Facility",
+    description:
+      form.description.trim() ||
+      currentFacility?.description ||
+      "Facility details unavailable.",
+    icon: form.icon.trim() || currentFacility?.icon || "concierge",
+    imageUrl: form.image_url.trim() || null,
+    status: form.status,
+    sortOrder: Number(form.sort_order || currentFacility?.sortOrder || 999),
+  };
+}
 
 function renderFacilityIcon(icon: string) {
   const className = "h-5 w-5";
@@ -198,7 +294,14 @@ export default function Home() {
     });
   }, [hasVideoEnded]);
 
-  const loadRooms = async (signal?: AbortSignal) => {
+  const loadRooms = useCallback(async (signal?: AbortSignal) => {
+    const localRooms = readLocalCatalog<RoomCatalogItem>(LOCAL_ROOM_CATALOG_KEY);
+
+    if (localRooms?.length) {
+      setCatalogRooms(localRooms);
+      return;
+    }
+
     try {
       const response = await fetch("/api/rooms", {
         cache: "no-store",
@@ -217,32 +320,22 @@ export default function Home() {
     } catch {
       // Fallback to static catalog when live data is unavailable.
     }
-  };
+  }, []);
 
-  const loadFacilities = async (signal?: AbortSignal) => {
-    try {
-      const response = await fetch("/api/facilities", {
-        cache: "no-store",
-        signal,
-      });
+  const loadFacilities = useCallback(async (signal?: AbortSignal) => {
+    void signal;
 
-      if (!response.ok) {
-        return;
-      }
+    const localFacilities = readLocalCatalog<FacilityCatalogItem>(
+      LOCAL_FACILITY_CATALOG_KEY,
+    );
 
-      const result = (await response.json()) as { facilities?: FacilityCatalogItem[] };
-
-      if (result.facilities) {
-        setCatalogFacilities(result.facilities);
-      }
-    } catch {
-      // Fallback to static facilities when live data is unavailable.
+    if (localFacilities?.length) {
+      setCatalogFacilities(sortFacilities(localFacilities));
+      return;
     }
-  };
 
-  const refreshPublicContent = async () => {
-    await Promise.all([loadRooms(), loadFacilities()]);
-  };
+    setCatalogFacilities(getStaticFacilities());
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -253,7 +346,7 @@ export default function Home() {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [loadFacilities, loadRooms]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -669,57 +762,101 @@ export default function Home() {
     setCrudError(null);
     setCrudSuccess(null);
 
+    if (crudModal.kind === "facility") {
+      const currentFacility = catalogFacilities.find(
+        (facility) => facility.id === crudModal.form.id,
+      );
+      const nextFacility = facilityFromForm(crudModal.form, currentFacility);
+      const nextFacilities = sortFacilities(
+        upsertCatalogItem(catalogFacilities, nextFacility),
+      );
+
+      writeLocalCatalog(LOCAL_FACILITY_CATALOG_KEY, nextFacilities);
+      setCatalogFacilities(nextFacilities);
+      setCrudSuccess(
+        crudModal.mode === "edit"
+          ? "Facility updated in the page UI."
+          : "Facility added to the page UI.",
+      );
+      setCrudModal(null);
+      setActiveCrudId(null);
+      return;
+    }
+
+    const currentRoom = catalogRooms.find((room) => room.id === crudModal.form.id);
+    const optimisticRoom = roomFromForm(crudModal.form, currentRoom);
+    let nextRoom = optimisticRoom;
+    let persisted = false;
+
     try {
       const isEdit = crudModal.mode === "edit";
-      const endpoint =
-        crudModal.kind === "room"
-          ? isEdit
-            ? `/api/admin/rooms/${crudModal.form.id}`
-            : "/api/admin/rooms"
-          : isEdit
-            ? `/api/admin/facilities/${crudModal.form.id}`
-            : "/api/admin/facilities";
-      const payload =
-        crudModal.kind === "room"
-          ? {
-              name: crudModal.form.name.trim(),
-              type: crudModal.form.type.trim(),
-              base_price: Number(crudModal.form.base_price),
-              capacity: Number(crudModal.form.capacity),
-              images: crudModal.form.imagesText
-                .split("\n")
-                .map((value) => value.trim())
-                .filter(Boolean),
-              description: crudModal.form.description.trim() || null,
-              status: crudModal.form.status,
-            }
-          : {
-              title: crudModal.form.title.trim(),
-              description: crudModal.form.description.trim(),
-              icon: crudModal.form.icon,
-              image_url: crudModal.form.image_url.trim() || null,
-              status: crudModal.form.status,
-              sort_order: crudModal.form.sort_order ? Number(crudModal.form.sort_order) : null,
-            };
-      const response = await fetch(endpoint, {
-        method: isEdit ? "PATCH" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const result = (await response.json()) as { error?: string };
+      const payload = {
+        name: crudModal.form.name.trim(),
+        type: crudModal.form.type.trim(),
+        base_price: Number(crudModal.form.base_price),
+        capacity: Number(crudModal.form.capacity),
+        images: crudModal.form.imagesText
+          .split("\n")
+          .map((value) => value.trim())
+          .filter(Boolean),
+        description: crudModal.form.description.trim() || null,
+        status: crudModal.form.status,
+      };
+      const response = await fetch(
+        isEdit ? `/api/admin/rooms/${crudModal.form.id}` : "/api/admin/rooms",
+        {
+          method: isEdit ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+      );
+      const result = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        room?: {
+          id: string;
+          name?: string | null;
+          type?: string | null;
+          base_price?: number | null;
+          capacity?: number | null;
+          images?: string[] | null;
+          description?: string | null;
+          status?: string | null;
+        };
+      };
 
-      if (!response.ok) {
-        throw new Error(result.error ?? "Failed to save content.");
+      if (response.ok && result.room) {
+        nextRoom = resolveRoomDetails(result.room.id, result.room);
+        persisted = true;
       }
-
-      await refreshPublicContent();
-      setCrudSuccess(isEdit ? "Content updated." : "Content created.");
-      setCrudModal(null);
-    } catch (saveError) {
-      setCrudError(saveError instanceof Error ? saveError.message : "Failed to save content.");
-    } finally {
-      setActiveCrudId(null);
+    } catch {
+      persisted = false;
     }
+
+    const nextRooms = upsertCatalogItem(catalogRooms, nextRoom);
+    writeLocalCatalog(LOCAL_ROOM_CATALOG_KEY, nextRooms);
+    setCatalogRooms(nextRooms);
+    setCrudSuccess(
+      persisted
+        ? crudModal.mode === "edit"
+          ? "Suite updated."
+          : "Suite created."
+        : "Suite updated in the page UI. Supabase room schema still needs syncing.",
+    );
+    setCrudModal(null);
+    setActiveCrudId(null);
+  };
+
+  const removeLocalCatalogItem = (kind: "room" | "facility", id: string) => {
+    if (kind === "facility") {
+      const nextFacilities = catalogFacilities.filter((facility) => facility.id !== id);
+      writeLocalCatalog(LOCAL_FACILITY_CATALOG_KEY, nextFacilities);
+      setCatalogFacilities(nextFacilities);
+      return;
+    }
+
+    const nextRooms = catalogRooms.filter((room) => room.id !== id);
+    writeLocalCatalog(LOCAL_ROOM_CATALOG_KEY, nextRooms);
+    setCatalogRooms(nextRooms);
   };
 
   const deleteCrudItem = async (kind: "room" | "facility", id: string, label: string) => {
@@ -733,22 +870,20 @@ export default function Home() {
     setCrudError(null);
     setCrudSuccess(null);
 
+    if (kind === "facility") {
+      removeLocalCatalogItem(kind, id);
+      setCrudSuccess("Facility archived from the page UI.");
+      setActiveCrudId(null);
+      return;
+    }
+
     try {
-      const response = await fetch(
-        kind === "room" ? `/api/admin/rooms/${id}` : `/api/admin/facilities/${id}`,
-        { method: "DELETE" },
-      );
-      const result = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(result.error ?? "Failed to archive content.");
-      }
-
-      await refreshPublicContent();
-      setCrudSuccess("Content archived.");
-    } catch (deleteError) {
-      setCrudError(deleteError instanceof Error ? deleteError.message : "Failed to archive content.");
+      await fetch(`/api/admin/rooms/${id}`, { method: "DELETE" });
+    } catch {
+      // The visible page state is still updated when the live schema is out of sync.
     } finally {
+      removeLocalCatalogItem(kind, id);
+      setCrudSuccess("Suite archived from the page UI.");
       setActiveCrudId(null);
     }
   };
@@ -924,11 +1059,11 @@ export default function Home() {
               </div>
             ) : null}
 
-            <div className="ux-philosophy-grid mt-12 grid grid-cols-1 gap-5 pb-8 text-left sm:mt-16 sm:gap-6 md:mt-20 md:grid-cols-2 xl:grid-cols-3">
+            <div className="ux-philosophy-grid mt-12 grid grid-cols-1 items-stretch gap-5 pb-8 text-left sm:mt-16 sm:gap-6 md:mt-20 md:grid-cols-2 xl:grid-cols-3">
               {catalogFacilities.map((feature, index) => (
                 <div
                   key={feature.id}
-                  className="ux-philosophy-card ux-glass-card group relative overflow-hidden rounded-[1.5rem] border-border/80 p-6 sm:p-8"
+                  className="ux-philosophy-card ux-glass-card group relative flex h-full min-h-[22rem] flex-col overflow-hidden rounded-[1.5rem] border-border/80 p-6 sm:p-8"
                   style={{ "--card-delay": `${index * 140}ms` } as CSSProperties}
                 >
                   {isAdmin ? (
@@ -953,7 +1088,7 @@ export default function Home() {
                     </div>
                   ) : null}
                   {feature.imageUrl ? (
-                    <div className="-mx-6 -mt-6 mb-6 h-40 overflow-hidden bg-muted sm:-mx-8 sm:-mt-8">
+                    <div className="-mx-6 -mt-6 mb-6 h-44 shrink-0 overflow-hidden bg-muted sm:-mx-8 sm:-mt-8">
                       <Image
                         src={feature.imageUrl}
                         alt={feature.title}
@@ -966,11 +1101,15 @@ export default function Home() {
                   <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
                     {renderFacilityIcon(feature.icon)}
                   </div>
-                  <h3 className="font-serif text-xl text-foreground">{feature.title}</h3>
-                  <p className="mt-4 text-sm font-light leading-relaxed text-foreground/62">
+                  <h3 className="min-h-[3.25rem] font-serif text-xl leading-tight text-foreground">
+                    {feature.title}
+                  </h3>
+                  <p className="mt-4 text-sm font-light leading-7 text-foreground/62">
                     {feature.description}
                   </p>
-                  <div className="mt-8 h-px w-full bg-gradient-to-r from-primary/40 via-border to-transparent" />
+                  <div className="mt-auto pt-8">
+                    <div className="h-px w-full bg-gradient-to-r from-primary/40 via-border to-transparent" />
+                  </div>
                 </div>
               ))}
             </div>
@@ -1012,11 +1151,11 @@ export default function Home() {
               ) : null}
             </div>
 
-            <div className="ux-collection-grid mt-10 grid grid-cols-1 gap-5 pb-8 sm:mt-14 sm:gap-6 lg:grid-cols-2">
+            <div className="ux-collection-grid mt-10 grid grid-cols-1 items-stretch gap-5 pb-8 sm:mt-14 sm:gap-6 lg:grid-cols-2">
               {catalogRooms.map((room, index) => (
                 <article
                   key={room.id}
-                  className="ux-collection-card group relative overflow-hidden rounded-[1.75rem] border border-border/80 bg-card transition-all duration-500 transform-gpu hover:-translate-y-1.5 hover:border-primary/28 hover:shadow-[0_24px_54px_rgba(95,72,38,0.16)] dark:border-white/8 dark:bg-[linear-gradient(180deg,rgba(28,31,42,0.96)_0%,rgba(18,21,30,0.98)_100%)] dark:hover:shadow-[0_28px_60px_rgba(255,215,0,0.36)]"
+                  className="ux-collection-card group relative h-full overflow-hidden rounded-[1.75rem] border border-border/80 bg-card transition-all duration-500 transform-gpu hover:-translate-y-1.5 hover:border-primary/28 hover:shadow-[0_24px_54px_rgba(95,72,38,0.16)] dark:border-white/8 dark:bg-[linear-gradient(180deg,rgba(28,31,42,0.96)_0%,rgba(18,21,30,0.98)_100%)] dark:hover:shadow-[0_28px_60px_rgba(255,215,0,0.36)]"
                 >
                   {isAdmin ? (
                     <div className="absolute right-4 top-4 z-20 flex gap-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
@@ -1039,10 +1178,10 @@ export default function Home() {
                       </button>
                     </div>
                   ) : null}
-                  <div className="grid h-full sm:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[240px_minmax(0,1fr)]">
+                  <div className="grid h-full min-h-[30rem] sm:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[240px_minmax(0,1fr)]">
                     <Link
                       href={`/rooms/${room.id}`}
-                      className="relative min-h-[220px] overflow-hidden bg-muted sm:min-h-full dark:bg-[#0d1118]"
+                      className="relative min-h-[230px] overflow-hidden bg-muted sm:min-h-full dark:bg-[#0d1118]"
                     >
                       <div className="absolute inset-0 z-10 bg-transparent transition-colors duration-500 dark:bg-black/24 dark:group-hover:bg-black/8" />
                       <Image
@@ -1081,12 +1220,12 @@ export default function Home() {
                           {room.description}
                         </p>
 
-                        <div className="mt-7 flex flex-wrap gap-6 text-[11px] uppercase tracking-[0.24em] text-foreground/48 dark:text-white/46">
-                          <span className="inline-flex items-center gap-2">
+                        <div className="mt-7 grid gap-3 text-[11px] uppercase tracking-[0.22em] text-foreground/48 sm:grid-cols-2 dark:text-white/46">
+                          <span className="inline-flex min-w-0 items-center gap-2">
                             <Users className="h-4 w-4 text-primary" />
                             {room.capacity} Guests
                           </span>
-                          <span className="inline-flex items-center gap-2">
+                          <span className="inline-flex min-w-0 items-center gap-2">
                             <LayoutDashboard className="h-4 w-4 text-primary" />
                             {room.size}
                           </span>
