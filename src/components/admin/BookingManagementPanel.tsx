@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { fetchAdmin } from "@/lib/adminFetch";
 
 type AdminRoom = {
   id: string;
@@ -138,8 +139,8 @@ export function BookingManagementPanel() {
 
       try {
         const [bookingsResponse, roomsResponse] = await Promise.all([
-          fetch("/api/admin/bookings", { cache: "no-store" }),
-          fetch("/api/admin/rooms", { cache: "no-store" }),
+          fetchAdmin("/api/admin/bookings"),
+          fetchAdmin("/api/admin/rooms"),
         ]);
         const bookingsResult = (await bookingsResponse.json()) as BookingsResponse & { error?: string };
         const roomsResult = (await roomsResponse.json()) as RoomsResponse & { error?: string };
@@ -439,23 +440,8 @@ export function BookingManagementPanel() {
           return (
             <div
               key={booking.id}
-              className="grid gap-4 rounded-lg border border-white/10 bg-black/12 p-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(180px,0.7fr)_130px_220px]"
+              className="grid gap-4 rounded-lg border border-white/10 bg-black/12 p-4 xl:grid-cols-[220px_minmax(0,1.1fr)_minmax(180px,0.7fr)_130px]"
             >
-              <div>
-                <p className="font-medium text-white">#{booking.id.slice(0, 8)} - {getGuestName(booking)}</p>
-                <p className="mt-1 text-sm text-white/55">{booking.email ?? "Email kosong"}</p>
-                <p className="mt-2 text-xs text-white/35">{room?.name ?? booking.room_id ?? "Kamar tidak tersedia"}</p>
-              </div>
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-white/42">Tanggal</p>
-                <p className="mt-2 text-sm text-white">{formatDate(booking.check_in)}</p>
-                <p className="text-xs text-white/45">sampai {formatDate(booking.check_out)}</p>
-              </div>
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-white/42">Status</p>
-                <p className="mt-2 text-sm text-white">{booking.status ?? "UNPAID"}</p>
-                <p className="mt-1 text-xs text-white/45">{isArchived ? "Archived" : "Visible"}</p>
-              </div>
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
@@ -500,6 +486,21 @@ export function BookingManagementPanel() {
                 <span className="flex h-10 items-center text-sm font-medium text-white">
                   {formatCurrency(Number(booking.total_price ?? 0))}
                 </span>
+              </div>
+              <div>
+                <p className="font-medium text-white">#{booking.id.slice(0, 8)} - {getGuestName(booking)}</p>
+                <p className="mt-1 text-sm text-white/55">{booking.email ?? "Email kosong"}</p>
+                <p className="mt-2 text-xs text-white/35">{room?.name ?? booking.room_id ?? "Kamar tidak tersedia"}</p>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white/42">Tanggal</p>
+                <p className="mt-2 text-sm text-white">{formatDate(booking.check_in)}</p>
+                <p className="text-xs text-white/45">sampai {formatDate(booking.check_out)}</p>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white/42">Status</p>
+                <p className="mt-2 text-sm text-white">{booking.status ?? "UNPAID"}</p>
+                <p className="mt-1 text-xs text-white/45">{isArchived ? "Archived" : "Visible"}</p>
               </div>
             </div>
           );

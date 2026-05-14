@@ -8,8 +8,26 @@ export type ProfileRow = Pick<
 
 export type ProfileRole = ProfileRow["role"];
 
+const configuredAdminEmails = ["aris.maulana.am57@gmail.com"];
+
 export function isAdminRole(role: ProfileRole | undefined | null) {
   return role === "admin";
+}
+
+export function isConfiguredAdminEmail(email: string | undefined | null) {
+  const normalizedEmail = email?.trim().toLowerCase();
+
+  return Boolean(
+    normalizedEmail &&
+      configuredAdminEmails.some((adminEmail) => adminEmail.toLowerCase() === normalizedEmail),
+  );
+}
+
+export function hasAdminAccess(
+  role: ProfileRole | undefined | null,
+  email?: string | null,
+) {
+  return isAdminRole(role) || isConfiguredAdminEmail(email);
 }
 
 export function isReceptionistRole(role: ProfileRole | undefined | null) {
@@ -20,9 +38,20 @@ export function isStaffRole(role: ProfileRole | undefined | null) {
   return isAdminRole(role) || isReceptionistRole(role);
 }
 
+export function hasStaffAccess(
+  role: ProfileRole | undefined | null,
+  email?: string | null,
+) {
+  return isStaffRole(role) || isConfiguredAdminEmail(email);
+}
+
 export function getRoleHomePath(role: ProfileRole | undefined | null) {
   if (isAdminRole(role)) {
     return "/admin";
+  }
+
+  if (isReceptionistRole(role)) {
+    return "/receptionist";
   }
 
   return "/#collection";
@@ -53,6 +82,10 @@ export function getPostAuthRedirect(
 
   if (safeRedirect) {
     if (safeRedirect.startsWith("/admin") && !isAdminRole(role)) {
+      return "/";
+    }
+
+    if (safeRedirect.startsWith("/receptionist") && !isStaffRole(role)) {
       return "/";
     }
 
@@ -101,6 +134,79 @@ export async function getProfileForUser(
 
   if (error) {
     throw new Error("Failed to load user profile");
+  }
+
+  return data;
+}
+
+export async function ensureConfiguredAdminProfile(
+  supabase: SupabaseClient<Database>,
+  user: User,
+  currentProfile?: ProfileRow | null,
+) {
+  if (!isConfiguredAdminEmail(user.email)) {
+    return currentProfile ?? (await getProfileForUser(supabase, user.id));
+  }
+
+  const profile = currentProfile ?? (await getProfileForUser(supabase, user.id));
+
+  if (profile?.role === "admin") {
+    return profile;
+  }
+
+  if (profile) {
+    let result = await supabase
+      .from("profiles")
+      .update({ role: "admin", deleted_at: null })
+      .eq("id", user.id)
+      .select("id, first_name, last_name, role")
+      .single();
+
+    if (result.error?.message.includes("deleted_at")) {
+      result = await supabase
+        .from("profiles")
+        .update({ role: "admin" })
+        .eq("id", user.id)
+        .select("id, first_name, last_name, role")
+        .single();
+    }
+
+    const { data, error } = result;
+
+    if (error) {
+      throw new Error("Failed to promote configured admin profile");
+    }
+
+    return data;
+  }
+
+  let result = await supabase
+    .from("profiles")
+    .insert({
+      id: user.id,
+      ...deriveProfileName(user),
+      role: "admin",
+      deleted_at: null,
+    })
+    .select("id, first_name, last_name, role")
+    .single();
+
+  if (result.error?.message.includes("deleted_at")) {
+    result = await supabase
+      .from("profiles")
+      .insert({
+        id: user.id,
+        ...deriveProfileName(user),
+        role: "admin",
+      })
+      .select("id, first_name, last_name, role")
+      .single();
+  }
+
+  const { data, error } = result;
+
+  if (error) {
+    throw new Error("Failed to provision configured admin profile");
   }
 
   return data;

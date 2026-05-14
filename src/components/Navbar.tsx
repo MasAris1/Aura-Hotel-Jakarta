@@ -3,7 +3,15 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, LayoutDashboard, LogOut, Menu, UserRound, X } from "lucide-react";
+import {
+  ChevronDown,
+  ClipboardList,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  UserRound,
+  X,
+} from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import type { Session } from "@supabase/supabase-js";
 import {
@@ -324,6 +332,7 @@ export function Navbar() {
   const useHeroChrome = pathname === "/" && !isScrolled && !mobileMenuOpen;
   const greetingName = getGreetingName(userProfile, session);
   const isAdmin = userProfile?.role === "admin";
+  const canUseReceptionist = userProfile?.role === "admin" || userProfile?.role === "receptionist";
   const shellClassName = useHeroChrome
     ? "border-border/85 bg-card/92 shadow-[0_18px_50px_rgba(82,62,32,0.16)] dark:border-white/10 dark:bg-black/18 dark:shadow-none"
     : "border-border/80 bg-card/88 shadow-[0_24px_70px_rgba(0,0,0,0.16)]";
@@ -419,6 +428,16 @@ export function Navbar() {
                     <UserRound className="h-4 w-4" />
                     Profil
                   </Link>
+                  {canUseReceptionist ? (
+                    <Link
+                      href="/receptionist"
+                      onClick={() => setAccountMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 font-inter text-xs uppercase tracking-[0.22em] text-foreground/72 transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      <ClipboardList className="h-4 w-4" />
+                      Resepsionis
+                    </Link>
+                  ) : null}
                   {isAdmin ? (
                     <Link
                       href="/admin"
@@ -511,6 +530,15 @@ export function Navbar() {
                 >
                   Profil
                 </Link>
+                {canUseReceptionist ? (
+                  <Link
+                    href="/receptionist"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-[1.75rem] border border-border bg-card/55 px-6 py-5 text-lg uppercase tracking-[0.28em] text-foreground/84 transition-all duration-300 hover:border-primary/35 hover:bg-primary/10 hover:text-foreground"
+                  >
+                    Resepsionis
+                  </Link>
+                ) : null}
                 {isAdmin ? (
                   <Link
                     href="/admin"

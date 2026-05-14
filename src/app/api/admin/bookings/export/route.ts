@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { getSupabaseAdmin } from "@/utils/supabase/admin";
-import { createClient } from "@/utils/supabase/server";
-import { getProfileForUser, isAdminRole } from "@/lib/auth";
+import { requireAdminApi } from "@/lib/adminApi";
 import { resolveRoomDetails } from "@/lib/roomCatalog";
 
 type AdminPeriod = "month" | "3m" | "6m" | "1y";
@@ -102,18 +100,9 @@ function formatDateTime(date: Date) {
 
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const profile = await getProfileForUser(supabase, user.id);
-    if (!isAdminRole(profile?.role)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const access = await requireAdminApi();
+    if ("error" in access) {
+      return access.error;
     }
 
     const requestUrl = new URL(request.url);
@@ -123,12 +112,11 @@ export async function GET(request: Request) {
     const periodRange = getPeriodRange(period);
     const dateFrom = requestUrl.searchParams.get("dateFrom") ?? periodRange.from;
     const dateTo = requestUrl.searchParams.get("dateTo") ?? periodRange.to;
-    const supabaseAdmin = getSupabaseAdmin();
+    const supabaseAdmin = access.supabaseAdmin;
 
     let query = supabaseAdmin
       .from("bookings")
       .select("id, created_at, room_id, first_name, last_name, email, check_in, check_out, total_price, status")
-      .is("deleted_at", null)
       .order("created_at", { ascending: false });
 
     if (status && status !== "ALL") {

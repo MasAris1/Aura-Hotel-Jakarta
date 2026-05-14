@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireAdminApi } from "@/lib/adminApi";
+import { getStaticFacilityById } from "@/lib/facilityCatalog";
+import type { Database } from "@/types/supabase";
 
 const facilitySelect =
   "id, title, description, icon, image_url, status, sort_order, deleted_at, created_at, updated_at";
@@ -13,6 +16,36 @@ const facilitySchema = z.object({
   status: z.enum(["AVAILABLE", "UNAVAILABLE"]),
   sort_order: z.number().int().min(0).nullable().optional(),
 });
+
+const uuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+async function findFacility(
+  supabaseAdmin: SupabaseClient<Database>,
+  id: string,
+  fallbackTitle?: string,
+) {
+  if (uuidPattern.test(id)) {
+    return supabaseAdmin
+      .from("facilities")
+      .select(facilitySelect)
+      .eq("id", id)
+      .maybeSingle();
+  }
+
+  const staticFacility = getStaticFacilityById(id);
+  const title = fallbackTitle || staticFacility?.title;
+
+  if (!title) {
+    return { data: null, error: null };
+  }
+
+  return supabaseAdmin
+    .from("facilities")
+    .select(facilitySelect)
+    .eq("title", title)
+    .maybeSingle();
+}
 
 export async function PATCH(
   request: Request,
@@ -30,30 +63,27 @@ export async function PATCH(
     }
 
     const { id } = (await context.params) as { id: string };
-    const { data: currentFacility, error: currentError } = await access.supabaseAdmin
-      .from("facilities")
-      .select(facilitySelect)
-      .eq("id", id)
-      .maybeSingle();
+    const { data: currentFacility, error: currentError } = await findFacility(
+      access.supabaseAdmin,
+      id,
+      parsed.data.title,
+    );
 
     if (currentError) {
       return NextResponse.json({ error: "Failed to load facility" }, { status: 500 });
     }
 
-    if (!currentFacility) {
-      return NextResponse.json({ error: "Facility not found" }, { status: 404 });
-    }
-
-    const { data: facility, error } = await access.supabaseAdmin
-      .from("facilities")
-      .update({
+    const payload = {
         ...parsed.data,
         icon: parsed.data.icon ?? "concierge",
         image_url: parsed.data.image_url ?? null,
         sort_order: parsed.data.sort_order ?? null,
         updated_at: new Date().toISOString(),
-      })
-      .eq("id", id)
+      };
+    const query = currentFacility
+      ? access.supabaseAdmin.from("facilities").update(payload).eq("id", currentFacility.id)
+      : access.supabaseAdmin.from("facilities").insert(payload);
+    const { data: facility, error } = await query
       .select(facilitySelect)
       .single();
 
@@ -64,7 +94,7 @@ export async function PATCH(
     await access.supabaseAdmin.from("audit_logs").insert({
       table_name: "facilities",
       record_id: facility.id,
-      action: "UPDATE",
+      action: currentFacility ? "UPDATE" : "INSERT",
       old_data: currentFacility,
       new_data: facility,
       performed_by: access.user.id,
@@ -87,11 +117,10 @@ export async function DELETE(
 
   try {
     const { id } = (await context.params) as { id: string };
-    const { data: currentFacility, error: currentError } = await access.supabaseAdmin
-      .from("facilities")
-      .select(facilitySelect)
-      .eq("id", id)
-      .maybeSingle();
+    const { data: currentFacility, error: currentError } = await findFacility(
+      access.supabaseAdmin,
+      id,
+    );
 
     if (currentError) {
       return NextResponse.json({ error: "Failed to load facility" }, { status: 500 });
@@ -107,7 +136,7 @@ export async function DELETE(
         deleted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .eq("id", id)
+      .eq("id", currentFacility.id)
       .select(facilitySelect)
       .single();
 

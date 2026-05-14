@@ -10,6 +10,7 @@
     "audit:supabase": "node scripts/audit-supabase-live.mjs",
     "backfill:transactions": "node scripts/backfill-booking-transactions.mjs",
     "backup:legacy-supabase": "node scripts/export-legacy-supabase-tables.mjs",
+    "sync:catalogs-live": "node scripts/sync-static-catalogs-to-live.mjs",
     "sync:rooms-live": "node scripts/sync-curated-rooms-to-live.mjs"
   },
   "dependencies": {

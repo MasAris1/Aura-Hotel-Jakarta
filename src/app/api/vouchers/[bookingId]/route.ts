@@ -47,7 +47,6 @@ export async function GET(
       .from("bookings")
       .select("id, user_id, room_id, first_name, last_name, email, check_in, check_out, total_price, status, created_at, rooms(*)")
       .eq("id", bookingId)
-      .is("deleted_at", null)
       .maybeSingle();
 
     if (error) {

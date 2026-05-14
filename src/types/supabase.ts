@@ -59,6 +59,62 @@ export type Database = {
         };
         Relationships: [];
       };
+      room_units: {
+        Row: {
+          id: string;
+          room_id: string;
+          unit_number: string;
+          floor: number;
+          status: string;
+          current_guest_name: string | null;
+          current_guest_email: string | null;
+          check_in: string | null;
+          check_out: string | null;
+          notes: string | null;
+          deleted_at: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          room_id: string;
+          unit_number: string;
+          floor?: number;
+          status?: string;
+          current_guest_name?: string | null;
+          current_guest_email?: string | null;
+          check_in?: string | null;
+          check_out?: string | null;
+          notes?: string | null;
+          deleted_at?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          room_id?: string;
+          unit_number?: string;
+          floor?: number;
+          status?: string;
+          current_guest_name?: string | null;
+          current_guest_email?: string | null;
+          check_in?: string | null;
+          check_out?: string | null;
+          notes?: string | null;
+          deleted_at?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          Relationship & {
+            foreignKeyName: "room_units_room_id_fkey";
+            columns: ["room_id"];
+            isOneToOne: false;
+            referencedRelation: "rooms";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       facilities: {
         Row: {
           id: string;

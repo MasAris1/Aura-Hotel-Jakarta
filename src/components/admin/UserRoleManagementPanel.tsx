@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { fetchAdmin } from "@/lib/adminFetch";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -145,7 +146,7 @@ export function UserRoleManagementPanel() {
       setError(null);
 
       try {
-        const response = await fetch("/api/admin/users", { cache: "no-store" });
+        const response = await fetchAdmin("/api/admin/users");
         const result = (await response.json()) as UsersResponse & { error?: string };
 
         if (!response.ok) {
@@ -393,11 +394,11 @@ export function UserRoleManagementPanel() {
           <Table>
             <TableHeader>
               <TableRow className="border-white/10 hover:bg-transparent">
+                <TableHead className="w-40 text-white/55">Aksi</TableHead>
                 <TableHead className="text-white/55">User</TableHead>
                 <TableHead className="text-white/55">Role</TableHead>
                 <TableHead className="text-white/55">Keterangan</TableHead>
                 <TableHead className="text-white/55">Bergabung</TableHead>
-                <TableHead className="text-white/55">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -412,6 +413,45 @@ export function UserRoleManagementPanel() {
                     key={user.id}
                     className="border-white/10 hover:bg-white/[0.03]"
                   >
+                    <TableCell className="w-40 align-top">
+                      <div className="flex min-w-36 flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setForm({
+                              id: user.id,
+                              email: user.email,
+                              password: "",
+                              first_name: user.first_name ?? "",
+                              last_name: user.last_name ?? "",
+                              role: currentRole,
+                            })
+                          }
+                          className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] px-4 text-sm font-medium text-white transition-colors hover:bg-white/[0.06]"
+                        >
+                          Edit
+                        </button>
+                        {isArchived ? (
+                          <button
+                            type="button"
+                            disabled={isBusy}
+                            onClick={() => restoreUser(user.id)}
+                            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-60"
+                          >
+                            {isBusy ? "Memulihkan..." : "Restore"}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={isBusy || user.is_current_user}
+                            onClick={() => archiveUser(user.id)}
+                            className="inline-flex h-10 items-center justify-center rounded-lg border border-red-500/20 bg-red-500/10 px-4 text-sm font-medium text-red-200 transition-colors hover:bg-red-500/20 disabled:opacity-45"
+                          >
+                            {isBusy ? "Mengarsipkan..." : "Archive"}
+                          </button>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell className="align-top">
                       <div className="flex min-w-[220px] flex-col">
                         <span className="font-medium text-white">{getFullName(user)}</span>
@@ -450,45 +490,6 @@ export function UserRoleManagementPanel() {
                     </TableCell>
                     <TableCell className="align-top text-white/72">
                       {formatDate(user.created_at)}
-                    </TableCell>
-                    <TableCell className="align-top">
-                      <div className="flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setForm({
-                              id: user.id,
-                              email: user.email,
-                              password: "",
-                              first_name: user.first_name ?? "",
-                              last_name: user.last_name ?? "",
-                              role: currentRole,
-                            })
-                          }
-                          className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] px-4 text-sm font-medium text-white transition-colors hover:bg-white/[0.06]"
-                        >
-                          Edit
-                        </button>
-                        {isArchived ? (
-                          <button
-                            type="button"
-                            disabled={isBusy}
-                            onClick={() => restoreUser(user.id)}
-                            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-60"
-                          >
-                            {isBusy ? "Memulihkan..." : "Restore"}
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            disabled={isBusy || user.is_current_user}
-                            onClick={() => archiveUser(user.id)}
-                            className="inline-flex h-10 items-center justify-center rounded-lg border border-red-500/20 bg-red-500/10 px-4 text-sm font-medium text-red-200 transition-colors hover:bg-red-500/20 disabled:opacity-45"
-                          >
-                            {isBusy ? "Mengarsipkan..." : "Archive"}
-                          </button>
-                        )}
-                      </div>
                     </TableCell>
                   </TableRow>
                 );

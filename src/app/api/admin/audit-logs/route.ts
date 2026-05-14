@@ -1,22 +1,11 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
-import { getSupabaseAdmin } from "@/utils/supabase/admin";
-import { getProfileForUser, isAdminRole } from "@/lib/auth";
+import { requireAdminApi } from "@/lib/adminApi";
 
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const profile = await getProfileForUser(supabase, user.id);
-    if (!isAdminRole(profile?.role)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const access = await requireAdminApi();
+    if ("error" in access) {
+      return access.error;
     }
 
     const url = new URL(request.url);
@@ -25,7 +14,7 @@ export async function GET(request: Request) {
     const performedBy = url.searchParams.get("performed_by");
     const dateFrom = url.searchParams.get("dateFrom");
     const dateTo = url.searchParams.get("dateTo");
-    const supabaseAdmin = getSupabaseAdmin();
+    const supabaseAdmin = access.supabaseAdmin;
 
     let query = supabaseAdmin
       .from("audit_logs")

@@ -17,17 +17,17 @@ export async function GET() {
       return access.error;
     }
 
-    const [{ data: profiles, error: profilesError }, { data: usersData, error: usersError }] =
-      await Promise.all([
-        access.supabaseAdmin
-          .from("profiles")
-          .select("id, first_name, last_name, role, created_at")
-          .order("created_at", { ascending: false }),
-        access.supabaseAdmin.auth.admin.listUsers({
-          page: 1,
-          perPage: 200,
-        }),
-      ]);
+    const [profilesResult, { data: usersData, error: usersError }] = await Promise.all([
+      access.supabaseAdmin
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false }),
+      access.supabaseAdmin.auth.admin.listUsers({
+        page: 1,
+        perPage: 200,
+      }),
+    ]);
+    const { data: profiles, error: profilesError } = profilesResult;
 
     if (profilesError || usersError) {
       return NextResponse.json({ error: "Failed to load users" }, { status: 500 });
@@ -47,7 +47,10 @@ export async function GET() {
         created_at: profile?.created_at ?? authUser.created_at ?? null,
         last_sign_in_at: authUser.last_sign_in_at ?? null,
         email_confirmed_at: authUser.email_confirmed_at ?? null,
-        deleted_at: null,
+        deleted_at:
+          profile && "deleted_at" in profile && typeof profile.deleted_at === "string"
+            ? profile.deleted_at
+            : null,
         is_current_user: authUser.id === access.user.id,
       };
     });
@@ -58,7 +61,8 @@ export async function GET() {
         email: "",
         last_sign_in_at: null,
         email_confirmed_at: null,
-        deleted_at: null,
+        deleted_at:
+          "deleted_at" in entry && typeof entry.deleted_at === "string" ? entry.deleted_at : null,
         is_current_user: entry.id === access.user.id,
       }));
 

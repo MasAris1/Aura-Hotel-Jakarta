@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { fetchAdmin } from "@/lib/adminFetch";
 
 type AdminRoom = {
   id: string;
@@ -83,7 +84,7 @@ export function RoomRateManagementPanel() {
       setError(null);
 
       try {
-        const response = await fetch("/api/admin/room-rates", { cache: "no-store" });
+        const response = await fetchAdmin("/api/admin/room-rates");
         const result = (await response.json()) as RoomRatesResponse & { error?: string };
 
         if (!response.ok) {
@@ -299,20 +300,8 @@ export function RoomRateManagementPanel() {
           return (
             <div
               key={rate.id}
-              className="grid gap-4 rounded-lg border border-white/10 bg-black/12 p-4 lg:grid-cols-[minmax(0,1fr)_160px_140px_220px]"
+              className="grid gap-4 rounded-lg border border-white/10 bg-black/12 p-4 lg:grid-cols-[220px_minmax(0,1fr)_160px_140px]"
             >
-              <div>
-                <p className="font-medium text-white">{room?.name ?? "Kamar tidak tersedia"}</p>
-                <p className="mt-1 text-xs text-white/45">{rate.room_id}</p>
-              </div>
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-white/42">Tanggal</p>
-                <p className="mt-2 text-sm text-white">{formatDate(rate.rate_date)}</p>
-              </div>
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-white/42">Harga</p>
-                <p className="mt-2 text-sm font-medium text-white">{formatCurrency(Number(rate.price))}</p>
-              </div>
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
@@ -347,6 +336,18 @@ export function RoomRateManagementPanel() {
                     {isBusy ? "Mengarsipkan..." : "Archive"}
                   </button>
                 )}
+              </div>
+              <div>
+                <p className="font-medium text-white">{room?.name ?? "Kamar tidak tersedia"}</p>
+                <p className="mt-1 text-xs text-white/45">{rate.room_id}</p>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white/42">Tanggal</p>
+                <p className="mt-2 text-sm text-white">{formatDate(rate.rate_date)}</p>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white/42">Harga</p>
+                <p className="mt-2 text-sm font-medium text-white">{formatCurrency(Number(rate.price))}</p>
               </div>
             </div>
           );

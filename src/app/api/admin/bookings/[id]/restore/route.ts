@@ -1,8 +1,25 @@
 import { NextResponse } from "next/server";
 import { requireAdminApi } from "@/lib/adminApi";
 
-const bookingSelect =
-  "id, user_id, room_id, first_name, last_name, email, special_requests, check_in, check_out, total_price, status, deleted_at, created_at, updated_at";
+function normalizeBooking(booking: Record<string, unknown>) {
+  return {
+    id: String(booking.id ?? ""),
+    user_id: typeof booking.user_id === "string" ? booking.user_id : null,
+    room_id: typeof booking.room_id === "string" ? booking.room_id : null,
+    first_name: typeof booking.first_name === "string" ? booking.first_name : null,
+    last_name: typeof booking.last_name === "string" ? booking.last_name : null,
+    email: typeof booking.email === "string" ? booking.email : null,
+    special_requests:
+      typeof booking.special_requests === "string" ? booking.special_requests : null,
+    check_in: String(booking.check_in ?? ""),
+    check_out: String(booking.check_out ?? ""),
+    total_price: Number(booking.total_price ?? 0),
+    status: typeof booking.status === "string" ? booking.status : null,
+    deleted_at: typeof booking.deleted_at === "string" ? booking.deleted_at : null,
+    created_at: typeof booking.created_at === "string" ? booking.created_at : null,
+    updated_at: typeof booking.updated_at === "string" ? booking.updated_at : null,
+  };
+}
 
 export async function POST(
   _: Request,
@@ -17,7 +34,7 @@ export async function POST(
     const { id } = (await context.params) as { id: string };
     const { data: currentBooking, error: currentError } = await access.supabaseAdmin
       .from("bookings")
-      .select(bookingSelect)
+      .select("*")
       .eq("id", id)
       .maybeSingle();
 
@@ -29,15 +46,29 @@ export async function POST(
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
-    const { data: booking, error } = await access.supabaseAdmin
+    let result = await access.supabaseAdmin
       .from("bookings")
       .update({
         deleted_at: null,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)
-      .select(bookingSelect)
+      .select("*")
       .single();
+
+    if (result.error?.message.includes("deleted_at")) {
+      result = await access.supabaseAdmin
+        .from("bookings")
+        .update({
+          status: currentBooking.status ?? "UNPAID",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id)
+        .select("*")
+        .single();
+    }
+
+    const { data: booking, error } = result;
 
     if (error || !booking) {
       return NextResponse.json({ error: "Failed to restore booking" }, { status: 500 });
@@ -52,7 +83,7 @@ export async function POST(
       performed_by: access.user.id,
     });
 
-    return NextResponse.json({ booking });
+    return NextResponse.json({ booking: normalizeBooking(booking) });
   } catch {
     return NextResponse.json({ error: "Failed to restore booking" }, { status: 500 });
   }

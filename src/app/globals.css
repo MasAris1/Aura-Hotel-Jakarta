@@ -229,6 +229,19 @@
     @apply h-full w-full object-cover;
   }
 
+  .hero-light-photo {
+    opacity: 0;
+    filter: saturate(0.96) contrast(0.98) brightness(1.02);
+  }
+
+  .hero-tone-overlay {
+    background: rgba(0, 0, 0, 0.18);
+  }
+
+  .hero-light-readability {
+    display: none;
+  }
+
   .hero-video {
     @apply h-full w-full object-cover;
   }
@@ -321,46 +334,73 @@
     will-change: transform, opacity;
   }
 
+  .light .hero-dark-photo {
+    opacity: 0 !important;
+  }
+
+  .light .hero-light-photo {
+    opacity: 1;
+  }
+
+  .light .hero-tone-overlay {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .light .hero-light-readability {
+    display: block;
+    background:
+      radial-gradient(ellipse at 21% 55%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.26) 30%, rgba(255, 255, 255, 0.08) 52%, transparent 74%),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 38%, transparent 70%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 42%, rgba(255, 255, 255, 0.1) 100%);
+  }
+
   .light .hero-vignette,
   .light .hero-grid {
     opacity: 0;
   }
 
+  .light .ux-hero-scroll-indicator {
+    filter: drop-shadow(0 10px 18px rgba(255, 255, 255, 0.7));
+  }
+
+  .light .ux-hero-scroll-indicator > span {
+    color: rgba(17, 24, 39, 0.72) !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  }
+
+  .light .ux-hero-scroll-mouse {
+    border-color: rgba(17, 24, 39, 0.5) !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.58),
+      0 0 0 1px rgba(198, 155, 73, 0.22) !important;
+  }
+
+  .light .ux-hero-scroll-wheel {
+    background: color-mix(in oklab, var(--primary) 86%, #6b4a00) !important;
+    box-shadow: 0 0 10px rgba(198, 155, 73, 0.42) !important;
+  }
+
+  .light .ux-hero-scroll-tail {
+    background: linear-gradient(180deg, rgba(17, 24, 39, 0.62) 0%, rgba(198, 155, 73, 0.46) 100%) !important;
+  }
+
   .light .ux-hero-readable {
-    text-shadow:
-      -2px -2px 0 rgba(255, 255, 255, 0.98),
-      2px -2px 0 rgba(255, 255, 255, 0.98),
-      -2px 2px 0 rgba(255, 255, 255, 0.98),
-      2px 2px 0 rgba(255, 255, 255, 0.98),
-      0 0 10px rgba(255, 255, 255, 0.96),
-      0 14px 34px rgba(255, 255, 255, 0.82);
+    text-shadow: none;
   }
 
   .light .ux-hero-readable .ux-hero-main {
-    -webkit-text-stroke: 3px rgba(255, 255, 255, 0.98);
+    -webkit-text-stroke: 0;
     paint-order: stroke fill;
-    text-shadow:
-      -3px -3px 0 rgba(255, 255, 255, 0.98),
-      3px -3px 0 rgba(255, 255, 255, 0.98),
-      -3px 3px 0 rgba(255, 255, 255, 0.98),
-      3px 3px 0 rgba(255, 255, 255, 0.98),
-      0 0 14px rgba(255, 255, 255, 1),
-      0 18px 42px rgba(255, 255, 255, 0.88),
-      0 24px 54px rgba(17, 24, 39, 0.28);
+    text-shadow: none;
   }
 
   .light .ux-hero-readable .ux-hero-kicker,
   .light .ux-hero-readable .ux-hero-sub,
   .light .ux-hero-readable .ux-hero-copy {
-    -webkit-text-stroke: 0.65px rgba(255, 255, 255, 0.98);
+    -webkit-text-stroke: 0;
     paint-order: stroke fill;
-    text-shadow:
-      -2px -2px 0 rgba(255, 255, 255, 0.98),
-      2px -2px 0 rgba(255, 255, 255, 0.98),
-      -2px 2px 0 rgba(255, 255, 255, 0.98),
-      2px 2px 0 rgba(255, 255, 255, 0.98),
-      0 0 10px rgba(255, 255, 255, 0.96),
-      0 12px 30px rgba(255, 255, 255, 0.82);
+    text-shadow: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -449,7 +489,6 @@
   }
 
   .ux-glass-card:hover {
-    transform: translateY(-8px);
     border-color: color-mix(in oklab, var(--primary) 38%, var(--border));
     box-shadow: 0 34px 80px rgba(0, 0, 0, 0.42);
   }

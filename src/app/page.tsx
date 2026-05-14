@@ -37,7 +37,9 @@ import {
 } from "@/lib/roomCatalog";
 import {
   getStaticFacilities,
+  resolveFacilityDetails,
   type FacilityCatalogItem,
+  type LiveFacilityLookup,
 } from "@/lib/facilityCatalog";
 import { createClient } from "@/utils/supabase/client";
 
@@ -105,16 +107,6 @@ const emptyFacilityForm: FacilityFormState = {
   sort_order: "70",
 };
 
-function createLocalId(label: string) {
-  const slug = label
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
-  return slug || `item-${Date.now()}`;
-}
-
 function readLocalCatalog<T>(key: string): T[] | null {
   if (typeof window === "undefined") {
     return null;
@@ -156,46 +148,6 @@ function upsertCatalogItem<TItem extends { id: string; status?: string | null }>
     : [...items, nextItem];
 
   return nextItems.filter((item) => item.status !== "UNAVAILABLE");
-}
-
-function roomFromForm(form: RoomFormState, currentRoom?: RoomCatalogItem | null): RoomCatalogItem {
-  const images = form.imagesText
-    .split("\n")
-    .map((value) => value.trim())
-    .filter(Boolean);
-
-  return {
-    id: form.id || createLocalId(form.name),
-    name: form.name.trim() || currentRoom?.name || "Untitled Suite",
-    type: form.type.trim() || currentRoom?.type || "Suite",
-    images: images.length > 0 ? images : currentRoom?.images ?? [],
-    basePrice: Number(form.base_price || currentRoom?.basePrice || 0),
-    capacity: Number(form.capacity || currentRoom?.capacity || 1),
-    description: form.description.trim() || currentRoom?.description || "Room details unavailable.",
-    size: currentRoom?.size ?? "Spacious stay",
-    bedType: currentRoom?.bedType ?? "Premium bedding",
-    amenities: currentRoom?.amenities ?? [],
-    isFeatured: currentRoom?.isFeatured ?? false,
-    status: form.status,
-  };
-}
-
-function facilityFromForm(
-  form: FacilityFormState,
-  currentFacility?: FacilityCatalogItem | null,
-): FacilityCatalogItem {
-  return {
-    id: form.id || createLocalId(form.title),
-    title: form.title.trim() || currentFacility?.title || "Untitled Facility",
-    description:
-      form.description.trim() ||
-      currentFacility?.description ||
-      "Facility details unavailable.",
-    icon: form.icon.trim() || currentFacility?.icon || "concierge",
-    imageUrl: form.image_url.trim() || null,
-    status: form.status,
-    sortOrder: Number(form.sort_order || currentFacility?.sortOrder || 999),
-  };
 }
 
 function renderFacilityIcon(icon: string) {
@@ -295,13 +247,6 @@ export default function Home() {
   }, [hasVideoEnded]);
 
   const loadRooms = useCallback(async (signal?: AbortSignal) => {
-    const localRooms = readLocalCatalog<RoomCatalogItem>(LOCAL_ROOM_CATALOG_KEY);
-
-    if (localRooms?.length) {
-      setCatalogRooms(localRooms);
-      return;
-    }
-
     try {
       const response = await fetch("/api/rooms", {
         cache: "no-store",
@@ -316,25 +261,49 @@ export default function Home() {
 
       if (result.rooms) {
         setCatalogRooms(result.rooms);
+        writeLocalCatalog(LOCAL_ROOM_CATALOG_KEY, result.rooms);
+        return;
       }
     } catch {
-      // Fallback to static catalog when live data is unavailable.
+      const localRooms = readLocalCatalog<RoomCatalogItem>(LOCAL_ROOM_CATALOG_KEY);
+
+      if (localRooms?.length) {
+        setCatalogRooms(localRooms);
+      }
     }
   }, []);
 
   const loadFacilities = useCallback(async (signal?: AbortSignal) => {
-    void signal;
+    try {
+      const response = await fetch("/api/facilities", {
+        cache: "no-store",
+        signal,
+      });
 
-    const localFacilities = readLocalCatalog<FacilityCatalogItem>(
-      LOCAL_FACILITY_CATALOG_KEY,
-    );
+      if (!response.ok) {
+        return;
+      }
 
-    if (localFacilities?.length) {
-      setCatalogFacilities(sortFacilities(localFacilities));
-      return;
+      const result = (await response.json()) as { facilities?: FacilityCatalogItem[] };
+
+      if (result.facilities) {
+        const nextFacilities = sortFacilities(result.facilities);
+        setCatalogFacilities(nextFacilities);
+        writeLocalCatalog(LOCAL_FACILITY_CATALOG_KEY, nextFacilities);
+        return;
+      }
+    } catch {
+      const localFacilities = readLocalCatalog<FacilityCatalogItem>(
+        LOCAL_FACILITY_CATALOG_KEY,
+      );
+
+      if (localFacilities?.length) {
+        setCatalogFacilities(sortFacilities(localFacilities));
+        return;
+      }
+
+      setCatalogFacilities(getStaticFacilities());
     }
-
-    setCatalogFacilities(getStaticFacilities());
   }, []);
 
   useEffect(() => {
@@ -476,12 +445,11 @@ export default function Home() {
           },
         });
 
-        gsap.from(".ux-philosophy-card", {
+        gsap.from(".ux-philosophy-grid", {
           autoAlpha: 0,
-          y: 52,
+          y: 28,
           duration: 0.95,
           ease: "power3.out",
-          stagger: 0.14,
           scrollTrigger: {
             trigger: ".ux-philosophy-grid",
             start: "top 82%",
@@ -530,11 +498,11 @@ export default function Home() {
           },
         });
 
-        gsap.from(".ux-collection-card", {
-          y: 36,
+        gsap.from(".ux-collection-grid", {
+          autoAlpha: 0,
+          y: 28,
           duration: 0.9,
           ease: "power3.out",
-          stagger: 0.08,
           scrollTrigger: {
             trigger: collectionRef.current,
             start: "top 74%",
@@ -763,30 +731,51 @@ export default function Home() {
     setCrudSuccess(null);
 
     if (crudModal.kind === "facility") {
-      const currentFacility = catalogFacilities.find(
-        (facility) => facility.id === crudModal.form.id,
-      );
-      const nextFacility = facilityFromForm(crudModal.form, currentFacility);
-      const nextFacilities = sortFacilities(
-        upsertCatalogItem(catalogFacilities, nextFacility),
-      );
+      try {
+        const isEdit = crudModal.mode === "edit";
+        const payload = {
+          title: crudModal.form.title.trim(),
+          description: crudModal.form.description.trim(),
+          icon: crudModal.form.icon.trim() || "concierge",
+          image_url: crudModal.form.image_url.trim() || null,
+          status: crudModal.form.status,
+          sort_order: crudModal.form.sort_order.trim()
+            ? Number(crudModal.form.sort_order)
+            : null,
+        };
+        const response = await fetch(
+          isEdit ? `/api/admin/facilities/${crudModal.form.id}` : "/api/admin/facilities",
+          {
+            method: isEdit ? "PATCH" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          },
+        );
+        const result = (await response.json().catch(() => ({}))) as {
+          error?: string;
+          facility?: LiveFacilityLookup;
+        };
 
-      writeLocalCatalog(LOCAL_FACILITY_CATALOG_KEY, nextFacilities);
-      setCatalogFacilities(nextFacilities);
-      setCrudSuccess(
-        crudModal.mode === "edit"
-          ? "Facility updated in the page UI."
-          : "Facility added to the page UI.",
-      );
-      setCrudModal(null);
-      setActiveCrudId(null);
+        if (!response.ok || !result.facility) {
+          throw new Error(result.error ?? "Failed to save facility.");
+        }
+
+        const nextFacility = resolveFacilityDetails(result.facility.id, result.facility);
+        const nextFacilities = sortFacilities(
+          upsertCatalogItem(catalogFacilities, nextFacility),
+        );
+
+        writeLocalCatalog(LOCAL_FACILITY_CATALOG_KEY, nextFacilities);
+        setCatalogFacilities(nextFacilities);
+        setCrudSuccess(isEdit ? "Facility updated." : "Facility created.");
+        setCrudModal(null);
+      } catch (saveError) {
+        setCrudError(saveError instanceof Error ? saveError.message : "Failed to save facility.");
+      } finally {
+        setActiveCrudId(null);
+      }
       return;
     }
-
-    const currentRoom = catalogRooms.find((room) => room.id === crudModal.form.id);
-    const optimisticRoom = roomFromForm(crudModal.form, currentRoom);
-    let nextRoom = optimisticRoom;
-    let persisted = false;
 
     try {
       const isEdit = crudModal.mode === "edit";
@@ -824,26 +813,21 @@ export default function Home() {
         };
       };
 
-      if (response.ok && result.room) {
-        nextRoom = resolveRoomDetails(result.room.id, result.room);
-        persisted = true;
+      if (!response.ok || !result.room) {
+        throw new Error(result.error ?? "Failed to save suite.");
       }
-    } catch {
-      persisted = false;
-    }
 
-    const nextRooms = upsertCatalogItem(catalogRooms, nextRoom);
-    writeLocalCatalog(LOCAL_ROOM_CATALOG_KEY, nextRooms);
-    setCatalogRooms(nextRooms);
-    setCrudSuccess(
-      persisted
-        ? crudModal.mode === "edit"
-          ? "Suite updated."
-          : "Suite created."
-        : "Suite updated in the page UI. Supabase room schema still needs syncing.",
-    );
-    setCrudModal(null);
-    setActiveCrudId(null);
+      const nextRoom = resolveRoomDetails(result.room.id, result.room);
+      const nextRooms = upsertCatalogItem(catalogRooms, nextRoom);
+      writeLocalCatalog(LOCAL_ROOM_CATALOG_KEY, nextRooms);
+      setCatalogRooms(nextRooms);
+      setCrudSuccess(isEdit ? "Suite updated." : "Suite created.");
+      setCrudModal(null);
+    } catch (saveError) {
+      setCrudError(saveError instanceof Error ? saveError.message : "Failed to save suite.");
+    } finally {
+      setActiveCrudId(null);
+    }
   };
 
   const removeLocalCatalogItem = (kind: "room" | "facility", id: string) => {
@@ -870,20 +854,22 @@ export default function Home() {
     setCrudError(null);
     setCrudSuccess(null);
 
-    if (kind === "facility") {
-      removeLocalCatalogItem(kind, id);
-      setCrudSuccess("Facility archived from the page UI.");
-      setActiveCrudId(null);
-      return;
-    }
-
     try {
-      await fetch(`/api/admin/rooms/${id}`, { method: "DELETE" });
-    } catch {
-      // The visible page state is still updated when the live schema is out of sync.
-    } finally {
+      const response = await fetch(
+        kind === "facility" ? `/api/admin/facilities/${id}` : `/api/admin/rooms/${id}`,
+        { method: "DELETE" },
+      );
+      const result = (await response.json().catch(() => ({}))) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(result.error ?? `Failed to archive ${kind}.`);
+      }
+
       removeLocalCatalogItem(kind, id);
-      setCrudSuccess("Suite archived from the page UI.");
+      setCrudSuccess(kind === "facility" ? "Facility archived." : "Suite archived.");
+    } catch (deleteError) {
+      setCrudError(deleteError instanceof Error ? deleteError.message : `Failed to archive ${kind}.`);
+    } finally {
       setActiveCrudId(null);
     }
   };
@@ -919,8 +905,19 @@ export default function Home() {
             priority
             quality={78}
             sizes="100vw"
-            className={`hero-photo absolute inset-0 z-0 transition-all duration-[1800ms] ease-out ${
+            className={`hero-photo hero-dark-photo absolute inset-0 z-0 transition-all duration-[1800ms] ease-out ${
               hasVideoEnded ? "scale-100 opacity-100" : "scale-[1.02] opacity-0"
+            }`}
+          />
+          <Image
+            src="/media/HI.jpg"
+            alt="Soft daylight view of Bundaran HI Jakarta"
+            fill
+            priority
+            quality={82}
+            sizes="100vw"
+            className={`hero-photo hero-light-photo absolute inset-0 z-0 transition-all duration-[1800ms] ease-out ${
+              hasVideoEnded ? "scale-100" : "scale-[1.02]"
             }`}
           />
 
@@ -944,7 +941,8 @@ export default function Home() {
             </video>
           ) : null}
 
-          <div className="absolute inset-0 z-[2] bg-black/18 dark:bg-black/45" />
+          <div className="hero-tone-overlay absolute inset-0 z-[2]" />
+          <div className="hero-light-readability absolute inset-0 z-[3]" />
           <div className="hero-vignette" />
           <div className="hero-grid" />
           <div
@@ -1059,7 +1057,7 @@ export default function Home() {
               </div>
             ) : null}
 
-            <div className="ux-philosophy-grid mt-12 grid grid-cols-1 items-stretch gap-5 pb-8 text-left sm:mt-16 sm:gap-6 md:mt-20 md:grid-cols-2 xl:grid-cols-3">
+            <div className="ux-philosophy-grid mt-12 grid auto-rows-fr grid-cols-1 items-stretch gap-5 pb-8 text-left sm:mt-16 sm:gap-6 md:mt-20 md:grid-cols-2">
               {catalogFacilities.map((feature, index) => (
                 <div
                   key={feature.id}
@@ -1151,11 +1149,11 @@ export default function Home() {
               ) : null}
             </div>
 
-            <div className="ux-collection-grid mt-10 grid grid-cols-1 items-stretch gap-5 pb-8 sm:mt-14 sm:gap-6 lg:grid-cols-2">
+            <div className="ux-collection-grid mt-10 grid auto-rows-fr grid-cols-1 items-stretch gap-5 pb-8 sm:mt-14 sm:gap-6 lg:grid-cols-2">
               {catalogRooms.map((room, index) => (
                 <article
                   key={room.id}
-                  className="ux-collection-card group relative h-full overflow-hidden rounded-[1.75rem] border border-border/80 bg-card transition-all duration-500 transform-gpu hover:-translate-y-1.5 hover:border-primary/28 hover:shadow-[0_24px_54px_rgba(95,72,38,0.16)] dark:border-white/8 dark:bg-[linear-gradient(180deg,rgba(28,31,42,0.96)_0%,rgba(18,21,30,0.98)_100%)] dark:hover:shadow-[0_28px_60px_rgba(255,215,0,0.36)]"
+                  className="ux-collection-card group relative h-full overflow-hidden rounded-[1.75rem] border border-border/80 bg-card transition-all duration-500 hover:border-primary/28 hover:shadow-[0_24px_54px_rgba(95,72,38,0.16)] dark:border-white/8 dark:bg-[linear-gradient(180deg,rgba(28,31,42,0.96)_0%,rgba(18,21,30,0.98)_100%)] dark:hover:shadow-[0_28px_60px_rgba(255,215,0,0.36)]"
                 >
                   {isAdmin ? (
                     <div className="absolute right-4 top-4 z-20 flex gap-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
@@ -1178,10 +1176,10 @@ export default function Home() {
                       </button>
                     </div>
                   ) : null}
-                  <div className="grid h-full min-h-[30rem] sm:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[240px_minmax(0,1fr)]">
+                  <div className="grid h-full min-h-[30rem] md:grid-cols-[200px_minmax(0,1fr)] xl:grid-cols-[220px_minmax(0,1fr)]">
                     <Link
                       href={`/rooms/${room.id}`}
-                      className="relative min-h-[230px] overflow-hidden bg-muted sm:min-h-full dark:bg-[#0d1118]"
+                      className="relative min-h-[230px] overflow-hidden bg-muted md:min-h-full dark:bg-[#0d1118]"
                     >
                       <div className="absolute inset-0 z-10 bg-transparent transition-colors duration-500 dark:bg-black/24 dark:group-hover:bg-black/8" />
                       <Image
@@ -1191,13 +1189,13 @@ export default function Home() {
                         quality={92}
                         priority={index === 0}
                         loading={index === 0 ? "eager" : "lazy"}
-                        sizes="(min-width: 1280px) 240px, (min-width: 640px) 220px, 100vw"
+                        sizes="(min-width: 1280px) 220px, (min-width: 768px) 200px, 100vw"
                         className="object-cover transform-gpu will-change-transform transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
                         style={{ backfaceVisibility: "hidden" }}
                       />
                     </Link>
 
-                    <div className="flex h-full flex-col justify-between p-5 sm:p-6 lg:p-7">
+                    <div className="flex h-full flex-col justify-between p-5 sm:p-6">
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[10px] uppercase tracking-[0.26em] text-primary">
@@ -1232,7 +1230,7 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="mt-8 flex flex-col gap-4 border-t border-border pt-6 sm:gap-5 lg:flex-row lg:items-end lg:justify-between dark:border-white/8">
+                      <div className="mt-8 flex flex-col gap-4 border-t border-border pt-6 sm:gap-5 dark:border-white/8">
                         <div>
                           <span className="block text-[10px] uppercase tracking-[0.26em] text-foreground/44 dark:text-white/42">
                             Per night
@@ -1242,16 +1240,16 @@ export default function Home() {
                           </span>
                         </div>
 
-                        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                        <div className="flex flex-col gap-3 min-[1180px]:flex-row min-[1180px]:flex-wrap">
                           <Link
                             href={`/rooms/${room.id}`}
-                            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border px-4 py-2 text-[11px] uppercase tracking-[0.26em] text-foreground/72 transition-all duration-300 hover:border-primary/35 hover:text-primary dark:border-white/10 dark:text-white/72 sm:w-auto"
+                            className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full border border-border px-4 py-2 text-[11px] uppercase tracking-[0.2em] text-foreground/72 transition-all duration-300 hover:border-primary/35 hover:text-primary dark:border-white/10 dark:text-white/72 min-[1180px]:w-auto"
                           >
                             View details
                           </Link>
                           <Link
                             href={`/booking?room=${room.id}`}
-                            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-[11px] uppercase tracking-[0.26em] text-primary-foreground transition-all duration-300 hover:shadow-[0_14px_28px_rgba(198,155,73,0.3)] sm:w-auto"
+                            className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-primary px-4 py-2 text-[11px] uppercase tracking-[0.2em] text-primary-foreground transition-all duration-300 hover:shadow-[0_14px_28px_rgba(198,155,73,0.3)] min-[1180px]:w-auto"
                           >
                             Reserve now
                             <ArrowRight className="h-3.5 w-3.5" />

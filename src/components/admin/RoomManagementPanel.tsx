@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { fetchAdmin } from "@/lib/adminFetch";
 
 type AdminRoom = {
   id: string;
@@ -93,7 +94,7 @@ export function RoomManagementPanel() {
       setError(null);
 
       try {
-        const response = await fetch("/api/admin/rooms", { cache: "no-store" });
+        const response = await fetchAdmin("/api/admin/rooms");
         const result = (await response.json()) as RoomsResponse & { error?: string };
 
         if (!response.ok) {
@@ -394,28 +395,8 @@ export function RoomManagementPanel() {
           return (
             <div
               key={room.id}
-              className="grid gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5 lg:grid-cols-[minmax(0,1.1fr)_140px_160px_220px]"
+              className="grid gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5 lg:grid-cols-[220px_minmax(0,1.1fr)_140px_160px]"
             >
-              <div>
-                <p className="font-medium text-white">{room.name}</p>
-                <p className="mt-1 text-sm text-white/55">
-                  {room.type} • {room.capacity} guests • {formatCurrency(Number(room.base_price))}
-                </p>
-                <p className="mt-3 text-[11px] uppercase tracking-[0.24em] text-white/38">
-                  Created {formatDate(room.created_at)}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.24em] text-white/45">Status</p>
-                <p className="mt-2 text-sm text-white">{room.status ?? "AVAILABLE"}</p>
-              </div>
-
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.24em] text-white/45">Visibility</p>
-                <p className="mt-2 text-sm text-white">{isArchived ? "Archived" : "Visible"}</p>
-              </div>
-
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
@@ -454,6 +435,25 @@ export function RoomManagementPanel() {
                     {isBusy ? "Archiving..." : "Archive"}
                   </button>
                 )}
+              </div>
+              <div>
+                <p className="font-medium text-white">{room.name}</p>
+                <p className="mt-1 text-sm text-white/55">
+                  {room.type} • {room.capacity} guests • {formatCurrency(Number(room.base_price))}
+                </p>
+                <p className="mt-3 text-[11px] uppercase tracking-[0.24em] text-white/38">
+                  Created {formatDate(room.created_at)}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.24em] text-white/45">Status</p>
+                <p className="mt-2 text-sm text-white">{room.status ?? "AVAILABLE"}</p>
+              </div>
+
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.24em] text-white/45">Visibility</p>
+                <p className="mt-2 text-sm text-white">{isArchived ? "Archived" : "Visible"}</p>
               </div>
             </div>
           );

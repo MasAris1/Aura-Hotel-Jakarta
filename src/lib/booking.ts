@@ -108,13 +108,13 @@ export async function getRoomQuote(
     throw new BookingQuoteError("Kamar sedang tidak tersedia untuk dipesan", 409);
   }
 
-  const { data: roomRates, error: roomRatesError } = await supabase
+  const roomRatesResult = await supabase
     .from("room_rates")
     .select("rate_date, price")
     .eq("room_id", roomId)
-    .is("deleted_at", null)
     .gte("rate_date", checkIn)
     .lt("rate_date", checkOut);
+  const { data: roomRates, error: roomRatesError } = roomRatesResult;
 
   const roomDetails = resolveRoomDetails(room.id, room);
   const basePrice = Number(room.base_price ?? roomDetails.basePrice ?? 0);

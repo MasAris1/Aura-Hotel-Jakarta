@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { Search } from "lucide-react";
+import { fetchAdmin } from "@/lib/adminFetch";
 
 type AuditLogEntry = {
   id: string;
@@ -71,9 +72,7 @@ export function AuditLogsPanel() {
           }
         }
 
-        const response = await fetch(`/api/admin/audit-logs?${params.toString()}`, {
-          cache: "no-store",
-        });
+        const response = await fetchAdmin(`/api/admin/audit-logs?${params.toString()}`);
         const result = (await response.json()) as AuditLogResponse & { error?: string };
 
         if (!response.ok) {
@@ -184,7 +183,11 @@ export function AuditLogsPanel() {
             className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"
           >
             <summary className="cursor-pointer list-none">
-              <div className="grid gap-4 md:grid-cols-[180px_140px_minmax(0,1fr)_180px]">
+              <div className="grid gap-4 md:grid-cols-[180px_180px_140px_minmax(0,1fr)]">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.24em] text-white/45">Action</p>
+                  <p className="mt-2 text-sm text-primary">{log.action}</p>
+                </div>
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.24em] text-white/45">Time</p>
                   <p className="mt-2 text-sm text-white">{formatTimestamp(log.created_at)}</p>
@@ -196,10 +199,6 @@ export function AuditLogsPanel() {
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.24em] text-white/45">Actor</p>
                   <p className="mt-2 text-sm text-white">{getActorLabel(log)}</p>
-                </div>
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.24em] text-white/45">Action</p>
-                  <p className="mt-2 text-sm text-primary">{log.action}</p>
                 </div>
               </div>
             </summary>

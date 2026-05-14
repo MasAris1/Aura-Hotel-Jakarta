@@ -38,7 +38,6 @@ export async function POST(req: Request) {
             .eq('id', bookingId)
             .eq('user_id', user.id)
             .eq('status', 'UNPAID')
-            .is('deleted_at', null)
             .single();
         const booking = bookingData as BookingRow | null;
 

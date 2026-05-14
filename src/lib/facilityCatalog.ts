@@ -15,6 +15,11 @@ export type LiveFacilityLookup = Pick<
   | "created_at"
 >;
 
+type FacilityIdentity = {
+  id?: string | null;
+  title?: string | null;
+};
+
 export type ResolvedFacilityDetails = {
   id: string;
   title: string;
@@ -91,6 +96,9 @@ const staticFacilities: FacilityCatalogItem[] = [
 ];
 
 const staticFacilityMap = new Map(staticFacilities.map((facility) => [facility.id, facility]));
+const staticFacilityTitleMap = new Map(
+  staticFacilities.map((facility) => [facility.title.toLowerCase(), facility]),
+);
 
 export function getStaticFacilities() {
   return staticFacilities;
@@ -104,11 +112,27 @@ export function getStaticFacilityById(facilityId: string | null | undefined) {
   return staticFacilityMap.get(facilityId) ?? null;
 }
 
+function getStaticFacilityForLiveFacility(facility: FacilityIdentity) {
+  if (facility.id) {
+    const byId = getStaticFacilityById(facility.id);
+
+    if (byId) {
+      return byId;
+    }
+  }
+
+  const normalizedTitle = facility.title?.trim().toLowerCase();
+
+  return normalizedTitle ? staticFacilityTitleMap.get(normalizedTitle) ?? null : null;
+}
+
 export function resolveFacilityDetails(
   facilityId: string | null | undefined,
   liveFacility?: LiveFacilityLookup | null,
 ): ResolvedFacilityDetails {
-  const staticFacility = getStaticFacilityById(facilityId);
+  const staticFacility = liveFacility
+    ? getStaticFacilityForLiveFacility(liveFacility)
+    : getStaticFacilityById(facilityId);
   const imageUrl = liveFacility?.image_url?.trim() || staticFacility?.imageUrl || null;
 
   return {
@@ -135,8 +159,14 @@ export function mergeFacilityCatalogItems(facilities: LiveFacilityLookup[]) {
     .filter((facility) => !facility.deleted_at && facility.status !== "UNAVAILABLE")
     .map((facility) => resolveFacilityDetails(facility.id, facility));
   const liveFacilityIds = new Set(facilities.map((facility) => facility.id));
+  const liveFacilityTitles = new Set(
+    facilities.map((facility) => facility.title.trim().toLowerCase()),
+  );
   const fallbackFacilities = staticFacilities.filter(
-    (facility) => !liveFacilityIds.has(facility.id) && !hiddenFacilityIds.has(facility.id),
+    (facility) =>
+      !liveFacilityIds.has(facility.id) &&
+      !liveFacilityTitles.has(facility.title.toLowerCase()) &&
+      !hiddenFacilityIds.has(facility.id),
   );
 
   return [...liveFacilities, ...fallbackFacilities].sort((left, right) => {

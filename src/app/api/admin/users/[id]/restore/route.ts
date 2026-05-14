@@ -1,7 +1,18 @@
 import { NextResponse } from "next/server";
 import { requireAdminApi } from "@/lib/adminApi";
 
-const profileSelect = "id, first_name, last_name, role, deleted_at, created_at";
+const profileSelect = "*";
+
+function normalizeProfile(profile: Record<string, unknown>) {
+  return {
+    id: String(profile.id ?? ""),
+    first_name: typeof profile.first_name === "string" ? profile.first_name : null,
+    last_name: typeof profile.last_name === "string" ? profile.last_name : null,
+    role: typeof profile.role === "string" ? profile.role : "guest",
+    deleted_at: typeof profile.deleted_at === "string" ? profile.deleted_at : null,
+    created_at: typeof profile.created_at === "string" ? profile.created_at : null,
+  };
+}
 
 export async function POST(
   _: Request,
@@ -28,12 +39,23 @@ export async function POST(
       return NextResponse.json({ error: "User profile not found" }, { status: 404 });
     }
 
-    const { data: profile, error } = await access.supabaseAdmin
+    let result = await access.supabaseAdmin
       .from("profiles")
       .update({ deleted_at: null })
       .eq("id", id)
       .select(profileSelect)
       .single();
+
+    if (result.error?.message.includes("deleted_at")) {
+      result = await access.supabaseAdmin
+        .from("profiles")
+        .update({ role: currentProfile.role ?? "guest" })
+        .eq("id", id)
+        .select(profileSelect)
+        .single();
+    }
+
+    const { data: profile, error } = result;
 
     if (error || !profile) {
       return NextResponse.json({ error: "Failed to restore user profile" }, { status: 500 });
@@ -52,7 +74,7 @@ export async function POST(
 
     return NextResponse.json({
       user: {
-        ...profile,
+        ...normalizeProfile(profile),
         email: authUser.data.user?.email ?? "",
         last_sign_in_at: authUser.data.user?.last_sign_in_at ?? null,
         email_confirmed_at: authUser.data.user?.email_confirmed_at ?? null,

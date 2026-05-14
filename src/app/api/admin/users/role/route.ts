@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { createClient } from "@/utils/supabase/server";
-import { getSupabaseAdmin } from "@/utils/supabase/admin";
-import { getProfileForUser, isAdminRole } from "@/lib/auth";
+import { requireAdminApi } from "@/lib/adminApi";
 
 const payloadSchema = z.object({
   targetUserId: z.string().uuid("Invalid user id"),
@@ -17,27 +15,17 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Invalid role update payload" }, { status: 400 });
     }
 
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const requesterProfile = await getProfileForUser(supabase, user.id);
-    if (!isAdminRole(requesterProfile?.role)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const access = await requireAdminApi();
+    if ("error" in access) {
+      return access.error;
     }
 
     const { targetUserId, role } = parsed.data;
-    if (targetUserId === user.id) {
+    if (targetUserId === access.user.id) {
       return NextResponse.json({ error: "You cannot change your own role from the admin UI" }, { status: 409 });
     }
 
-    const supabaseAdmin = getSupabaseAdmin();
-    const { data: targetProfile, error: targetError } = await supabaseAdmin
+    const { data: targetProfile, error: targetError } = await access.supabaseAdmin
       .from("profiles")
       .select("id, first_name, last_name, role, created_at")
       .eq("id", targetUserId)
@@ -51,7 +39,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "User profile not found" }, { status: 404 });
     }
 
-    const { data: updatedProfile, error: updateError } = await supabaseAdmin
+    const { data: updatedProfile, error: updateError } = await access.supabaseAdmin
       .from("profiles")
       .update({ role })
       .eq("id", targetUserId)
@@ -62,15 +50,15 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Failed to update user role" }, { status: 500 });
     }
 
-    const authUser = await supabaseAdmin.auth.admin.getUserById(targetUserId);
+    const authUser = await access.supabaseAdmin.auth.admin.getUserById(targetUserId);
 
-    await supabaseAdmin.from("audit_logs").insert({
+    await access.supabaseAdmin.from("audit_logs").insert({
       table_name: "profiles",
       record_id: targetUserId,
       action: "UPDATE",
       old_data: targetProfile,
       new_data: updatedProfile,
-      performed_by: user.id,
+      performed_by: access.user.id,
     });
 
     return NextResponse.json({

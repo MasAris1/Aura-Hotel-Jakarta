@@ -11,7 +11,18 @@ const userSchema = z.object({
   role: z.enum(["guest", "receptionist", "admin"]),
 });
 
-const profileSelect = "id, first_name, last_name, role, created_at";
+const profileSelect = "*";
+
+function normalizeProfile(profile: Record<string, unknown>) {
+  return {
+    id: String(profile.id ?? ""),
+    first_name: typeof profile.first_name === "string" ? profile.first_name : null,
+    last_name: typeof profile.last_name === "string" ? profile.last_name : null,
+    role: typeof profile.role === "string" ? profile.role : "guest",
+    deleted_at: typeof profile.deleted_at === "string" ? profile.deleted_at : null,
+    created_at: typeof profile.created_at === "string" ? profile.created_at : null,
+  };
+}
 
 async function getAuthShape(
   supabaseAdmin: ReturnType<typeof getSupabaseAdmin>,
@@ -99,6 +110,7 @@ export async function PATCH(
     }
 
     const authShape = await getAuthShape(access.supabaseAdmin, id);
+    const normalizedProfile = normalizeProfile(profile);
 
     await access.supabaseAdmin.from("audit_logs").insert({
       table_name: "profiles",
@@ -111,8 +123,7 @@ export async function PATCH(
 
     return NextResponse.json({
       user: {
-        ...profile,
-        deleted_at: null,
+        ...normalizedProfile,
         ...authShape,
         is_current_user: id === access.user.id,
       },
@@ -152,12 +163,23 @@ export async function DELETE(
       return NextResponse.json({ error: "User profile not found" }, { status: 404 });
     }
 
-    const { data: profile, error } = await access.supabaseAdmin
+    let result = await access.supabaseAdmin
       .from("profiles")
       .update({ deleted_at: new Date().toISOString(), role: "guest" })
       .eq("id", id)
       .select(profileSelect)
       .single();
+
+    if (result.error?.message.includes("deleted_at")) {
+      result = await access.supabaseAdmin
+        .from("profiles")
+        .update({ role: "guest" })
+        .eq("id", id)
+        .select(profileSelect)
+        .single();
+    }
+
+    const { data: profile, error } = result;
 
     if (error || !profile) {
       return NextResponse.json({ error: "Failed to archive user profile" }, { status: 500 });
@@ -176,7 +198,7 @@ export async function DELETE(
 
     return NextResponse.json({
       user: {
-        ...profile,
+        ...normalizeProfile(profile),
         ...authShape,
         is_current_user: false,
       },

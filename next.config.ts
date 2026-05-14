@@ -13,7 +13,7 @@ const contentSecurityPolicy = [
 const nextConfig: NextConfig = {
   output: "standalone",
   images: {
-    qualities: [75, 78, 92],
+    qualities: [75, 78, 82, 92],
     remotePatterns: [
       {
         protocol: 'https',

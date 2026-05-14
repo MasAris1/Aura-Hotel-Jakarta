@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { getPostAuthRedirect, getProfileForUser, getRoleHomePath, isAdminRole } from '@/lib/auth'
+import { getPostAuthRedirect, getProfileForUser, getRoleHomePath, hasAdminAccess } from '@/lib/auth'
 import { getRequiredEnv } from '@/lib/env'
 import {
     hasEnabledTwoFactor,
@@ -11,6 +11,10 @@ import {
 import type { Database } from '@/types/supabase'
 
 export async function updateSession(request: NextRequest) {
+    const pathname = request.nextUrl.pathname
+    const isRouteGuardedStaffApi =
+        pathname.startsWith('/api/admin') ||
+        pathname.startsWith('/api/receptionist')
     let supabaseResponse = NextResponse.next({
         request,
     })
@@ -36,6 +40,10 @@ export async function updateSession(request: NextRequest) {
         }
     )
 
+    if (isRouteGuardedStaffApi) {
+        return supabaseResponse
+    }
+
     // IMPORTANT: Avoid writing any logic between createServerClient and
     // supabase.auth.getUser(). A simple mistake could make it very hard to debug
     // issues with users being randomly logged out.
@@ -43,7 +51,6 @@ export async function updateSession(request: NextRequest) {
     const {
         data: { user },
     } = await supabase.auth.getUser()
-    const pathname = request.nextUrl.pathname
     const needsProtectedPageAuthentication =
         pathname.startsWith('/profile') ||
         pathname.startsWith('/booking') ||
@@ -140,7 +147,7 @@ export async function updateSession(request: NextRequest) {
             ? await getProfileForUser(supabase, user.id)
             : null
 
-    if (user && pathname.startsWith('/admin') && !isAdminRole(profile?.role)) {
+    if (user && pathname.startsWith('/admin') && !hasAdminAccess(profile?.role, user.email)) {
         const url = request.nextUrl.clone()
         url.pathname = '/'
         url.search = ''

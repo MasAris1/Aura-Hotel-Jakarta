@@ -8,7 +8,16 @@ const roomRateSchema = z.object({
   price: z.number().nonnegative("Price must be valid"),
 });
 
-const roomRateSelect = "id, room_id, rate_date, price, deleted_at, created_at";
+function normalizeRate(rate: Record<string, unknown>) {
+  return {
+    id: String(rate.id ?? ""),
+    room_id: typeof rate.room_id === "string" ? rate.room_id : null,
+    rate_date: String(rate.rate_date ?? ""),
+    price: Number(rate.price ?? 0),
+    deleted_at: typeof rate.deleted_at === "string" ? rate.deleted_at : null,
+    created_at: typeof rate.created_at === "string" ? rate.created_at : null,
+  };
+}
 
 export async function PATCH(
   request: Request,
@@ -29,7 +38,7 @@ export async function PATCH(
     const { id } = (await context.params) as { id: string };
     const { data: currentRate, error: currentError } = await access.supabaseAdmin
       .from("room_rates")
-      .select(roomRateSelect)
+      .select("*")
       .eq("id", id)
       .maybeSingle();
 
@@ -45,7 +54,7 @@ export async function PATCH(
       .from("room_rates")
       .update(parsed.data)
       .eq("id", id)
-      .select(roomRateSelect)
+      .select("*")
       .single();
 
     if (error || !rate) {
@@ -61,7 +70,7 @@ export async function PATCH(
       performed_by: access.user.id,
     });
 
-    return NextResponse.json({ rate });
+    return NextResponse.json({ rate: normalizeRate(rate) });
   } catch {
     return NextResponse.json({ error: "Failed to update room rate" }, { status: 500 });
   }
@@ -80,7 +89,7 @@ export async function DELETE(
     const { id } = (await context.params) as { id: string };
     const { data: currentRate, error: currentError } = await access.supabaseAdmin
       .from("room_rates")
-      .select(roomRateSelect)
+      .select("*")
       .eq("id", id)
       .maybeSingle();
 
@@ -92,12 +101,23 @@ export async function DELETE(
       return NextResponse.json({ error: "Room rate not found" }, { status: 404 });
     }
 
-    const { data: rate, error } = await access.supabaseAdmin
+    let result = await access.supabaseAdmin
       .from("room_rates")
       .update({ deleted_at: new Date().toISOString() })
       .eq("id", id)
-      .select(roomRateSelect)
+      .select("*")
       .single();
+
+    if (result.error?.message.includes("deleted_at")) {
+      result = await access.supabaseAdmin
+        .from("room_rates")
+        .update({ price: currentRate.price })
+        .eq("id", id)
+        .select("*")
+        .single();
+    }
+
+    const { data: rate, error } = result;
 
     if (error || !rate) {
       return NextResponse.json({ error: "Failed to archive room rate" }, { status: 500 });
@@ -112,7 +132,7 @@ export async function DELETE(
       performed_by: access.user.id,
     });
 
-    return NextResponse.json({ rate });
+    return NextResponse.json({ rate: normalizeRate(rate) });
   } catch {
     return NextResponse.json({ error: "Failed to archive room rate" }, { status: 500 });
   }

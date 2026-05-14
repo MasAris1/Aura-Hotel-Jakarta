@@ -61,7 +61,6 @@ export async function POST(req: Request) {
       .from("bookings")
       .select("id, status, total_price")
       .eq("id", bookingId)
-      .is("deleted_at", null)
       .maybeSingle();
 
     if (bookingError) {
@@ -104,8 +103,7 @@ export async function POST(req: Request) {
         status: transition.nextStatus,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", booking.id)
-      .is("deleted_at", null);
+      .eq("id", booking.id);
 
     if (updateError) {
       return NextResponse.json({ error: "Failed to update booking" }, { status: 500 });

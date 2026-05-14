@@ -8,6 +8,7 @@ import {
   Download,
   FileText,
   Hotel,
+  Sparkles,
   ShieldCheck,
   UserRound,
   UsersRound,
@@ -16,7 +17,11 @@ import {
 import type { Database } from "@/types/supabase";
 import type { BookingStatus } from "@/lib/clientWarmup";
 import { cn } from "@/lib/utils";
-import { getProfileForUser, isAdminRole } from "@/lib/auth";
+import {
+  ensureConfiguredAdminProfile,
+  getProfileForUser,
+  hasAdminAccess,
+} from "@/lib/auth";
 import { createClient } from "@/utils/supabase/server";
 import { getSupabaseAdmin } from "@/utils/supabase/admin";
 import {
@@ -26,6 +31,7 @@ import {
 } from "@/lib/roomCatalog";
 import { AuditLogsPanel } from "@/components/admin/AuditLogsPanel";
 import { BookingManagementPanel } from "@/components/admin/BookingManagementPanel";
+import { FacilityManagementPanel } from "@/components/admin/FacilityManagementPanel";
 import { RoomRateManagementPanel } from "@/components/admin/RoomRateManagementPanel";
 import { RoomManagementPanel } from "@/components/admin/RoomManagementPanel";
 import { UserRoleManagementPanel } from "@/components/admin/UserRoleManagementPanel";
@@ -259,13 +265,14 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     redirect("/login?redirect=/admin");
   }
 
-  const profile = await getProfileForUser(supabase, user.id);
+  const supabaseAdmin = getSupabaseAdmin();
+  let profile = await getProfileForUser(supabase, user.id);
 
-  if (!isAdminRole(profile?.role)) {
+  if (!hasAdminAccess(profile?.role, user.email)) {
     redirect("/");
   }
 
-  const supabaseAdmin = getSupabaseAdmin();
+  profile = await ensureConfiguredAdminProfile(supabaseAdmin, user, profile);
   const [
     { data: metricsRows },
     { data: recentRows },
@@ -275,7 +282,6 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     supabaseAdmin
       .from("bookings")
       .select("id, created_at, room_id, check_in, check_out, total_price, status")
-      .is("deleted_at", null)
       .gte("created_at", `${periodRange.from}T00:00:00`)
       .lte("created_at", `${periodRange.to}T23:59:59`)
       .order("created_at", { ascending: false }),
@@ -284,7 +290,6 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       .select(
         "id, created_at, room_id, first_name, last_name, email, check_in, check_out, total_price, status",
       )
-      .is("deleted_at", null)
       .gte("created_at", `${periodRange.from}T00:00:00`)
       .lte("created_at", `${periodRange.to}T23:59:59`)
       .order("created_at", { ascending: false })
@@ -868,7 +873,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             <div>
               <h2 className="font-serif text-2xl text-white">Kelola admin</h2>
               <p className="mt-1 text-sm text-white/58">
-                Data user, booking, kamar, harga harian, dan audit log.
+                Data user, booking, kamar, fasilitas, harga harian, dan audit log.
               </p>
             </div>
             <TabsList variant="line" className="border-b border-white/10 px-0">
@@ -880,6 +885,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               </TabsTrigger>
               <TabsTrigger value="rooms" className="px-4 text-white/65 data-active:text-white">
                 Kamar
+              </TabsTrigger>
+              <TabsTrigger value="facilities" className="px-4 text-white/65 data-active:text-white">
+                Fasilitas
               </TabsTrigger>
               <TabsTrigger value="rates" className="px-4 text-white/65 data-active:text-white">
                 Harga
@@ -937,6 +945,25 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               </CardHeader>
               <CardContent className="pt-6">
                 <RoomManagementPanel />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="facilities">
+            <Card className="border border-white/10 bg-white/[0.04] text-white ring-0">
+              <CardHeader className="border-b border-white/10">
+                <div>
+                  <CardTitle className="text-white">Manajemen fasilitas</CardTitle>
+                  <CardDescription className="text-white/60">
+                    Tambah, ubah, arsipkan, dan pulihkan fasilitas yang tampil di website.
+                  </CardDescription>
+                </div>
+                <CardAction>
+                  <Sparkles className="size-5 text-primary" />
+                </CardAction>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <FacilityManagementPanel />
               </CardContent>
             </Card>
           </TabsContent>
