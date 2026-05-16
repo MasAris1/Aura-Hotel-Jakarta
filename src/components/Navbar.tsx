@@ -144,7 +144,7 @@ export function Navbar() {
       window.removeEventListener("scroll", handleScroll);
       subscription.unsubscribe();
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (!accountMenuOpen) {
