@@ -230,26 +230,26 @@ function getRoleBadgeClassName(role: string | null) {
   }
 
   if (role === "receptionist") {
-    return "border-sky-300/20 bg-sky-300/10 text-sky-100";
+    return "border-sky-500/20 bg-sky-500/10 text-sky-700 dark:border-sky-300/20 dark:bg-sky-300/10 dark:text-sky-100";
   }
 
-  return "border-white/12 bg-white/[0.04] text-white/72";
+  return "border-slate-200 bg-slate-100 text-slate-700 dark:border-white/12 dark:bg-white/[0.04] dark:text-white/72";
 }
 
 function getStatusBadgeClassName(status: BookingStatus) {
   if (status === "PAID" || status === "CHECKED_IN" || status === "CHECKED_OUT") {
-    return "border-emerald-300/20 bg-emerald-300/12 text-emerald-100";
+    return "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:border-emerald-300/20 dark:bg-emerald-300/12 dark:text-emerald-100";
   }
 
   if (status === "UNPAID") {
-    return "border-amber-300/20 bg-amber-300/12 text-amber-100";
+    return "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:border-amber-300/20 dark:bg-amber-300/12 dark:text-amber-100";
   }
 
   if (status === "EXPIRED" || status === "REFUNDED") {
-    return "border-rose-300/20 bg-rose-300/12 text-rose-100";
+    return "border-rose-500/20 bg-rose-500/10 text-rose-700 dark:border-rose-300/20 dark:bg-rose-300/12 dark:text-rose-100";
   }
 
-  return "border-white/12 text-white/70";
+  return "border-slate-200 bg-slate-100 text-slate-700 dark:border-white/12 dark:bg-transparent dark:text-white/70";
 }
 
 export default async function AdminPage({ searchParams }: AdminPageProps) {

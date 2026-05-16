@@ -57,31 +57,31 @@ const statusOptions: Array<{
   {
     value: "AVAILABLE",
     label: "Kosong",
-    tone: "border-emerald-300/20 bg-emerald-300/12 text-emerald-100",
+    tone: "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:border-emerald-300/20 dark:bg-emerald-300/12 dark:text-emerald-100",
     icon: BedDouble,
   },
   {
     value: "OCCUPIED",
     label: "Terisi",
-    tone: "border-sky-300/20 bg-sky-300/12 text-sky-100",
+    tone: "border-sky-500/20 bg-sky-500/10 text-sky-700 dark:border-sky-300/20 dark:bg-sky-300/12 dark:text-sky-100",
     icon: CalendarClock,
   },
   {
     value: "MAINTENANCE",
     label: "Maintenance",
-    tone: "border-rose-300/20 bg-rose-300/12 text-rose-100",
+    tone: "border-rose-500/20 bg-rose-500/10 text-rose-700 dark:border-rose-300/20 dark:bg-rose-300/12 dark:text-rose-100",
     icon: Wrench,
   },
   {
     value: "CLEANING",
     label: "Dibersihkan",
-    tone: "border-amber-300/20 bg-amber-300/12 text-amber-100",
+    tone: "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:border-amber-300/20 dark:bg-amber-300/12 dark:text-amber-100",
     icon: Brush,
   },
   {
     value: "RESERVED",
     label: "Reservasi",
-    tone: "border-violet-300/20 bg-violet-300/12 text-violet-100",
+    tone: "border-violet-500/20 bg-violet-500/10 text-violet-700 dark:border-violet-300/20 dark:bg-violet-300/12 dark:text-violet-100",
     icon: CircleSlash,
   },
 ];
