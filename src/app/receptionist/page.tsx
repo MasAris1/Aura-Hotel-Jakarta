@@ -92,7 +92,7 @@ export default async function ReceptionistPage() {
     "Resepsionis";
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_rgba(15,19,27,0.98)_0%,_rgba(9,12,18,1)_100%)] pb-16 pt-28 text-white">
+    <main className="theme-aware-admin min-h-screen bg-[linear-gradient(180deg,_rgba(15,19,27,0.98)_0%,_rgba(9,12,18,1)_100%)] pb-16 pt-28 text-foreground">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 sm:px-6">
         <section className="rounded-xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_20px_70px_rgba(0,0,0,0.26)] sm:p-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
