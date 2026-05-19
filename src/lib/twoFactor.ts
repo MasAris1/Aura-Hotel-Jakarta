@@ -291,9 +291,10 @@ export function hasConfiguredTwoFactor(storedSecret?: string | null) {
 }
 
 export function hasEnabledTwoFactor(user: TwoFactorMetadataUser) {
+  const isEnabled = user.user_metadata?.[TWO_FACTOR_MANUAL_ENABLED_METADATA_KEY];
   return (
     hasConfiguredTwoFactor(getStoredTwoFactorSecret(user)) &&
-    user.user_metadata?.[TWO_FACTOR_MANUAL_ENABLED_METADATA_KEY] === true
+    (isEnabled === true || isEnabled === "true")
   );
 }
 
