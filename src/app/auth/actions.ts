@@ -21,6 +21,7 @@ import {
     getTwoFactorCookieOptions,
     hasEnabledTwoFactor,
     hasConfiguredTwoFactor,
+    isTwoFactorVerifiedForUser,
     TWO_FACTOR_CHALLENGE_COOKIE,
     TWO_FACTOR_CHALLENGE_TTL_SECONDS,
     TWO_FACTOR_VERIFIED_COOKIE,
