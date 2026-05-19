@@ -563,3 +563,24 @@ export async function updatePassword(formData: FormData, redirectTo?: string) {
     const nextLogin = sanitizeInternalRedirect(redirectTo) ?? '/login'
     redirect(`${nextLogin}${nextLogin.includes('?') ? '&' : '?'}reset=success`)
 }
+
+export async function checkTwoFactorVerification() {
+    const supabase = await createClient()
+    const cookieStore = await cookies()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+        return false
+    }
+
+    if (!hasEnabledTwoFactor(user)) {
+        return true
+    }
+
+    return await isTwoFactorVerifiedForUser(
+        user,
+        cookieStore.get(TWO_FACTOR_VERIFIED_COOKIE)?.value,
+    )
+}

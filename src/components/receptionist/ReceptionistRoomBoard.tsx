@@ -6,6 +6,7 @@ import {
   Brush,
   CalendarClock,
   CircleSlash,
+  DoorOpen,
   Search,
   Wrench,
 } from "lucide-react";
@@ -115,6 +116,19 @@ function formatCurrency(value: number | null) {
   return currencyFormatter.format(Number(value ?? 0));
 }
 
+function formatCapacitySummary(capacities: number[]) {
+  if (capacities.length === 0) {
+    return "Kapasitas belum diatur";
+  }
+
+  const minCapacity = Math.min(...capacities);
+  const maxCapacity = Math.max(...capacities);
+
+  return minCapacity === maxCapacity
+    ? `${minCapacity} tamu`
+    : `${minCapacity}-${maxCapacity} tamu`;
+}
+
 type ReceptionistRoomBoardProps = {
   initialUnits: ReceptionistRoomUnit[];
 };
@@ -135,6 +149,67 @@ export function ReceptionistRoomBoard({ initialUnits }: ReceptionistRoomBoardPro
     });
 
     return counts;
+  }, [roomUnits]);
+
+  const availableTypeSummaries = useMemo(() => {
+    const summaries = new Map<
+      string,
+      {
+        name: string;
+        count: number;
+        unitNumbers: string[];
+        roomTypes: Set<string>;
+        capacities: Set<number>;
+        minPrice: number | null;
+      }
+    >();
+
+    roomUnits.forEach((unit) => {
+      if (unit.status !== "AVAILABLE") {
+        return;
+      }
+
+      const name = unit.rooms?.name?.trim() || "Kamar";
+      const key = name.toLowerCase();
+      const current =
+        summaries.get(key) ??
+        summaries
+          .set(key, {
+            name,
+            count: 0,
+            unitNumbers: [],
+            roomTypes: new Set<string>(),
+            capacities: new Set<number>(),
+            minPrice: null,
+          })
+          .get(key);
+
+      if (!current) {
+        return;
+      }
+
+      current.count += 1;
+      current.unitNumbers.push(unit.unit_number);
+
+      if (unit.rooms?.type) {
+        current.roomTypes.add(unit.rooms.type);
+      }
+
+      if (typeof unit.rooms?.capacity === "number") {
+        current.capacities.add(unit.rooms.capacity);
+      }
+
+      if (typeof unit.rooms?.base_price === "number") {
+        current.minPrice =
+          current.minPrice === null
+            ? unit.rooms.base_price
+            : Math.min(current.minPrice, unit.rooms.base_price);
+      }
+    });
+
+    return Array.from(summaries.values()).sort(
+      (first, second) => second.count - first.count || first.name.localeCompare(second.name),
+    );
   }, [roomUnits]);
 
   const filteredUnits = useMemo(() => {
@@ -239,6 +314,86 @@ export function ReceptionistRoomBoard({ initialUnits }: ReceptionistRoomBoardPro
             </button>
           );
         })}
+      </section>
+
+      <section className="rounded-xl border border-white/10 bg-white/[0.04] p-4 text-white sm:p-5">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="font-serif text-2xl text-white">Tipe kamar tersedia</h2>
+            <p className="mt-1 text-sm text-white/58">
+              {statusCounts.get("AVAILABLE") ?? 0} unit kosong dari {roomUnits.length} unit.
+            </p>
+          </div>
+          <Badge
+            variant="outline"
+            className="w-fit border-emerald-300/20 bg-emerald-300/12 text-emerald-100"
+          >
+            <DoorOpen className="size-3.5" />
+            Siap ditempati
+          </Badge>
+        </div>
+
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {availableTypeSummaries.length > 0 ? (
+            availableTypeSummaries.map((summary) => {
+              const roomTypes = Array.from(summary.roomTypes);
+              const capacities = Array.from(summary.capacities);
+              const visibleUnits = summary.unitNumbers.slice(0, 5);
+              const hiddenUnitCount = Math.max(summary.unitNumbers.length - visibleUnits.length, 0);
+
+              return (
+                <article
+                  key={summary.name}
+                  className="rounded-lg border border-white/10 bg-black/12 p-4"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="text-xs uppercase tracking-[0.16em] text-white/42">
+                        {roomTypes.length > 0 ? roomTypes.join(", ") : "Kamar"}
+                      </p>
+                      <h3 className="mt-2 truncate font-serif text-2xl text-white">
+                        {summary.name}
+                      </h3>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-3xl font-semibold text-white">{summary.count}</p>
+                      <p className="text-xs uppercase tracking-[0.16em] text-white/42">unit</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-2 text-xs text-white/62">
+                    <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1">
+                      {formatCapacitySummary(capacities)}
+                    </span>
+                    <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1">
+                      mulai {formatCurrency(summary.minPrice)}
+                    </span>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {visibleUnits.map((unitNumber) => (
+                      <span
+                        key={unitNumber}
+                        className="rounded-md border border-emerald-300/15 bg-emerald-300/10 px-2 py-1 text-xs font-medium text-emerald-50"
+                      >
+                        {unitNumber}
+                      </span>
+                    ))}
+                    {hiddenUnitCount > 0 ? (
+                      <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-xs text-white/58">
+                        +{hiddenUnitCount}
+                      </span>
+                    ) : null}
+                  </div>
+                </article>
+              );
+            })
+          ) : (
+            <div className="rounded-lg border border-white/10 bg-black/12 p-4 text-sm text-white/58 md:col-span-2 xl:col-span-3">
+              Belum ada tipe kamar kosong.
+            </div>
+          )}
+        </div>
       </section>
 
       <section className="rounded-xl border border-white/10 bg-white/[0.04] text-white">

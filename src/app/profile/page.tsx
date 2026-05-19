@@ -16,6 +16,8 @@ import {
   TWO_FACTOR_ENABLED_AT_METADATA_KEY,
 } from "@/lib/twoFactor";
 import { createClient } from "@/utils/supabase/server";
+import { EditableProfile } from "./EditableProfile";
+import { BookingHistory } from "./BookingHistory";
 
 type ProfilePageProps = {
   searchParams?: Promise<{
@@ -34,6 +36,20 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
   }
 
   const profile = await ensureProfileForUser(supabase, user);
+
+  const { data: bookings } = await supabase
+    .from("bookings")
+    .select(`
+      id,
+      check_in,
+      check_out,
+      total_price,
+      status,
+      rooms ( name )
+    `)
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
   const fullName =
     `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim() ||
     user.email?.split("@")[0] ||
@@ -93,17 +109,13 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
 
         <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
           <aside className="border border-border bg-card p-7">
-            <div className="flex items-center gap-5">
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border border-primary/25 bg-primary/10 font-playfair text-3xl text-primary">
-                {initials || "G"}
-              </div>
-              <div>
-                <h2 className="font-playfair text-2xl text-foreground">{fullName}</h2>
-                <p className="mt-2 font-inter text-xs uppercase tracking-[0.24em] text-foreground/45">
-                  {profile.role ?? "guest"}
-                </p>
-              </div>
-            </div>
+            <EditableProfile
+              initialFirstName={profile.first_name || ""}
+              initialLastName={profile.last_name || ""}
+              email={user.email || ""}
+              role={profile.role || "guest"}
+              initials={initials}
+            />
 
             <div className="mt-8 space-y-4 font-inter text-sm text-foreground/65">
               <ProfileMeta icon={<Mail className="h-4 w-4" />} label="Email" value={user.email ?? "-"} />
@@ -199,6 +211,20 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
             <div className="grid gap-6 sm:grid-cols-2">
               <AccountStat label="Profile status" value="Ready" />
               <AccountStat label="Login destination" value="Home" />
+            </div>
+
+            <div className="border border-border bg-card p-7">
+              <div className="mb-6 flex items-start justify-between gap-4">
+                <div>
+                  <p className="mb-3 font-inter text-xs uppercase tracking-[0.28em] text-foreground/45">
+                    History
+                  </p>
+                  <h2 className="font-playfair text-3xl text-foreground">
+                    Riwayat Reservasi
+                  </h2>
+                </div>
+              </div>
+              <BookingHistory bookings={bookings as any || []} />
             </div>
           </section>
         </div>

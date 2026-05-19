@@ -22,6 +22,8 @@ import {
   type UserProfile,
 } from "@/lib/clientWarmup";
 import { createClient } from "@/utils/supabase/client";
+import { checkTwoFactorVerification } from "@/app/auth/actions";
+
 
 const navLinks = [
   { name: "Home", href: "/#home", sectionId: "home" },
@@ -118,6 +120,16 @@ export function Navbar() {
         data: { session: currentSession },
       } = await supabase.auth.getSession();
 
+      if (currentSession) {
+        const isVerified = await checkTwoFactorVerification();
+        if (!isVerified) {
+          setSession(null);
+          setAuthLoading(false);
+          setUserProfile(null);
+          return;
+        }
+      }
+
       setSession(currentSession);
       setAuthLoading(false);
       void syncUserRole(currentSession);
@@ -127,16 +139,25 @@ export function Navbar() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, currentSession) => {
-      setSession(currentSession);
-      setAuthLoading(false);
-
+    } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
       if (!currentSession) {
+        setSession(null);
+        setAuthLoading(false);
         clearWarmCaches();
         setUserProfile(null);
         return;
       }
 
+      const isVerified = await checkTwoFactorVerification();
+      if (!isVerified) {
+        setSession(null);
+        setAuthLoading(false);
+        setUserProfile(null);
+        return;
+      }
+
+      setSession(currentSession);
+      setAuthLoading(false);
       void syncUserRole(currentSession);
     });
 
