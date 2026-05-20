@@ -52,8 +52,31 @@ export async function POST(req: Request) {
             data.checkOut,
         );
 
-        // Coba insert Booking dengan Supabase
-        const { data: bookingData, error: insertError } = await supabase.from('bookings').insert({
+        // Cari room_unit yang AVAILABLE untuk room_id ini
+        const { data: availableUnits, error: unitError } = await supabaseAdmin
+            .from('room_units')
+            .select('id, unit_number')
+            .eq('room_id', data.roomId)
+            .eq('status', 'AVAILABLE')
+            .limit(1);
+
+        if (unitError || !availableUnits || availableUnits.length === 0) {
+            return NextResponse.json({ error: "Gagal Booking: Tidak ada unit kamar yang tersedia untuk dipesan." }, { status: 409 });
+        }
+
+        const allocatedUnit = availableUnits[0];
+
+        // Update room_unit menjadi RESERVED
+        await supabaseAdmin.from('room_units').update({
+            status: 'RESERVED',
+            current_guest_name: `${data.firstName} ${data.lastName}`,
+            current_guest_email: data.email,
+            check_in: data.checkIn,
+            check_out: data.checkOut
+        }).eq('id', allocatedUnit.id);
+
+        // Coba insert Booking dengan SupabaseAdmin (Bypass RLS)
+        const { data: bookingData, error: insertError } = await supabaseAdmin.from('bookings').insert({
             user_id: user.id,
             room_id: data.roomId,
             first_name: data.firstName,
@@ -66,6 +89,16 @@ export async function POST(req: Request) {
             status: 'UNPAID'
         }).select().single();
         const booking = bookingData as BookingRow | null;
+
+        if (booking && !insertError) {
+            await supabaseAdmin.from('audit_logs').insert({
+                table_name: 'bookings',
+                record_id: booking.id,
+                action: 'CREATE_RESERVATION',
+                new_data: booking as any,
+                performed_by: user.id
+            });
+        }
 
         if (insertError || !booking) {
             console.error("Booking Error:", insertError);
@@ -115,11 +148,29 @@ export async function POST(req: Request) {
             console.error("Midtrans Config Diagnostics:", midtransConfigDiagnostics);
 
             // Jangan hapus booking agar histori transaksi tetap utuh.
-            await supabase
+            await supabaseAdmin
                 .from('bookings')
                 .update({ status: 'EXPIRED', updated_at: new Date().toISOString() })
                 .eq('id', booking.id)
                 .eq('status', 'UNPAID');
+
+            await supabaseAdmin.from('audit_logs').insert({
+                table_name: 'bookings',
+                record_id: booking.id,
+                action: 'UPDATE_STATUS_EXPIRED',
+                old_data: { status: 'UNPAID' },
+                new_data: { status: 'EXPIRED' },
+                performed_by: user.id
+            });
+
+            // Bebaskan unit kamar kembali ke AVAILABLE
+            await supabaseAdmin.from('room_units').update({
+                status: 'AVAILABLE',
+                current_guest_name: null,
+                current_guest_email: null,
+                check_in: null,
+                check_out: null
+            }).eq('id', allocatedUnit.id);
 
             try {
                 await upsertBookingTransaction(supabaseAdmin, {

@@ -117,6 +117,47 @@ export async function POST(req: Request) {
                 return NextResponse.json({ error: "Db Update Failed" }, { status: 500 });
             }
 
+            await supabase.from('audit_logs').insert({
+                table_name: 'bookings',
+                record_id: order_id,
+                action: `UPDATE_STATUS_${newStatus}`,
+                old_data: { status: booking.status },
+                new_data: { status: newStatus },
+                performed_by: 'SYSTEM'
+            });
+
+            // Sinkronisasi status room_units
+            if (newStatus === 'EXPIRED' || newStatus === 'REFUNDED') {
+                await supabase.from('room_units').update({
+                    status: 'AVAILABLE',
+                    current_guest_name: null,
+                    current_guest_email: null,
+                    check_in: null,
+                    check_out: null
+                })
+                .eq('room_id', booking.room_id)
+                .eq('current_guest_email', booking.email)
+                .in('status', ['RESERVED', 'OCCUPIED']);
+            } else if (newStatus === 'CHECKED_IN') {
+                await supabase.from('room_units').update({
+                    status: 'OCCUPIED'
+                })
+                .eq('room_id', booking.room_id)
+                .eq('current_guest_email', booking.email)
+                .eq('status', 'RESERVED');
+            } else if (newStatus === 'CHECKED_OUT') {
+                await supabase.from('room_units').update({
+                    status: 'CLEANING',
+                    current_guest_name: null,
+                    current_guest_email: null,
+                    check_in: null,
+                    check_out: null
+                })
+                .eq('room_id', booking.room_id)
+                .eq('current_guest_email', booking.email)
+                .eq('status', 'OCCUPIED');
+            }
+
             booking.status = newStatus;
         }
 
