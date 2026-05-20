@@ -135,14 +135,14 @@ export async function POST(req: Request) {
                     check_in: null,
                     check_out: null
                 })
-                .eq('room_id', booking.room_id)
+                .eq('room_id', booking.room_id ?? '')
                 .eq('current_guest_email', booking.email)
                 .in('status', ['RESERVED', 'OCCUPIED']);
             } else if (newStatus === 'CHECKED_IN') {
                 await supabase.from('room_units').update({
                     status: 'OCCUPIED'
                 })
-                .eq('room_id', booking.room_id)
+                .eq('room_id', booking.room_id ?? '')
                 .eq('current_guest_email', booking.email)
                 .eq('status', 'RESERVED');
             } else if (newStatus === 'CHECKED_OUT') {
@@ -153,7 +153,7 @@ export async function POST(req: Request) {
                     check_in: null,
                     check_out: null
                 })
-                .eq('room_id', booking.room_id)
+                .eq('room_id', booking.room_id ?? '')
                 .eq('current_guest_email', booking.email)
                 .eq('status', 'OCCUPIED');
             }
