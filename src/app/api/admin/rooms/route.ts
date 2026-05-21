@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdminApi } from "@/lib/adminApi";
 import { normalizeRoomImages } from "@/lib/roomCatalog";
+import { revalidateAllRoomData } from "@/lib/revalidate";
 
 const roomSchema = z.object({
   name: z.string().min(2, "Room name is required"),
@@ -130,6 +131,8 @@ export async function POST(request: Request) {
       new_data: room,
       performed_by: access.user.id,
     });
+
+    revalidateAllRoomData();
 
     return NextResponse.json({
       room: normalizeAdminRoom(room as Record<string, unknown>),

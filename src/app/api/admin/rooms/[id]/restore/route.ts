@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminApi } from "@/lib/adminApi";
 import { normalizeRoomImages } from "@/lib/roomCatalog";
+import { revalidateAllRoomData } from "@/lib/revalidate";
 
 function normalizeAdminRoom(room: Record<string, unknown>) {
   return {
@@ -69,6 +70,8 @@ export async function POST(
       new_data: room,
       performed_by: access.user.id,
     });
+
+    revalidateAllRoomData(id);
 
     return NextResponse.json({
       room: normalizeAdminRoom(room as Record<string, unknown>),

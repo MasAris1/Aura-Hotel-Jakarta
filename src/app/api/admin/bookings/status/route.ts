@@ -8,6 +8,7 @@ import {
   mapBookingStatusToTransactionStatus,
   upsertBookingTransaction,
 } from "@/lib/transactions";
+import { revalidateRoomPages } from "@/lib/revalidate";
 
 const bookingActionSchema = z.object({
   bookingId: z.string().uuid("Invalid booking id"),
@@ -118,6 +119,8 @@ export async function POST(req: Request) {
           ? "REFUNDED"
           : mapBookingStatusToTransactionStatus(transition.nextStatus),
     });
+
+    revalidateRoomPages();
 
     return NextResponse.json({
       success: true,

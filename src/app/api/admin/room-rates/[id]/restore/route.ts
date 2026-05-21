@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminApi } from "@/lib/adminApi";
+import { revalidateRoomPages } from "@/lib/revalidate";
 
 function normalizeRate(rate: Record<string, unknown>) {
   return {
@@ -67,6 +68,8 @@ export async function POST(
       new_data: rate,
       performed_by: access.user.id,
     });
+
+    revalidateRoomPages();
 
     return NextResponse.json({ rate: normalizeRate(rate) });
   } catch {

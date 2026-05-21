@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireStaffApi } from "@/lib/adminApi";
+import { revalidateRoomPages } from "@/lib/revalidate";
 
 const roomUnitStatusSchema = z.enum([
   "AVAILABLE",
@@ -124,6 +125,8 @@ export async function PATCH(request: Request, context: RouteContext) {
     new_data: roomUnit,
     performed_by: access.user.id,
   });
+
+  revalidateRoomPages();
 
   return NextResponse.json({ roomUnit });
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdminApi } from "@/lib/adminApi";
+import { revalidateRoomPages } from "@/lib/revalidate";
 
 const roomRateSchema = z.object({
   room_id: z.string().uuid("Invalid room id"),
@@ -102,6 +103,8 @@ export async function POST(request: Request) {
       new_data: rate,
       performed_by: access.user.id,
     });
+
+    revalidateRoomPages();
 
     return NextResponse.json({ rate: normalizeRate(rate) });
   } catch {

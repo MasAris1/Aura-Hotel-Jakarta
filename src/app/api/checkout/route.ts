@@ -9,6 +9,7 @@ import {
     TRANSACTION_STATUSES,
     upsertBookingTransaction,
 } from "@/lib/transactions";
+import { revalidateRoomPages } from "@/lib/revalidate";
 
 function getErrorMessage(error: unknown) {
     return error instanceof Error ? error.message : "Unknown server error";
@@ -98,6 +99,8 @@ export async function POST(req: Request) {
                 new_data: booking as any,
                 performed_by: user.id
             });
+
+            revalidateRoomPages();
         }
 
         if (insertError || !booking) {
@@ -142,6 +145,7 @@ export async function POST(req: Request) {
             });
 
             return NextResponse.json({ success: true, bookingId: booking.id, token, totalPrice: quote.totalPrice }, { status: 201 });
+
 
         } catch (midtransError: unknown) {
             console.error("Midtrans Error:", getErrorMessage(midtransError));

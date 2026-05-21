@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "@/utils/supabase/admin";
 import { getPublicSiteUrl, getRequiredEnv } from "@/lib/env";
 import { resolveMidtransStatuses, upsertBookingTransaction } from "@/lib/transactions";
 import { resolveRoomDetails } from "@/lib/roomCatalog";
+import { revalidateRoomPages } from "@/lib/revalidate";
 
 type BookingStatus =
     | "UNPAID"
@@ -159,6 +160,8 @@ export async function POST(req: Request) {
             }
 
             booking.status = newStatus;
+
+            revalidateRoomPages();
         }
 
         // 5. Distribusi E-Voucher (Resend)

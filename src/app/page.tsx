@@ -261,15 +261,10 @@ export default function Home() {
 
       if (result.rooms) {
         setCatalogRooms(result.rooms);
-        writeLocalCatalog(LOCAL_ROOM_CATALOG_KEY, result.rooms);
         return;
       }
     } catch {
-      const localRooms = readLocalCatalog<RoomCatalogItem>(LOCAL_ROOM_CATALOG_KEY);
-
-      if (localRooms?.length) {
-        setCatalogRooms(localRooms);
-      }
+      // Keep static fallback on network error.
     }
   }, []);
 
@@ -819,7 +814,6 @@ export default function Home() {
 
       const nextRoom = resolveRoomDetails(result.room.id, result.room);
       const nextRooms = upsertCatalogItem(catalogRooms, nextRoom);
-      writeLocalCatalog(LOCAL_ROOM_CATALOG_KEY, nextRooms);
       setCatalogRooms(nextRooms);
       setCrudSuccess(isEdit ? "Suite updated." : "Suite created.");
       setCrudModal(null);
@@ -839,7 +833,6 @@ export default function Home() {
     }
 
     const nextRooms = catalogRooms.filter((room) => room.id !== id);
-    writeLocalCatalog(LOCAL_ROOM_CATALOG_KEY, nextRooms);
     setCatalogRooms(nextRooms);
   };
 
