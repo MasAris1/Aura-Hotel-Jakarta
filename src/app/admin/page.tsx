@@ -412,8 +412,8 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     .slice(0, 5);
 
   return (
-    <main className="theme-aware-admin min-h-screen bg-[linear-gradient(180deg,_rgba(15,19,27,0.98)_0%,_rgba(9,12,18,1)_100%)] pb-16 pt-28 text-foreground">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 sm:px-6">
+    <main className="theme-aware-admin min-h-screen bg-[linear-gradient(180deg,_rgba(15,19,27,0.98)_0%,_rgba(9,12,18,1)_100%)] pb-12 pt-24 sm:pb-16 sm:pt-28 text-foreground">
+      <div className="mx-auto flex max-w-7xl flex-col gap-5 sm:gap-6 px-4 sm:px-6">
         <section className="rounded-xl border border-white/10 bg-white/[0.04] p-5 text-white shadow-[0_20px_70px_rgba(0,0,0,0.26)] sm:p-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-3">
@@ -425,7 +425,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                 Admin
               </Badge>
               <div>
-                <h1 className="font-serif text-3xl text-white sm:text-4xl">
+                <h1 className="font-serif text-2xl text-white sm:text-3xl md:text-4xl">
                   Dashboard Admin
                 </h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-white/62">
@@ -710,7 +710,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </div>
         </section>
 
-        <section className="rounded-xl border border-white/10 bg-white/[0.04] p-5 text-white">
+        <section className="rounded-xl border border-white/10 bg-white/[0.04] p-5 sm:p-6 text-white">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-2xl">
               <div className="flex items-center gap-3">

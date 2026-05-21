@@ -1232,6 +1232,17 @@ export default function Home() {
 
                       <div className="mt-8 flex flex-col gap-4 border-t border-border pt-6 sm:gap-5 dark:border-white/8">
                         <div>
+                          <div className="mb-3">
+                            {room.totalUnits > 0 ? (
+                              <span className="inline-flex rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[10px] uppercase tracking-[0.26em] text-primary">
+                                {room.totalUnits} Kamar Tersedia
+                              </span>
+                            ) : (
+                              <span className="inline-flex rounded-full border border-red-500/25 bg-red-500/10 px-3 py-1 text-[10px] uppercase tracking-[0.26em] text-red-500">
+                                Penuh / Sold Out
+                              </span>
+                            )}
+                          </div>
                           <span className="block text-[10px] uppercase tracking-[0.26em] text-foreground/44 dark:text-white/42">
                             Per night
                           </span>
@@ -1249,9 +1260,15 @@ export default function Home() {
                           </Link>
                           <Link
                             href={`/booking?room=${room.id}`}
-                            className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-primary px-4 py-2 text-[11px] uppercase tracking-[0.2em] text-primary-foreground transition-all duration-300 hover:shadow-[0_14px_28px_rgba(198,155,73,0.3)] min-[1180px]:w-auto"
+                            className={`inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-primary px-4 py-2 text-[11px] uppercase tracking-[0.2em] text-primary-foreground transition-all duration-300 min-[1180px]:w-auto ${
+                              room.totalUnits > 0
+                                ? "hover:shadow-[0_14px_28px_rgba(198,155,73,0.3)]"
+                                : "pointer-events-none opacity-50"
+                            }`}
+                            tabIndex={room.totalUnits > 0 ? 0 : -1}
+                            aria-disabled={room.totalUnits === 0}
                           >
-                            Reserve now
+                            {room.totalUnits > 0 ? "Reserve now" : "Sold out"}
                             <ArrowRight className="h-3.5 w-3.5" />
                           </Link>
                         </div>

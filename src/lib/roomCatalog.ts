@@ -14,6 +14,7 @@ export type LiveRoomLookup = {
   status?: string | null;
   deleted_at?: string | null;
   image_url?: string | null;
+  total_units?: number;
 };
 
 export type ResolvedRoomDetails = {
@@ -29,6 +30,7 @@ export type ResolvedRoomDetails = {
   amenities: string[];
   isFeatured: boolean;
   status: string | null;
+  totalUnits: number;
 };
 
 export type RoomCatalogItem = ResolvedRoomDetails;
@@ -106,6 +108,7 @@ export function resolveRoomDetails(
     amenities: staticRoom?.amenities ?? [],
     isFeatured: staticRoom?.isFeatured ?? false,
     status: liveRoom?.status ?? null,
+    totalUnits: liveRoom?.total_units ?? 0,
   };
 }
 

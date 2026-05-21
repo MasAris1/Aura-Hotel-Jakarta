@@ -94,14 +94,14 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     : params.twoFactor;
 
   return (
-    <main className="min-h-screen bg-background px-6 pb-20 pt-32 text-foreground">
+    <main className="min-h-screen bg-background px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-32 text-foreground">
       <section className="mx-auto max-w-6xl">
-        <div className="mb-10 flex flex-col gap-6 border-b border-border pb-8 lg:flex-row lg:items-end lg:justify-between">
+        <div className="mb-8 flex flex-col gap-5 border-b border-border pb-6 sm:mb-10 sm:gap-6 sm:pb-8 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="mb-4 font-inter text-xs uppercase tracking-[0.32em] text-primary">
               Account profile
             </p>
-            <h1 className="font-playfair text-4xl uppercase tracking-widest text-foreground sm:text-5xl">
+            <h1 className="font-playfair text-3xl uppercase tracking-widest text-foreground sm:text-4xl md:text-5xl">
               {fullName}
             </h1>
             <p className="mt-4 max-w-2xl font-inter text-sm leading-7 text-foreground/55">
@@ -133,7 +133,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
         ) : null}
 
         <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-          <aside className="border border-border bg-card p-7">
+          <aside className="border border-border bg-card p-5 sm:p-7">
             <EditableProfile
               initialFirstName={profile.first_name || ""}
               initialLastName={profile.last_name || ""}
@@ -158,13 +158,13 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
           </aside>
 
           <section className="space-y-8">
-            <div className="border border-border bg-card p-7">
-              <div className="mb-6 flex items-start justify-between gap-4">
+            <div className="border border-border bg-card p-5 sm:p-7">
+              <div className="mb-5 flex flex-col items-start justify-between gap-4 sm:mb-6 sm:flex-row">
                 <div>
                   <p className="mb-3 font-inter text-xs uppercase tracking-[0.28em] text-foreground/45">
                     Security
                   </p>
-                  <h2 className="font-playfair text-3xl text-foreground">
+                  <h2 className="font-playfair text-2xl text-foreground sm:text-3xl">
                     Two-factor authentication
                   </h2>
                 </div>
@@ -238,13 +238,13 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
               <AccountStat label="Login destination" value="Home" />
             </div>
 
-            <div className="border border-border bg-card p-7">
-              <div className="mb-6 flex items-start justify-between gap-4">
+            <div className="border border-border bg-card p-5 sm:p-7">
+              <div className="mb-5 flex flex-col items-start justify-between gap-4 sm:mb-6 sm:flex-row">
                 <div>
                   <p className="mb-3 font-inter text-xs uppercase tracking-[0.28em] text-foreground/45">
                     History
                   </p>
-                  <h2 className="font-playfair text-3xl text-foreground">
+                  <h2 className="font-playfair text-2xl text-foreground sm:text-3xl">
                     Riwayat Reservasi
                   </h2>
                 </div>
@@ -282,7 +282,7 @@ function ProfileMeta({
 
 function AccountStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border border-border bg-card p-6">
+    <div className="border border-border bg-card p-5 sm:p-6">
       <p className="font-inter text-[11px] uppercase tracking-[0.26em] text-foreground/40">
         {label}
       </p>

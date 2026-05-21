@@ -47,7 +47,7 @@ function getStatusColor(status: string | null) {
 export function BookingHistory({ bookings }: { bookings: Booking[] }) {
   if (!bookings || bookings.length === 0) {
     return (
-      <div className="border border-border bg-card p-7 text-center">
+      <div className="border border-border bg-card p-5 sm:p-7 text-center">
         <p className="font-inter text-sm text-foreground/55">
           Belum ada riwayat reservasi.
         </p>
@@ -60,15 +60,15 @@ export function BookingHistory({ bookings }: { bookings: Booking[] }) {
       {bookings.map((booking) => (
         <div
           key={booking.id}
-          className="border border-border bg-card p-6 transition-colors hover:border-primary/30"
+          className="border border-border bg-card p-5 sm:p-6 transition-colors hover:border-primary/30"
         >
           <div className="mb-4 flex flex-col justify-between gap-4 border-b border-border pb-4 sm:flex-row sm:items-center">
             <div>
               <p className="mb-1 font-inter text-[11px] uppercase tracking-[0.24em] text-foreground/45">
                 ID Booking: {booking.id.split("-")[0]}
               </p>
-              <h3 className="flex items-center gap-2 font-playfair text-xl text-foreground">
-                <BedDouble className="h-5 w-5 text-primary" />
+              <h3 className="flex items-center gap-2 font-playfair text-lg sm:text-xl text-foreground">
+                <BedDouble className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 {booking.rooms?.name || "Kamar tidak diketahui"}
               </h3>
             </div>

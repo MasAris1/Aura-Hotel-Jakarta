@@ -5,9 +5,10 @@ import { getStaticRooms, mergeRoomCatalogRooms, resolveRoomDetails } from "@/lib
 export async function GET() {
   try {
     const supabaseAdmin = getSupabaseAdmin();
-    const { data: rooms, error } = await supabaseAdmin
-      .from("rooms")
-      .select("*");
+    const [{ data: rooms, error }, { data: units }] = await Promise.all([
+      supabaseAdmin.from("rooms").select("*"),
+      supabaseAdmin.from("room_units").select("room_id").is("deleted_at", null)
+    ]);
 
     if (error) {
       return NextResponse.json({
@@ -15,7 +16,19 @@ export async function GET() {
       });
     }
 
-    return NextResponse.json({ rooms: mergeRoomCatalogRooms(rooms ?? []) });
+    const unitsCountByRoom: Record<string, number> = {};
+    if (units) {
+      for (const unit of units) {
+        unitsCountByRoom[unit.room_id] = (unitsCountByRoom[unit.room_id] || 0) + 1;
+      }
+    }
+
+    const roomsWithUnits = (rooms ?? []).map((room) => ({
+      ...room,
+      total_units: unitsCountByRoom[room.id] || 0,
+    }));
+
+    return NextResponse.json({ rooms: mergeRoomCatalogRooms(roomsWithUnits) });
   } catch {
     return NextResponse.json({
       rooms: getStaticRooms().map((room) => resolveRoomDetails(room.id)),
