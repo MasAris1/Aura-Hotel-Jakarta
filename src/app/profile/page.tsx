@@ -55,7 +55,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
   }
 
   // Fetch room names manually due to missing foreign key constraint
-  let bookings = [];
+  let bookings: any[] = [];
   if (rawBookings && rawBookings.length > 0) {
     const roomIds = Array.from(new Set(rawBookings.map(b => b.room_id).filter(Boolean)));
     const { data: rooms } = await supabase
