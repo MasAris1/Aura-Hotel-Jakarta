@@ -37,18 +37,43 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
 
   const profile = await ensureProfileForUser(supabase, user);
 
-  const { data: bookings } = await supabase
+  const { data: rawBookings, error } = await supabase
     .from("bookings")
     .select(`
       id,
+      room_id,
       check_in,
       check_out,
       total_price,
-      status,
-      rooms ( name )
+      status
     `)
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching bookings:", error);
+  }
+
+  // Fetch room names manually due to missing foreign key constraint
+  let bookings = [];
+  if (rawBookings && rawBookings.length > 0) {
+    const roomIds = Array.from(new Set(rawBookings.map(b => b.room_id).filter(Boolean)));
+    const { data: rooms } = await supabase
+      .from("rooms")
+      .select("id, name")
+      .in("id", roomIds);
+      
+    const roomMap = new Map((rooms || []).map(r => [r.id, r.name]));
+    
+    bookings = rawBookings.map(b => ({
+      id: b.id,
+      check_in: b.check_in,
+      check_out: b.check_out,
+      total_price: b.total_price,
+      status: b.status,
+      rooms: b.room_id ? { name: roomMap.get(b.room_id) || "Kamar tidak diketahui" } : null
+    }));
+  }
 
   const fullName =
     `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim() ||
