@@ -124,7 +124,17 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url)
     }
 
-    if (user && needsTwoFactor && !hasCompletedTwoFactor && (needsAuthentication || isAuthPage)) {
+    const isAuthCallback = pathname === '/auth/callback'
+    const isSignoutApi = pathname === '/api/auth/signout'
+
+    if (
+        user &&
+        needsTwoFactor &&
+        !hasCompletedTwoFactor &&
+        !isTwoFactorPage &&
+        !isAuthCallback &&
+        !isSignoutApi
+    ) {
         if (needsProtectedApiAuthentication) {
             return NextResponse.json(
                 { error: 'Two-factor verification required' },
@@ -133,9 +143,13 @@ export async function updateSession(request: NextRequest) {
         }
 
         const url = request.nextUrl.clone()
-        const redirectUrl = isAuthPage
-            ? request.nextUrl.searchParams.get('redirect')
-            : pathname + request.nextUrl.search
+        let redirectUrl = '/'
+        if (isAuthPage) {
+            const userProfile = await getProfileForUser(supabase, user.id)
+            redirectUrl = request.nextUrl.searchParams.get('redirect') || getRoleHomePath(userProfile?.role)
+        } else {
+            redirectUrl = pathname + request.nextUrl.search
+        }
 
         url.pathname = '/verify-2fa'
         url.search = `?redirect=${encodeURIComponent(redirectUrl || '/')}`

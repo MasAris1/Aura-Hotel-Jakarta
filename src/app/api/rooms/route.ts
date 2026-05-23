@@ -7,7 +7,7 @@ export async function GET() {
     const supabaseAdmin = getSupabaseAdmin();
     const [{ data: rooms, error }, { data: units }] = await Promise.all([
       supabaseAdmin.from("rooms").select("*"),
-      supabaseAdmin.from("room_units").select("room_id").is("deleted_at", null)
+      supabaseAdmin.from("room_units").select("room_id").is("deleted_at", null).eq("status", "AVAILABLE")
     ]);
 
     if (error) {
