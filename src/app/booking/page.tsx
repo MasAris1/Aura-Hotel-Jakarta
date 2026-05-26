@@ -5,6 +5,7 @@ import { useState, useEffect, useTransition, Suspense } from "react";
 import { ArrowLeft, ArrowRight, Calendar, CheckCircle2, ChevronRight, CreditCard, Download, Info, Loader2, Sparkles, User, UserCheck } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import QRCode from "qrcode";
 import {
     CLIENT_WARMUP_KEYS,
     deriveGuestIdentity,
@@ -69,6 +70,7 @@ function BookingForm() {
     const [bookingSuccess, setBookingSuccess] = useState(false);
     const [createdBookingId, setCreatedBookingId] = useState<string | null>(null);
     const [bookingStatus, setBookingStatus] = useState<string>("UNPAID");
+    const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
     const [user, setUser] = useState<AuthUser | null>(null);
     const [isAuthorizing, setIsAuthorizing] = useState(true);
 
@@ -184,6 +186,22 @@ function BookingForm() {
             if (intervalId) clearInterval(intervalId);
         };
     }, [bookingSuccess, createdBookingId]);
+
+    useEffect(() => {
+        if (createdBookingId && (bookingStatus === "PAID" || bookingStatus === "SUCCESS")) {
+            QRCode.toDataURL(`aura-voucher-${createdBookingId}`, {
+                errorCorrectionLevel: "M",
+                margin: 1,
+                width: 150,
+                color: {
+                    dark: "#000000",
+                    light: "#FFFFFF",
+                },
+            })
+            .then((url) => setQrCodeUrl(url))
+            .catch((err) => console.error("Error generating QR code:", err));
+        }
+    }, [createdBookingId, bookingStatus]);
 
     useEffect(() => {
         let isMounted = true;
@@ -445,11 +463,17 @@ function BookingForm() {
                         {/* QR Code Section */}
                         <div className="p-2 bg-white rounded-xl mb-4 flex items-center justify-center transition-all duration-300 shadow-md">
                             {bookingStatus === "PAID" || bookingStatus === "SUCCESS" ? (
-                                <img
-                                    alt="QR Code"
-                                    className="w-28 h-28 grayscale contrast-125 select-none"
-                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=aura-voucher-${createdBookingId}&color=000000`}
-                                />
+                                qrCodeUrl ? (
+                                    <img
+                                        alt="QR Code"
+                                        className="w-28 h-28 grayscale contrast-125 select-none"
+                                        src={qrCodeUrl}
+                                    />
+                                ) : (
+                                    <div className="w-28 h-28 flex items-center justify-center">
+                                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                                    </div>
+                                )
                             ) : (
                                 <div className="w-28 h-28 flex flex-col items-center justify-center bg-zinc-950 text-foreground/50 border border-dashed border-primary/20 rounded-lg">
                                     <Loader2 className="w-6 h-6 animate-spin text-primary mb-2" />
@@ -480,7 +504,7 @@ function BookingForm() {
                         {bookingStatus === "PAID" || bookingStatus === "SUCCESS" ? (
                             <>
                                 <Download className="w-4 h-4" />
-                                Unduh E-Voucher (PDF)
+                                Unduh Tiket (PDF)
                             </>
                         ) : (
                             <>

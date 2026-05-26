@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { BedDouble, Calendar, Download, Eye, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { BedDouble, Calendar, Download, Eye, X, Loader2 } from "lucide-react";
+import QRCode from "qrcode";
 
 type Booking = {
   id: string;
@@ -54,6 +55,25 @@ function getStatusColor(status: string | null) {
 
 export function BookingHistory({ bookings }: { bookings: Booking[] }) {
   const [activeTicket, setActiveTicket] = useState<Booking | null>(null);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
+
+  useEffect(() => {
+    if (activeTicket) {
+      QRCode.toDataURL(`aura-voucher-${activeTicket.id}`, {
+        errorCorrectionLevel: "M",
+        margin: 1,
+        width: 150,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      })
+      .then((url) => setQrCodeUrl(url))
+      .catch((err) => console.error("Error generating QR code:", err));
+    } else {
+      setQrCodeUrl("");
+    }
+  }, [activeTicket]);
 
   if (!bookings || bookings.length === 0) {
     return (
@@ -139,7 +159,7 @@ export function BookingHistory({ bookings }: { bookings: Booking[] }) {
                 className="inline-flex items-center gap-2 border border-border hover:border-primary px-4 py-2.5 font-inter text-[11px] uppercase tracking-wider text-foreground transition-all cursor-pointer font-medium bg-transparent"
               >
                 <Download className="h-3.5 w-3.5" />
-                Unduh Voucher
+                Unduh Tiket
               </a>
             </div>
           )}
@@ -222,11 +242,17 @@ export function BookingHistory({ bookings }: { bookings: Booking[] }) {
 
               {/* QR Code Section */}
               <div className="p-2 bg-white rounded-xl mb-4 flex items-center justify-center shadow-md">
-                <img
-                  alt="QR Code"
-                  className="w-28 h-28 grayscale contrast-125 select-none"
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=aura-voucher-${activeTicket.id}&color=000000`}
-                />
+                {qrCodeUrl ? (
+                  <img
+                    alt="QR Code"
+                    className="w-28 h-28 grayscale contrast-125 select-none"
+                    src={qrCodeUrl}
+                  />
+                ) : (
+                  <div className="w-28 h-28 flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                  </div>
+                )}
               </div>
               <p className="text-[9px] font-sans tracking-[0.2em] text-foreground/35 uppercase text-center font-light mb-6">Tunjukkan voucher saat Check-in</p>
 
@@ -237,7 +263,7 @@ export function BookingHistory({ bookings }: { bookings: Booking[] }) {
                   className="flex-1 bg-primary border border-primary text-primary-foreground font-sans text-[10px] tracking-[0.2em] uppercase py-3.5 text-center transition-all flex items-center justify-center gap-2 font-medium"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  Unduh (PDF)
+                  Unduh Tiket
                 </a>
                 <button
                   onClick={() => setActiveTicket(null)}

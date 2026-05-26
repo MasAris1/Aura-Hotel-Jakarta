@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import QRCode from "qrcode";
 import { createClient } from "@/utils/supabase/server";
 import { getProfileForUser, isStaffRole } from "@/lib/auth";
 import { getSupabaseAdmin } from "@/utils/supabase/admin";
@@ -91,63 +92,272 @@ export async function GET(
     const page = pdf.addPage([595.28, 841.89]);
     const boldFont = await pdf.embedFont(StandardFonts.HelveticaBold);
     const regularFont = await pdf.embedFont(StandardFonts.Helvetica);
-    const gold = rgb(0.78, 0.62, 0.29);
-    const white = rgb(0.95, 0.95, 0.95);
-    const soft = rgb(0.72, 0.72, 0.72);
-    const dark = rgb(0.08, 0.09, 0.12);
-    let y = 770;
+    const serifBold = await pdf.embedFont(StandardFonts.TimesRomanBold);
+    const serifRegular = await pdf.embedFont(StandardFonts.TimesRoman);
 
-    page.drawRectangle({ x: 0, y: 0, width: 595.28, height: 841.89, color: dark });
-    page.drawRectangle({ x: 42, y: 710, width: 511.28, height: 84, color: rgb(0.1, 0.11, 0.15), borderColor: gold, borderWidth: 1 });
-    page.drawText("Aura Hotel", { x: 58, y: y, size: 28, font: boldFont, color: gold });
-    page.drawText("Reservation E-Voucher", { x: 58, y: y - 30, size: 15, font: regularFont, color: white });
-    page.drawText(`Generated ${new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" }).format(new Date())}`, {
-      x: 58,
-      y: y - 52,
-      size: 10,
-      font: regularFont,
-      color: soft,
+    const darkBackground = rgb(0.035, 0.035, 0.043); // #09090b
+    const cardBackground = rgb(0.05, 0.05, 0.06); // #0d0d0f
+    const gold = rgb(0.83, 0.69, 0.28); // #d4af37
+    const white = rgb(1, 1, 1);
+    const muted = rgb(0.63, 0.63, 0.67); // #a1a1aa
+
+    // Draw Page Background
+    page.drawRectangle({
+      x: 0,
+      y: 0,
+      width: 595.28,
+      height: 841.89,
+      color: darkBackground,
     });
 
-    y = 640;
-    const lines = [
-      ["Booking ID", booking.id],
-      ["Guest Name", `${booking.first_name ?? ""} ${booking.last_name ?? ""}`.trim() || "-"],
-      ["Email", booking.email ?? "-"],
-      ["Room", room.name],
-      ["Room Type", room.type],
-      ["Check-in", formatDate(booking.check_in)],
-      ["Check-out", formatDate(booking.check_out)],
-      ["Total", formatCurrency(booking.total_price)],
-      ["Status", booking.status ?? "-"],
-    ];
+    // Draw Card Background
+    page.drawRectangle({
+      x: 97.64,
+      y: 70.95,
+      width: 400,
+      height: 700,
+      color: cardBackground,
+      borderColor: gold,
+      borderWidth: 1.5,
+    });
 
-    for (const [label, value] of lines) {
-      page.drawText(label, { x: 58, y, size: 11, font: boldFont, color: gold });
-      page.drawText(value, { x: 200, y, size: 11, font: regularFont, color: white });
-      y -= 34;
+    const guestName = `${booking.first_name ?? ""} ${booking.last_name ?? ""}`.trim() || booking.email?.split("@")[0] || "Guest";
+
+    // 1. Guest Name
+    page.drawText("NAMA TAMU", {
+      x: 120,
+      y: 735,
+      size: 8,
+      font: boldFont,
+      color: muted,
+    });
+    page.drawText(guestName, {
+      x: 120,
+      y: 708,
+      size: 18,
+      font: serifBold,
+      color: gold,
+    });
+
+    // Draw Status Pill on the top right
+    const statusText = (booking.status === "PAID" || booking.status === "SUCCESS") ? "TERBAYAR" : (booking.status ?? "UNKNOWN");
+    const statusTextWidth = boldFont.widthOfTextAtSize(statusText, 8);
+    const pillWidth = statusTextWidth + 16;
+    const pillHeight = 18;
+    const pillX = 497.64 - 20 - pillWidth;
+    const pillY = 718;
+
+    let pillBgColor = rgb(0.18, 0.13, 0.06);
+    let pillBorderColor = rgb(0.45, 0.32, 0.06);
+    let pillTextColor = rgb(0.8, 0.6, 0.2);
+
+    if (booking.status === "PAID" || booking.status === "SUCCESS" || booking.status === "CONFIRMED") {
+      pillBgColor = rgb(0.06, 0.18, 0.13);
+      pillBorderColor = rgb(0.06, 0.45, 0.32);
+      pillTextColor = rgb(0.2, 0.8, 0.6);
     }
 
-    page.drawLine({
-      start: { x: 58, y: y - 6 },
-      end: { x: 537, y: y - 6 },
-      thickness: 1,
-      color: rgb(0.2, 0.2, 0.24),
+    page.drawRectangle({
+      x: pillX,
+      y: pillY,
+      width: pillWidth,
+      height: pillHeight,
+      color: pillBgColor,
+      borderColor: pillBorderColor,
+      borderWidth: 1,
     });
-    page.drawText(
-      "Please present this voucher together with a valid identification document during check-in.",
-      { x: 58, y: y - 36, size: 10, font: regularFont, color: soft },
-    );
+
+    page.drawText(statusText, {
+      x: pillX + 8,
+      y: pillY + 5,
+      size: 8,
+      font: boldFont,
+      color: pillTextColor,
+    });
+
+    // Draw Header Separator
+    page.drawLine({
+      start: { x: 97.64, y: 685 },
+      end: { x: 497.64, y: 685 },
+      thickness: 1,
+      color: rgb(0.15, 0.16, 0.2),
+    });
+
+    // 2. Booking ID & Room Type Row
+    page.drawText("ID BOOKING", {
+      x: 120,
+      y: 655,
+      size: 8,
+      font: boldFont,
+      color: muted,
+    });
+    page.drawText(`#${booking.id.split("-")[0].toUpperCase()}`, {
+      x: 120,
+      y: 638,
+      size: 11,
+      font: boldFont,
+      color: white,
+    });
+
+    page.drawText("TIPE KAMAR", {
+      x: 320,
+      y: 655,
+      size: 8,
+      font: boldFont,
+      color: muted,
+    });
+    page.drawText(room.type || "Room", {
+      x: 320,
+      y: 638,
+      size: 11,
+      font: regularFont,
+      color: white,
+    });
+
+    // 3. Accommodation Row
+    page.drawText("AKOMODASI", {
+      x: 120,
+      y: 598,
+      size: 8,
+      font: boldFont,
+      color: muted,
+    });
+    page.drawText(room.name || "Kamar tidak diketahui", {
+      x: 120,
+      y: 576,
+      size: 15,
+      font: serifRegular,
+      color: white,
+    });
+
+    // Draw fields separator
+    page.drawLine({
+      start: { x: 120, y: 555 },
+      end: { x: 475, y: 555 },
+      thickness: 0.5,
+      color: rgb(0.15, 0.16, 0.2),
+    });
+
+    // 4. Check-in & Check-out Row
+    page.drawText("CHECK-IN", {
+      x: 120,
+      y: 532,
+      size: 8,
+      font: boldFont,
+      color: muted,
+    });
+    page.drawText(formatDate(booking.check_in), {
+      x: 120,
+      y: 515,
+      size: 11,
+      font: regularFont,
+      color: white,
+    });
+
+    page.drawText("CHECK-OUT", {
+      x: 320,
+      y: 532,
+      size: 8,
+      font: boldFont,
+      color: muted,
+    });
+    page.drawText(formatDate(booking.check_out), {
+      x: 320,
+      y: 515,
+      size: 11,
+      font: regularFont,
+      color: white,
+    });
+
+    // 5. Perforation Line
+    // Left notch circle
+    page.drawCircle({
+      x: 97.64,
+      y: 470,
+      size: 20,
+      color: darkBackground,
+    });
+    // Right notch circle
+    page.drawCircle({
+      x: 497.64,
+      y: 470,
+      size: 20,
+      color: darkBackground,
+    });
+    // Dashed line
+    const startX = 115;
+    const endX = 480;
+    const dashLength = 4;
+    const gapLength = 6;
+    for (let currentX = startX; currentX < endX; currentX += (dashLength + gapLength)) {
+      page.drawLine({
+        start: { x: currentX, y: 470 },
+        end: { x: Math.min(currentX + dashLength, endX), y: 470 },
+        thickness: 1,
+        color: gold,
+      });
+    }
+
+    // Helper for centering text
+    const drawCenteredText = (text: string, yVal: number, size: number, font: any, color: any) => {
+      const textWidth = font.widthOfTextAtSize(text, size);
+      page.drawText(text, {
+        x: 297.64 - textWidth / 2,
+        y: yVal,
+        size,
+        font,
+        color,
+      });
+    };
+
+    // 6. Total Pembayaran
+    drawCenteredText("TOTAL PEMBAYARAN", 430, 8, boldFont, muted);
+    drawCenteredText(formatCurrency(booking.total_price), 402, 22, serifBold, gold);
+
+    // 7. QR Code Card
+    // Generate QR code PNG buffer
+    const qrCodeBuffer = await QRCode.toBuffer(`aura-voucher-${booking.id}`, {
+      errorCorrectionLevel: "M",
+      margin: 1,
+      width: 220,
+      color: {
+        dark: "#000000",
+        light: "#FFFFFF",
+      },
+    });
+    const qrImage = await pdf.embedPng(qrCodeBuffer);
+
+    // Draw white background card for QR Code
+    page.drawRectangle({
+      x: 236.64,
+      y: 230,
+      width: 122,
+      height: 122,
+      color: white,
+    });
+    
+    // Draw QR code image
+    page.drawImage(qrImage, {
+      x: 242.64,
+      y: 236,
+      width: 110,
+      height: 110,
+    });
+
+    // 8. Footer Instructions
+    drawCenteredText("TUNJUKKAN VOUCHER SAAT CHECK-IN", 195, 8, boldFont, muted);
+    drawCenteredText("AURA HOTEL JAKARTA", 160, 10, serifBold, gold);
 
     const bytes = await pdf.save();
     return new NextResponse(Buffer.from(bytes), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="aura-voucher-${booking.id}.pdf"`,
+        "Content-Disposition": `attachment; filename="aura-ticket-${booking.id}.pdf"`,
       },
     });
-  } catch {
+  } catch (err) {
+    console.error("Error generating PDF:", err);
     return NextResponse.json({ error: "Failed to generate voucher" }, { status: 500 });
   }
 }
