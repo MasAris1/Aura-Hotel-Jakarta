@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useTransition, Suspense } from "react";
-import { ArrowLeft, ArrowRight, Calendar, CheckCircle2, ChevronRight, CreditCard, Info, Loader2, Sparkles, User, UserCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, CheckCircle2, ChevronRight, CreditCard, Download, Info, Loader2, Sparkles, User, UserCheck } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -38,6 +38,19 @@ function isValidDateRange(checkIn: string, checkOut: string) {
     return new Date(`${checkOut}T00:00:00`) > new Date(`${checkIn}T00:00:00`);
 }
 
+function formatDateLocal(dateString: string) {
+    if (!dateString) return "-";
+    try {
+        return new Intl.DateTimeFormat("id-ID", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        }).format(new Date(`${dateString}T00:00:00`));
+    } catch {
+        return dateString;
+    }
+}
+
 function formatRupiah(value?: number | null) {
     return typeof value === "number" && Number.isFinite(value)
         ? `IDR ${value.toLocaleString("id-ID")}`
@@ -54,6 +67,8 @@ function BookingForm() {
     const [step, setStep] = useState<Step>(1);
     const [isPending, startTransition] = useTransition();
     const [bookingSuccess, setBookingSuccess] = useState(false);
+    const [createdBookingId, setCreatedBookingId] = useState<string | null>(null);
+    const [bookingStatus, setBookingStatus] = useState<string>("UNPAID");
     const [user, setUser] = useState<AuthUser | null>(null);
     const [isAuthorizing, setIsAuthorizing] = useState(true);
 
@@ -135,6 +150,40 @@ function BookingForm() {
 
         void checkUser();
     }, [roomId, router]);
+
+    useEffect(() => {
+        if (!bookingSuccess || !createdBookingId) return;
+
+        const supabase = createClient();
+        let intervalId: NodeJS.Timeout;
+
+        const checkStatus = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from("bookings")
+                    .select("status")
+                    .eq("id", createdBookingId)
+                    .single();
+
+                if (data && data.status) {
+                    setBookingStatus(data.status);
+                    if (data.status === "PAID" || data.status === "SUCCESS") {
+                        clearInterval(intervalId);
+                    }
+                }
+            } catch (err) {
+                console.error("Error polling booking status:", err);
+            }
+        };
+
+        // Poll immediately, then every 2 seconds
+        void checkStatus();
+        intervalId = setInterval(checkStatus, 2000);
+
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
+    }, [bookingSuccess, createdBookingId]);
 
     useEffect(() => {
         let isMounted = true;
@@ -293,8 +342,11 @@ function BookingForm() {
                         return;
                     }
 
+                    setCreatedBookingId(data.bookingId);
+
                     window.snap.pay(data.token, {
                         onSuccess: () => {
+                            setCreatedBookingId(data.bookingId);
                             setBookingSuccess(true);
                         },
                         onPending: () => {
@@ -317,27 +369,147 @@ function BookingForm() {
 
     if (bookingSuccess) {
         return (
-            <div className="text-center max-w-md w-full mx-auto py-12">
-                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8">
-                    <CheckCircle2 className="w-10 h-10 text-primary" />
+            <div className="max-w-2xl w-full mx-auto py-12 px-4 flex flex-col items-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                    <CheckCircle2 className="w-8 h-8 text-primary animate-bounce" />
                 </div>
-                <h1 className="font-serif text-3xl md:text-4xl mb-4 text-foreground">Reservasi Diterima</h1>
-                <p className="font-sans text-foreground/60 mb-10 leading-relaxed font-light">
-                    Terima kasih telah memilih The Royal Horizon. Detail reservasi dan instruksi kedatangan telah dikirimkan ke email Anda.
+                <h1 className="font-serif text-3xl md:text-4xl mb-2 text-center text-foreground">Reservasi Diterima</h1>
+                <p className="font-sans text-sm text-foreground/60 mb-10 text-center leading-relaxed font-light max-w-md">
+                    Terima kasih telah memilih Aura Hotel Jakarta. Reservasi Anda telah masuk ke dalam sistem kami.
                 </p>
-                <div className="flex flex-col gap-4">
-                    <Link
-                        href="/profile"
-                        className="bg-primary text-primary-foreground py-4 font-sans text-xs tracking-[0.2em] uppercase hover:bg-primary/90 transition-colors text-center"
+
+                {/* Interactive Luxury Ticket */}
+                <div className="w-full max-w-[480px] bg-zinc-950/70 border border-primary/20 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(212,175,71,0.08)] relative backdrop-blur-md transition-transform duration-500 hover:scale-[1.01]">
+                    {/* Ticket Header */}
+                    <div className="p-6 border-b border-primary/10 flex justify-between items-start">
+                        <div>
+                            <p className="text-[10px] font-sans tracking-[0.2em] text-foreground/45 uppercase mb-1">Nama Tamu</p>
+                            <p className="font-serif text-lg text-primary">{firstName} {lastName}</p>
+                        </div>
+                        <div className={`px-3 py-1 border font-sans text-[10px] tracking-wider uppercase transition-all duration-300 ${
+                            bookingStatus === "PAID" || bookingStatus === "SUCCESS"
+                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-medium"
+                                : "border-amber-500/30 bg-amber-500/10 text-amber-400 animate-pulse font-medium"
+                        }`}>
+                            {bookingStatus === "PAID" || bookingStatus === "SUCCESS" ? "TERBAYAR" : "MEMVERIFIKASI"}
+                        </div>
+                    </div>
+
+                    {/* Ticket Body */}
+                    <div className="p-6 space-y-6">
+                        <div className="grid grid-cols-2 gap-6">
+                            <div>
+                                <p className="text-[10px] font-sans tracking-[0.2em] text-foreground/45 uppercase mb-1">ID Booking</p>
+                                <p className="font-sans text-sm text-foreground font-semibold uppercase tracking-wider">
+                                    #{createdBookingId ? createdBookingId.split("-")[0].toUpperCase() : "-"}
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-sans tracking-[0.2em] text-foreground/45 uppercase mb-1">Tipe Kamar</p>
+                                <p className="font-sans text-sm text-foreground font-medium">{room.type}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-sans tracking-[0.2em] text-foreground/45 uppercase mb-1">Akomodasi</p>
+                            <p className="font-serif text-xl text-foreground font-light">{room.name}</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-6 border-t border-primary/10 pt-6">
+                            <div>
+                                <p className="text-[10px] font-sans tracking-[0.2em] text-foreground/45 uppercase mb-1">Check-In</p>
+                                <p className="font-sans text-sm text-foreground">{formatDateLocal(checkIn)}</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-sans tracking-[0.2em] text-foreground/45 uppercase mb-1">Check-Out</p>
+                                <p className="font-sans text-sm text-foreground">{formatDateLocal(checkOut)}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Perforation Line */}
+                    <div className="relative h-6 flex items-center bg-transparent select-none">
+                        {/* Left notch */}
+                        <div className="absolute -left-3 w-6 h-6 bg-background rounded-full border-r border-primary/20"></div>
+                        {/* Dashed line */}
+                        <div className="w-full border-t border-dashed border-primary/30 mx-4"></div>
+                        {/* Right notch */}
+                        <div className="absolute -right-3 w-6 h-6 bg-background rounded-full border-l border-primary/20"></div>
+                    </div>
+
+                    {/* Ticket Footer */}
+                    <div className="p-6 flex flex-col items-center bg-black/40 border-t border-primary/5">
+                        <div className="mb-6 text-center">
+                            <p className="text-[10px] font-sans tracking-[0.2em] text-foreground/45 uppercase mb-1">Total Pembayaran</p>
+                            <p className="font-serif text-2xl text-primary tracking-tighter font-semibold">{formatRupiah(quote?.totalPrice)}</p>
+                        </div>
+
+                        {/* QR Code Section */}
+                        <div className="p-2 bg-white rounded-xl mb-4 flex items-center justify-center transition-all duration-300 shadow-md">
+                            {bookingStatus === "PAID" || bookingStatus === "SUCCESS" ? (
+                                <img
+                                    alt="QR Code"
+                                    className="w-28 h-28 grayscale contrast-125 select-none"
+                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=aura-voucher-${createdBookingId}&color=000000`}
+                                />
+                            ) : (
+                                <div className="w-28 h-28 flex flex-col items-center justify-center bg-zinc-950 text-foreground/50 border border-dashed border-primary/20 rounded-lg">
+                                    <Loader2 className="w-6 h-6 animate-spin text-primary mb-2" />
+                                    <span className="text-[9px] uppercase tracking-widest text-center px-2">Verifikasi</span>
+                                </div>
+                            )}
+                        </div>
+                        <p className="text-[9px] font-sans tracking-[0.2em] text-foreground/35 uppercase text-center font-light">Tunjukkan voucher saat Check-in</p>
+                    </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col gap-4 w-full max-w-[480px] mt-8">
+                    <a
+                        href={bookingStatus === "PAID" || bookingStatus === "SUCCESS" ? `/api/vouchers/${createdBookingId}` : undefined}
+                        onClick={(e) => {
+                            if (bookingStatus !== "PAID" && bookingStatus !== "SUCCESS") {
+                                e.preventDefault();
+                                alert("Pembayaran belum diverifikasi. Mohon tunggu beberapa saat.");
+                            }
+                        }}
+                        className={`w-full font-sans text-[11px] tracking-[0.25em] uppercase py-4 text-center transition-all flex items-center justify-center gap-2 border font-medium ${
+                            bookingStatus === "PAID" || bookingStatus === "SUCCESS"
+                                ? "bg-primary border-primary text-primary-foreground hover:bg-primary/95 cursor-pointer"
+                                : "bg-muted border-border text-muted-foreground cursor-not-allowed opacity-60"
+                        }`}
                     >
-                        Ke Profil
-                    </Link>
-                    <Link
-                        href="/"
-                        className="text-foreground/50 hover:text-foreground py-2 font-sans text-xs tracking-[0.2em] uppercase transition-colors text-center"
-                    >
-                        Kembali ke Beranda
-                    </Link>
+                        {bookingStatus === "PAID" || bookingStatus === "SUCCESS" ? (
+                            <>
+                                <Download className="w-4 h-4" />
+                                Unduh E-Voucher (PDF)
+                            </>
+                        ) : (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                                Menunggu Verifikasi Pembayaran...
+                            </>
+                        )}
+                    </a>
+
+                    {bookingStatus !== "PAID" && bookingStatus !== "SUCCESS" && (
+                        <p className="text-[11px] font-sans text-center text-foreground/40 leading-relaxed max-w-sm mx-auto font-light">
+                            Verifikasi otomatis sedang berjalan. Jika status tidak berubah dalam beberapa detik, silakan periksa riwayat reservasi Anda di profil.
+                        </p>
+                    )}
+
+                    <div className="flex gap-4 mt-2">
+                        <Link
+                            href="/profile"
+                            className="flex-1 border border-border text-foreground/75 py-4 font-sans text-[10px] tracking-[0.2em] uppercase hover:border-primary/50 hover:text-foreground transition-all text-center font-medium"
+                        >
+                            Ke Profil
+                        </Link>
+                        <Link
+                            href="/"
+                            className="flex-1 border border-transparent text-foreground/50 hover:text-foreground py-4 font-sans text-[10px] tracking-[0.2em] uppercase transition-all text-center font-medium"
+                        >
+                            Ke Beranda
+                        </Link>
+                    </div>
                 </div>
             </div>
         );

@@ -45,7 +45,10 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       check_in,
       check_out,
       total_price,
-      status
+      status,
+      first_name,
+      last_name,
+      email
     `)
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
@@ -60,19 +63,28 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     const roomIds = Array.from(new Set(rawBookings.map(b => b.room_id).filter((id): id is string => id != null)));
     const { data: rooms } = await supabase
       .from("rooms")
-      .select("id, name")
+      .select("id, name, type")
       .in("id", roomIds);
       
-    const roomMap = new Map((rooms || []).map(r => [r.id, r.name]));
+    const roomMap = new Map((rooms || []).map(r => [r.id, r]));
     
-    bookings = rawBookings.map(b => ({
-      id: b.id,
-      check_in: b.check_in,
-      check_out: b.check_out,
-      total_price: b.total_price,
-      status: b.status,
-      rooms: b.room_id ? { name: roomMap.get(b.room_id) || "Kamar tidak diketahui" } : null
-    }));
+    bookings = rawBookings.map(b => {
+      const room = b.room_id ? roomMap.get(b.room_id) : null;
+      return {
+        id: b.id,
+        check_in: b.check_in,
+        check_out: b.check_out,
+        total_price: b.total_price,
+        status: b.status,
+        first_name: b.first_name,
+        last_name: b.last_name,
+        email: b.email,
+        rooms: b.room_id ? {
+          name: room?.name || "Kamar tidak diketahui",
+          type: room?.type || "Luxury Room"
+        } : null
+      };
+    });
   }
 
   const fullName =
