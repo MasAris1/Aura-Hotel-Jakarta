@@ -29,6 +29,7 @@ import {
   isCuratedRoomId,
   resolveRoomDetails,
 } from "@/lib/roomCatalog";
+import { formatPaymentType } from "@/lib/transactions";
 import { AuditLogsPanel } from "@/components/admin/AuditLogsPanel";
 import { BookingManagementPanel } from "@/components/admin/BookingManagementPanel";
 import { FacilityManagementPanel } from "@/components/admin/FacilityManagementPanel";
@@ -91,7 +92,9 @@ type RecentBookingRow = Pick<
   | "check_out"
   | "total_price"
   | "status"
->;
+> & {
+  transactions: Array<{ payment_type: string | null }> | null;
+};
 
 type AdminPeriod = "month" | "3m" | "6m" | "1y";
 
@@ -288,7 +291,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     supabaseAdmin
       .from("bookings")
       .select(
-        "id, created_at, room_id, first_name, last_name, email, check_in, check_out, total_price, status",
+        "id, created_at, room_id, first_name, last_name, email, check_in, check_out, total_price, status, transactions ( payment_type )",
       )
       .gte("created_at", `${periodRange.from}T00:00:00`)
       .lte("created_at", `${periodRange.to}T23:59:59`)
@@ -571,6 +574,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                     <TableHead className="text-white/55">Tamu</TableHead>
                     <TableHead className="text-white/55">Tanggal</TableHead>
                     <TableHead className="text-white/55">Status</TableHead>
+                    <TableHead className="text-white/55">Jenis Pembayaran</TableHead>
                     <TableHead className="text-right text-white/55">Total</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -624,6 +628,11 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                           >
                             {status.replace("_", " ")}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-white/70 text-sm">
+                            {formatPaymentType(booking.transactions?.[0]?.payment_type)}
+                          </span>
                         </TableCell>
                         <TableCell className="text-right font-medium text-white">
                           {formatCurrency(Number(booking.total_price ?? 0))}

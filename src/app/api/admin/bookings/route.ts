@@ -16,9 +16,9 @@ const bookingSchema = z.object({
 });
 
 const bookingSelect =
-  "id, user_id, room_id, first_name, last_name, email, special_requests, check_in, check_out, total_price, status, deleted_at, created_at, updated_at";
+  "id, user_id, room_id, first_name, last_name, email, special_requests, check_in, check_out, total_price, status, deleted_at, created_at, updated_at, transactions ( payment_type )";
 
-function normalizeBooking(booking: Record<string, unknown>) {
+function normalizeBooking(booking: Record<string, any>) {
   return {
     id: String(booking.id ?? ""),
     user_id: typeof booking.user_id === "string" ? booking.user_id : null,
@@ -35,6 +35,7 @@ function normalizeBooking(booking: Record<string, unknown>) {
     deleted_at: typeof booking.deleted_at === "string" ? booking.deleted_at : null,
     created_at: typeof booking.created_at === "string" ? booking.created_at : null,
     updated_at: typeof booking.updated_at === "string" ? booking.updated_at : null,
+    transactions: booking.transactions ?? null,
   };
 }
 
@@ -52,7 +53,7 @@ export async function GET() {
   if (result.error) {
     result = await access.supabaseAdmin
       .from("bookings")
-      .select("*")
+      .select(bookingSelect)
       .order("created_at", { ascending: false });
   }
 

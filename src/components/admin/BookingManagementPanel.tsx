@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { fetchAdmin } from "@/lib/adminFetch";
+import { formatPaymentType } from "@/lib/transactions";
 
 type AdminRoom = {
   id: string;
@@ -26,6 +27,7 @@ type AdminBooking = {
   deleted_at: string | null;
   created_at: string | null;
   updated_at: string | null;
+  transactions?: Array<{ payment_type: string | null }> | null;
 };
 
 type BookingStatus =
@@ -490,7 +492,11 @@ export function BookingManagementPanel() {
               <div>
                 <p className="font-medium text-white">#{booking.id.slice(0, 8)} - {getGuestName(booking)}</p>
                 <p className="mt-1 text-sm text-white/55">{booking.email ?? "Email kosong"}</p>
-                <p className="mt-2 text-xs text-white/35">{room?.name ?? booking.room_id ?? "Kamar tidak tersedia"}</p>
+                <div className="mt-2 flex items-center gap-1.5 text-xs text-white/35">
+                  <span>{room?.name ?? booking.room_id ?? "Kamar tidak tersedia"}</span>
+                  <span>•</span>
+                  <span>{formatPaymentType(booking.transactions?.[0]?.payment_type)}</span>
+                </div>
               </div>
               <div>
                 <p className="text-[11px] uppercase tracking-[0.18em] text-white/42">Tanggal</p>

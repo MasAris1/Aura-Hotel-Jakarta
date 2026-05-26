@@ -59,6 +59,49 @@ function BookingForm() {
 
     const [checkIn, setCheckIn] = useState("");
     const [checkOut, setCheckOut] = useState("");
+    const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
+    const [customDuration, setCustomDuration] = useState("");
+
+    const calculateCheckOutDate = (checkInDate: string, days: number) => {
+        if (!checkInDate) return "";
+        const date = new Date(`${checkInDate}T00:00:00`);
+        date.setDate(date.getDate() + days);
+        return date.toISOString().slice(0, 10);
+    };
+
+    const handleSelectDuration = (days: number) => {
+        setSelectedDuration(days);
+        setCustomDuration("");
+        if (checkIn) {
+            setCheckOut(calculateCheckOutDate(checkIn, days));
+        }
+    };
+
+    const handleCustomDurationChange = (val: string) => {
+        setCustomDuration(val);
+        const days = parseInt(val, 10);
+        if (!isNaN(days) && days > 0) {
+            setSelectedDuration(days);
+            if (checkIn) {
+                setCheckOut(calculateCheckOutDate(checkIn, days));
+            }
+        } else {
+            setSelectedDuration(null);
+        }
+    };
+
+    const handleCheckInChange = (val: string) => {
+        setCheckIn(val);
+        if (selectedDuration && val) {
+            setCheckOut(calculateCheckOutDate(val, selectedDuration));
+        }
+    };
+
+    const handleCheckOutChange = (val: string) => {
+        setCheckOut(val);
+        setSelectedDuration(null);
+        setCustomDuration("");
+    };
     const [firstName, setFirstName] = useState(cachedIdentity?.firstName || "");
     const [lastName, setLastName] = useState(cachedIdentity?.lastName || "");
     const [specialRequests, setSpecialRequests] = useState("");
@@ -333,13 +376,45 @@ function BookingForm() {
                         <h2 className="font-serif text-2xl mb-8 flex items-center gap-3 text-foreground">
                             <Calendar className="w-6 h-6 text-primary" /> Pilih Jadwal Menginap
                         </h2>
+                        {/* Pilihan Durasi Menginap */}
+                        <div className="mb-8 space-y-3">
+                            <label className="block text-[10px] font-sans tracking-[0.2em] uppercase text-foreground/50">Durasi Menginap</label>
+                            <div className="flex flex-wrap items-center gap-3">
+                                {[1, 2, 3].map((days) => (
+                                    <button
+                                        key={days}
+                                        type="button"
+                                        onClick={() => handleSelectDuration(days)}
+                                        className={`px-5 py-3 font-sans text-xs tracking-wider uppercase border transition-all ${
+                                            selectedDuration === days && !customDuration
+                                                ? "border-primary bg-primary/10 text-primary font-medium"
+                                                : "border-border bg-muted/30 text-foreground/70 hover:border-foreground/30 hover:text-foreground"
+                                        }`}
+                                    >
+                                        {days} Hari
+                                    </button>
+                                ))}
+                                <div className="flex items-center gap-2 pl-2 border-l border-border">
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={customDuration}
+                                        onChange={(e) => handleCustomDurationChange(e.target.value)}
+                                        placeholder="Kustom"
+                                        className="w-20 bg-muted/50 border border-border px-3 py-2.5 font-sans text-xs focus:outline-none focus:border-primary transition-colors text-foreground text-center"
+                                    />
+                                    <span className="font-sans text-[11px] text-foreground/50">hari</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                             <div className="space-y-3">
                                 <label className="block text-[10px] font-sans tracking-[0.2em] uppercase text-foreground/50">Check-In</label>
                                 <input 
                                     type="date" 
                                     value={checkIn}
-                                    onChange={(e) => setCheckIn(e.target.value)}
+                                    onChange={(e) => handleCheckInChange(e.target.value)}
                                     min={today}
                                     className="w-full bg-muted/50 border border-border p-4 font-sans text-sm focus:outline-none focus:border-primary transition-colors text-foreground" 
                                 />
@@ -349,7 +424,7 @@ function BookingForm() {
                                 <input 
                                     type="date" 
                                     value={checkOut}
-                                    onChange={(e) => setCheckOut(e.target.value)}
+                                    onChange={(e) => handleCheckOutChange(e.target.value)}
                                     min={checkIn || today}
                                     className="w-full bg-muted/50 border border-border p-4 font-sans text-sm focus:outline-none focus:border-primary transition-colors text-foreground" 
                                 />

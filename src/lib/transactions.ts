@@ -151,3 +151,38 @@ export async function ensureTransactionForBooking(
     status: mapBookingStatusToTransactionStatus(booking.status),
   });
 }
+
+export function formatPaymentType(paymentType: string | null | undefined): string {
+  if (!paymentType) return "-";
+
+  const type = paymentType.toLowerCase();
+
+  if (type.startsWith("bank_transfer_")) {
+    const bank = type.replace("bank_transfer_", "").toUpperCase();
+    return `Transfer Bank (${bank})`;
+  }
+
+  switch (type) {
+    case "bank_transfer":
+      return "Transfer Bank";
+    case "credit_card":
+      return "Kartu Kredit";
+    case "gopay":
+      return "GoPay";
+    case "qris":
+      return "QRIS";
+    case "shopeepay":
+      return "ShopeePay";
+    case "echannel":
+      return "Transfer Bank (Mandiri)";
+    case "midtrans":
+      return "Midtrans";
+    default:
+      // Capitalize first letter of each word
+      return paymentType
+        .split(/[_-]/)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+  }
+}
+

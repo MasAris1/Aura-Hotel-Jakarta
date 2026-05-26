@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { requireAdminApi } from "@/lib/adminApi";
 import { resolveRoomDetails } from "@/lib/roomCatalog";
+import { formatPaymentType } from "@/lib/transactions";
 
 type AdminPeriod = "month" | "3m" | "6m" | "1y";
 type BookingExportRow = {
@@ -15,6 +16,7 @@ type BookingExportRow = {
   check_out: string;
   total_price: number | null;
   status: string | null;
+  transactions?: Array<{ payment_type: string | null }> | null;
 };
 type RoomExportRow = {
   id: string;
@@ -116,7 +118,7 @@ export async function GET(request: Request) {
 
     let query = supabaseAdmin
       .from("bookings")
-      .select("id, created_at, room_id, first_name, last_name, email, check_in, check_out, total_price, status")
+      .select("id, created_at, room_id, first_name, last_name, email, check_in, check_out, total_price, status, transactions ( payment_type )")
       .order("created_at", { ascending: false });
 
     if (status && status !== "ALL") {
@@ -172,6 +174,7 @@ export async function GET(request: Request) {
       "check_out",
       "total_price",
       "status",
+      "payment_type",
     ];
 
     const rows = bookingRows.map((booking) => {
@@ -187,6 +190,7 @@ export async function GET(request: Request) {
         capacity: bookingRoom?.capacity ?? 1,
       });
       const guestName = `${booking.first_name ?? ""} ${booking.last_name ?? ""}`.trim();
+      const paymentType = booking.transactions?.[0]?.payment_type;
 
       return [
         booking.id,
@@ -199,6 +203,7 @@ export async function GET(request: Request) {
         booking.check_out,
         booking.total_price,
         booking.status ?? "",
+        formatPaymentType(paymentType),
       ];
     });
 

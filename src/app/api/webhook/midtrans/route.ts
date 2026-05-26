@@ -34,6 +34,11 @@ type MidtransWebhookPayload = {
     fraud_status?: string;
     transaction_id?: string;
     payment_type?: string;
+    va_numbers?: Array<{
+        bank: string;
+        va_number: string;
+    }>;
+    permata_va_number?: string;
 };
 
 function getErrorMessage(error: unknown) {
@@ -91,10 +96,21 @@ export async function POST(req: Request) {
         const numericAmount = Number(body.gross_amount);
         const roomName = resolveRoomDetails(booking.room_id).name;
 
+        let paymentType = body.payment_type ?? "midtrans";
+        if (paymentType === "bank_transfer") {
+            if (body.va_numbers && body.va_numbers.length > 0 && body.va_numbers[0].bank) {
+                paymentType = `bank_transfer_${body.va_numbers[0].bank}`;
+            } else if (body.permata_va_number) {
+                paymentType = "bank_transfer_permata";
+            }
+        } else if (paymentType === "echannel") {
+            paymentType = "bank_transfer_mandiri";
+        }
+
         await upsertBookingTransaction(supabase, {
             bookingId: order_id,
             amount: Number.isFinite(numericAmount) ? numericAmount : null,
-            paymentType: body.payment_type ?? "midtrans",
+            paymentType,
             status: outcome.transactionStatus,
         });
 
