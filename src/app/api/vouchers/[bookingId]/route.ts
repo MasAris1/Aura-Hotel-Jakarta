@@ -6,7 +6,7 @@ import { getProfileForUser, isStaffRole } from "@/lib/auth";
 import { getSupabaseAdmin } from "@/utils/supabase/admin";
 import { resolveRoomDetails } from "@/lib/roomCatalog";
 
-const eligibleStatuses = new Set(["PAID", "CHECKED_IN", "CHECKED_OUT"]);
+const eligibleStatuses = new Set(["PAID"]);
 
 function formatCurrency(amount: number | null | undefined) {
   return new Intl.NumberFormat("id-ID", {

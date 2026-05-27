@@ -35,7 +35,7 @@ const periodOptions: Array<{ value: AdminPeriod; months: number }> = [
   { value: "1y", months: 12 },
 ];
 
-const settledStatuses = new Set(["PAID", "CHECKED_IN", "CHECKED_OUT"]);
+const settledStatuses = new Set(["PAID"]);
 
 function escapeCsvValue(value: string | number | null | undefined) {
   const normalized = value == null ? "" : String(value);
@@ -234,79 +234,212 @@ export async function GET(request: Request) {
       const page = pdf.addPage([595.28, 841.89]);
       const boldFont = await pdf.embedFont(StandardFonts.HelveticaBold);
       const regularFont = await pdf.embedFont(StandardFonts.Helvetica);
+      
       const gold = rgb(0.78, 0.62, 0.29);
-      const white = rgb(0.95, 0.95, 0.95);
-      const soft = rgb(0.68, 0.68, 0.72);
-      const dark = rgb(0.08, 0.09, 0.12);
-      let y = 770;
+      const white = rgb(0.95, 0.95, 0.97);
+      const soft = rgb(0.60, 0.63, 0.70);
+      const dark = rgb(0.06, 0.07, 0.10);
+      const cardBg = rgb(0.11, 0.13, 0.18);
+      const border = rgb(0.20, 0.22, 0.28);
 
       page.drawRectangle({ x: 0, y: 0, width: 595.28, height: 841.89, color: dark });
-      page.drawRectangle({
-        x: 42,
-        y: 710,
-        width: 511.28,
-        height: 84,
-        color: rgb(0.1, 0.11, 0.15),
-        borderColor: gold,
-        borderWidth: 1,
-      });
-      page.drawText("Aura Hotel Jakarta", { x: 58, y, size: 24, font: boldFont, color: gold });
-      page.drawText("Admin Booking Report", { x: 58, y: y - 28, size: 14, font: regularFont, color: white });
-      page.drawText(`Generated ${formatDateTime(new Date())}`, {
-        x: 58,
-        y: y - 50,
-        size: 10,
-        font: regularFont,
-        color: soft,
-      });
+      
+      // 1. Header Block
+      page.drawRectangle({ x: 42, y: 700, width: 6, height: 80, color: gold });
+      page.drawText("Aura Hotel Jakarta", { x: 60, y: 755, size: 24, font: boldFont, color: gold });
+      page.drawText("Laporan Operasional & Reservasi", { x: 60, y: 735, size: 12, font: boldFont, color: white });
+      page.drawText(`Dicetak pada: ${formatDateTime(new Date())}`, { x: 60, y: 715, size: 9, font: regularFont, color: soft });
 
-      y = 660;
-      const summaryLines = [
-        ["Period", `${formatDate(dateFrom)} - ${formatDate(dateTo)}`],
-        ["Status Filter", status && status !== "ALL" ? status : "ALL"],
-        ["Total Bookings", String(totalBookings)],
-        ["Gross Booking Value", formatCurrency(grossValue)],
-        ["Realized Revenue", formatCurrency(realizedRevenue)],
-      ];
+      // 2. Metadata Horizontal Strip
+      page.drawLine({ start: { x: 42, y: 685 }, end: { x: 553, y: 685 }, thickness: 1, color: border });
+      page.drawText(`Periode: ${formatDate(dateFrom)} - ${formatDate(dateTo)}`, { x: 42, y: 670, size: 9, font: boldFont, color: white });
+      page.drawText(`Filter Status: ${status && status !== "ALL" ? status : "SEMUA"}`, { x: 260, y: 670, size: 9, font: boldFont, color: gold });
+      page.drawText(`Total Data: ${totalBookings} Reservasi`, { x: 440, y: 670, size: 9, font: boldFont, color: white });
+      page.drawLine({ start: { x: 42, y: 655 }, end: { x: 553, y: 655 }, thickness: 1, color: border });
 
-      for (const [label, value] of summaryLines) {
-        page.drawText(label, { x: 58, y, size: 11, font: boldFont, color: gold });
-        page.drawText(value, { x: 210, y, size: 11, font: regularFont, color: white });
-        y -= 28;
-      }
+      // 3. KPI Cards (3 Columns)
+      // Card 1: Total Bookings
+      page.drawRectangle({ x: 42, y: 575, width: 159, height: 65, color: cardBg, borderColor: border, borderWidth: 1 });
+      page.drawText("TOTAL RESERVASI", { x: 52, y: 622, size: 8, font: boldFont, color: soft });
+      page.drawText(String(totalBookings), { x: 52, y: 590, size: 20, font: boldFont, color: white });
 
-      y -= 14;
-      page.drawText("Status Summary", { x: 58, y, size: 14, font: boldFont, color: white });
-      y -= 24;
+      // Card 2: Gross Value
+      page.drawRectangle({ x: 217, y: 575, width: 159, height: 65, color: cardBg, borderColor: border, borderWidth: 1 });
+      page.drawText("GROSS BOOKING VALUE", { x: 227, y: 622, size: 8, font: boldFont, color: soft });
+      page.drawText(formatCurrency(grossValue), { x: 227, y: 590, size: 12.5, font: boldFont, color: gold });
 
-      for (const [bookingStatus, value] of Array.from(statusMap.entries()).slice(0, 8)) {
-        page.drawText(bookingStatus, { x: 58, y, size: 10, font: boldFont, color: gold });
-        page.drawText(`${value.count} bookings`, { x: 190, y, size: 10, font: regularFont, color: white });
-        page.drawText(formatCurrency(value.amount), { x: 320, y, size: 10, font: regularFont, color: white });
-        y -= 20;
-      }
+      // Card 3: Realized Revenue
+      page.drawRectangle({ x: 392, y: 575, width: 161, height: 65, color: cardBg, borderColor: border, borderWidth: 1 });
+      page.drawText("REALIZED REVENUE", { x: 402, y: 622, size: 8, font: boldFont, color: soft });
+      page.drawText(formatCurrency(realizedRevenue), { x: 402, y: 590, size: 12.5, font: boldFont, color: rgb(0.2, 0.75, 0.4) });
 
-      y -= 14;
-      page.drawText("Recent Bookings", { x: 58, y, size: 14, font: boldFont, color: white });
-      y -= 24;
+      // 4. Status Summary Table & Horizontal Bar Chart
+      page.drawText("ANALISIS STATUS RESERVASI", { x: 42, y: 540, size: 11, font: boldFont, color: gold });
+      page.drawLine({ start: { x: 42, y: 532 }, end: { x: 553, y: 532 }, thickness: 1, color: border });
 
-      for (const row of rows.slice(0, 18)) {
-        const [bookingId, , , roomName, guestName, , checkIn, checkOut, totalPrice, bookingStatus] = row;
-        const line = `#${String(bookingId).slice(0, 8)}  ${guestName || "-"}  ${roomName || "-"}  ${formatDate(String(checkIn))}-${formatDate(String(checkOut))}  ${bookingStatus}`;
+      // Left Column: Table Headers
+      page.drawText("STATUS", { x: 48, y: 515, size: 8.5, font: boldFont, color: soft });
+      page.drawText("QTY", { x: 148, y: 515, size: 8.5, font: boldFont, color: soft });
+      page.drawText("TOTAL BIAYA", { x: 198, y: 515, size: 8.5, font: boldFont, color: soft });
+      page.drawLine({ start: { x: 42, y: 507 }, end: { x: 290, y: 507 }, thickness: 0.8, color: border });
 
-        page.drawText(line.slice(0, 88), { x: 58, y, size: 8.5, font: regularFont, color: soft });
-        page.drawText(formatCurrency(Number(totalPrice ?? 0)), {
-          x: 438,
-          y,
-          size: 8.5,
-          font: regularFont,
-          color: white,
-        });
-        y -= 18;
-
-        if (y < 54) {
-          break;
+      let rowY = 492;
+      const statusEntries = Array.from(statusMap.entries());
+      statusEntries.forEach(([bookingStatus, value], idx) => {
+        if (idx % 2 === 0) {
+          page.drawRectangle({ x: 42, y: rowY - 4, width: 248, height: 18, color: cardBg });
         }
+        page.drawText(bookingStatus, { x: 48, y: rowY, size: 8, font: boldFont, color: white });
+        page.drawText(`${value.count}x`, { x: 148, y: rowY, size: 8, font: regularFont, color: white });
+        page.drawText(formatCurrency(value.amount), { x: 198, y: rowY, size: 8, font: regularFont, color: white });
+        rowY -= 20;
+      });
+
+      // Right Column: Bar Chart
+      let chartY = 515;
+      statusEntries.forEach(([bookingStatus, value]) => {
+        const percentage = totalBookings > 0 ? (value.count / totalBookings) : 0;
+        page.drawText(bookingStatus, { x: 312, y: chartY, size: 8, font: boldFont, color: soft });
+        page.drawText(`${Math.round(percentage * 100)}%`, { x: 520, y: chartY, size: 8, font: boldFont, color: white });
+        
+        // Background bar
+        page.drawRectangle({ x: 312, y: chartY - 10, width: 200, height: 6, color: cardBg });
+        // Filled bar
+        const fillBarColor = bookingStatus === "PAID" ? rgb(0.2, 0.7, 0.3) : rgb(0.8, 0.5, 0.1);
+        if (percentage > 0) {
+          page.drawRectangle({ x: 312, y: chartY - 10, width: 200 * percentage, height: 6, color: fillBarColor });
+        }
+        chartY -= 20;
+      });
+
+      let y = Math.min(rowY, chartY) - 15;
+
+      // 5. Recent Bookings Section
+      page.drawText("DAFTAR TRANSAKSI RESERVASI", { x: 42, y, size: 11, font: boldFont, color: gold });
+      page.drawLine({ start: { x: 42, y: y - 8 }, end: { x: 553, y: y - 8 }, thickness: 1, color: border });
+      y -= 25;
+
+      page.drawText("BOOKING ID", { x: 48, y, size: 8.5, font: boldFont, color: soft });
+      page.drawText("TAMU / EMAIL", { x: 118, y, size: 8.5, font: boldFont, color: soft });
+      page.drawText("KAMAR", { x: 218, y, size: 8.5, font: boldFont, color: soft });
+      page.drawText("PERIODE IN - OUT", { x: 318, y, size: 8.5, font: boldFont, color: soft });
+      page.drawText("STATUS", { x: 438, y, size: 8.5, font: boldFont, color: soft });
+      page.drawText("TOTAL BIAYA", { x: 503, y, size: 8.5, font: boldFont, color: soft });
+      page.drawLine({ start: { x: 42, y: y - 5 }, end: { x: 553, y: y - 5 }, thickness: 0.8, color: border });
+      y -= 22;
+
+      let currentPage = page;
+      let pageNumber = 1;
+      const pages = [page];
+
+      const createNewPage = () => {
+        const newPage = pdf.addPage([595.28, 841.89]);
+        newPage.drawRectangle({ x: 0, y: 0, width: 595.28, height: 841.89, color: dark });
+        
+        // Draw simplified header
+        newPage.drawText("Aura Hotel Jakarta — Booking Report (Cont.)", { x: 42, y: 800, size: 10, font: boldFont, color: gold });
+        newPage.drawLine({ start: { x: 42, y: 792 }, end: { x: 553, y: 792 }, thickness: 1, color: border });
+
+        // Draw table headers
+        newPage.drawText("BOOKING ID", { x: 48, y: 775, size: 8.5, font: boldFont, color: soft });
+        newPage.drawText("TAMU / EMAIL", { x: 118, y: 775, size: 8.5, font: boldFont, color: soft });
+        newPage.drawText("KAMAR", { x: 218, y: 775, size: 8.5, font: boldFont, color: soft });
+        newPage.drawText("PERIODE IN - OUT", { x: 318, y: 775, size: 8.5, font: boldFont, color: soft });
+        newPage.drawText("STATUS", { x: 438, y: 775, size: 8.5, font: boldFont, color: soft });
+        newPage.drawText("TOTAL BIAYA", { x: 503, y: 775, size: 8.5, font: boldFont, color: soft });
+        newPage.drawLine({ start: { x: 42, y: 767 }, end: { x: 553, y: 767 }, thickness: 0.8, color: border });
+
+        pages.push(newPage);
+        pageNumber += 1;
+        return { newPage, startY: 745 };
+      };
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const bookingId = String(row[0]);
+        const roomName = String(row[3]);
+        const guestName = String(row[4]);
+        const email = String(row[5]);
+        const checkIn = String(row[6]);
+        const checkOut = String(row[7]);
+        const totalPrice = Number(row[8] ?? 0);
+        const bookingStatus = String(row[9] ?? "UNPAID");
+        const paymentType = String(row[10]);
+
+        if (y < 60) {
+          const res = createNewPage();
+          currentPage = res.newPage;
+          y = res.startY;
+        }
+
+        if (i % 2 === 0) {
+          currentPage.drawRectangle({
+            x: 42,
+            y: y - 5,
+            width: 511.28,
+            height: 22,
+            color: cardBg
+          });
+        }
+
+        // Column 1: ID
+        currentPage.drawText(`#${bookingId.slice(0, 8)}`, { x: 48, y: y + 2, size: 8, font: boldFont, color: white });
+
+        // Column 2: Guest / Email
+        const truncatedGuest = guestName.length > 18 ? guestName.slice(0, 16) + ".." : guestName;
+        const truncatedEmail = email.length > 20 ? email.slice(0, 18) + ".." : email;
+        currentPage.drawText(truncatedGuest || "-", { x: 118, y: y + 5, size: 8, font: boldFont, color: white });
+        currentPage.drawText(truncatedEmail || "-", { x: 118, y: y - 3, size: 7, font: regularFont, color: soft });
+
+        // Column 3: Room Name
+        const truncatedRoom = roomName.length > 20 ? roomName.slice(0, 18) + ".." : roomName;
+        currentPage.drawText(truncatedRoom || "-", { x: 218, y: y + 2, size: 8, font: regularFont, color: white });
+
+        // Column 4: Stay Period & Payment Type
+        currentPage.drawText(`${formatDate(checkIn)} - ${formatDate(checkOut)}`, { x: 318, y: y + 5, size: 7.5, font: regularFont, color: white });
+        currentPage.drawText(paymentType || "-", { x: 318, y: y - 3, size: 7, font: regularFont, color: soft });
+
+        // Column 5: Status Badge
+        const badgeColor = bookingStatus === "PAID" ? rgb(0.1, 0.45, 0.2) : rgb(0.55, 0.35, 0.05);
+        currentPage.drawRectangle({
+          x: 438,
+          y: y - 2,
+          width: 45,
+          height: 12,
+          color: badgeColor
+        });
+        currentPage.drawText(bookingStatus, {
+          x: 438 + (45 - boldFont.widthOfTextAtSize(bookingStatus, 6.5)) / 2,
+          y: y + 1,
+          size: 6.5,
+          font: boldFont,
+          color: white
+        });
+
+        // Column 6: Total Price
+        currentPage.drawText(formatCurrency(totalPrice), { x: 503, y: y + 2, size: 8, font: boldFont, color: white });
+
+        y -= 25;
+      }
+
+      const totalPages = pages.length;
+      for (let i = 0; i < totalPages; i++) {
+        const p = pages[i];
+        p.drawLine({ start: { x: 42, y: 40 }, end: { x: 553, y: 40 }, thickness: 0.8, color: border });
+        p.drawText(`Halaman ${i + 1} dari ${totalPages}`, {
+          x: 553 - regularFont.widthOfTextAtSize(`Halaman ${i + 1} dari ${totalPages}`, 8),
+          y: 26,
+          size: 8,
+          font: regularFont,
+          color: soft
+        });
+        p.drawText("Aura Hotel Jakarta — Laporan Keuangan & Reservasi", {
+          x: 42,
+          y: 26,
+          size: 8,
+          font: regularFont,
+          color: soft
+        });
       }
 
       const bytes = await pdf.save();

@@ -23,11 +23,7 @@ export function mapBookingStatusToTransactionStatus(
 ) {
   switch (status) {
     case "PAID":
-    case "CHECKED_IN":
-    case "CHECKED_OUT":
       return TRANSACTION_STATUSES.paid;
-    case "REFUNDED":
-      return TRANSACTION_STATUSES.refunded;
     case "EXPIRED":
       return TRANSACTION_STATUSES.expired;
     case "UNPAID":
@@ -99,7 +95,7 @@ export function resolveMidtransStatuses(
 
   if (transactionStatus === "refund" || transactionStatus === "partial_refund") {
     return {
-      bookingStatus: "REFUNDED",
+      bookingStatus: "EXPIRED",
       transactionStatus: TRANSACTION_STATUSES.refunded,
       isSuccess: false,
     };

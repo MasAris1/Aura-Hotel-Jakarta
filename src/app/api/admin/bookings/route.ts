@@ -12,7 +12,7 @@ const bookingSchema = z.object({
   check_in: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   check_out: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   total_price: z.number().nonnegative("Total price must be valid"),
-  status: z.enum(["UNPAID", "PAID", "CHECKED_IN", "CHECKED_OUT", "EXPIRED", "REFUNDED"]),
+  status: z.enum(["UNPAID", "PAID", "EXPIRED"]),
 });
 
 const bookingSelect =

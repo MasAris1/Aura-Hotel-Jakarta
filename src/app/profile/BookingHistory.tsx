@@ -143,9 +143,7 @@ export function BookingHistory({ bookings }: { bookings: Booking[] }) {
           {/* Action buttons for eligible bookings */}
           {(booking.status?.toUpperCase() === "PAID" ||
             booking.status?.toUpperCase() === "SUCCESS" ||
-            booking.status?.toUpperCase() === "CONFIRMED" ||
-            booking.status?.toUpperCase() === "CHECKED_IN" ||
-            booking.status?.toUpperCase() === "CHECKED_OUT") && (
+            booking.status?.toUpperCase() === "CONFIRMED") && (
             <div className="mt-6 flex flex-wrap gap-3 border-t border-border pt-4 justify-end">
               <button
                 onClick={() => setActiveTicket(booking)}

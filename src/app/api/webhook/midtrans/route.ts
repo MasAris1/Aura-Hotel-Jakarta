@@ -9,10 +9,7 @@ import { revalidateRoomPages } from "@/lib/revalidate";
 type BookingStatus =
     | "UNPAID"
     | "PAID"
-    | "EXPIRED"
-    | "REFUNDED"
-    | "CHECKED_IN"
-    | "CHECKED_OUT";
+    | "EXPIRED";
 
 type WebhookBooking = {
     id: string;
@@ -89,10 +86,7 @@ export async function POST(req: Request) {
         const isSuccess = outcome.isSuccess;
         const isAlreadyFinal =
             booking.status === 'PAID' ||
-            booking.status === 'CHECKED_IN' ||
-            booking.status === 'CHECKED_OUT' ||
-            booking.status === 'EXPIRED' ||
-            booking.status === 'REFUNDED';
+            booking.status === 'EXPIRED';
         const numericAmount = Number(body.gross_amount);
         const roomName = resolveRoomDetails(booking.room_id).name;
 
@@ -144,7 +138,7 @@ export async function POST(req: Request) {
             });
 
             // Sinkronisasi status room_units
-            if (newStatus === 'EXPIRED' || newStatus === 'REFUNDED') {
+            if (newStatus === 'EXPIRED') {
                 await supabase.from('room_units').update({
                     status: 'AVAILABLE',
                     current_guest_name: null,
@@ -155,24 +149,6 @@ export async function POST(req: Request) {
                 .eq('room_id', booking.room_id ?? '')
                 .eq('current_guest_email', booking.email)
                 .in('status', ['RESERVED', 'OCCUPIED']);
-            } else if (newStatus === 'CHECKED_IN') {
-                await supabase.from('room_units').update({
-                    status: 'OCCUPIED'
-                })
-                .eq('room_id', booking.room_id ?? '')
-                .eq('current_guest_email', booking.email)
-                .eq('status', 'RESERVED');
-            } else if (newStatus === 'CHECKED_OUT') {
-                await supabase.from('room_units').update({
-                    status: 'CLEANING',
-                    current_guest_name: null,
-                    current_guest_email: null,
-                    check_in: null,
-                    check_out: null
-                })
-                .eq('room_id', booking.room_id ?? '')
-                .eq('current_guest_email', booking.email)
-                .eq('status', 'OCCUPIED');
             }
 
             booking.status = newStatus;

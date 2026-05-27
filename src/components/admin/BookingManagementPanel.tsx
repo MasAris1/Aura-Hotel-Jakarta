@@ -33,10 +33,7 @@ type AdminBooking = {
 type BookingStatus =
   | "UNPAID"
   | "PAID"
-  | "CHECKED_IN"
-  | "CHECKED_OUT"
-  | "EXPIRED"
-  | "REFUNDED";
+  | "EXPIRED";
 
 type BookingFormState = {
   id?: string;
@@ -63,10 +60,7 @@ type RoomsResponse = {
 const statusOptions: BookingStatus[] = [
   "UNPAID",
   "PAID",
-  "CHECKED_IN",
-  "CHECKED_OUT",
   "EXPIRED",
-  "REFUNDED",
 ];
 
 const emptyForm: BookingFormState = {

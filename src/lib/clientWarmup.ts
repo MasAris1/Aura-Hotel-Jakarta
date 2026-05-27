@@ -10,10 +10,7 @@ export type RoomInfo = {
 export type BookingStatus =
   | "UNPAID"
   | "PAID"
-  | "CHECKED_IN"
-  | "CHECKED_OUT"
-  | "EXPIRED"
-  | "REFUNDED";
+  | "EXPIRED";
 
 export type UserProfile = {
   first_name?: string | null;
