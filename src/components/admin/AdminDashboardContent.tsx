@@ -466,16 +466,17 @@ export function AdminDashboardContent({
             <button
               type="submit"
               name="format"
-              value="csv"
+              value="xlsx"
               className={adminPrimaryButtonClassName}
             >
               <Download className="size-4" />
-              Export CSV
+              Export Excel
             </button>
             <button
               type="submit"
               name="format"
               value="pdf"
+              formTarget="_blank"
               className={adminOutlineButtonClassName}
             >
               <FileText className="size-4" />

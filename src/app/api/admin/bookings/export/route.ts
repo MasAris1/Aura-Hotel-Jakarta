@@ -3,6 +3,7 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { requireAdminApi } from "@/lib/adminApi";
 import { resolveRoomDetails } from "@/lib/roomCatalog";
 import { formatPaymentType } from "@/lib/transactions";
+import * as XLSX from "xlsx";
 
 type AdminPeriod = "month" | "3m" | "6m" | "1y";
 type BookingExportRow = {
@@ -109,7 +110,7 @@ export async function GET(request: Request) {
 
     const requestUrl = new URL(request.url);
     const status = requestUrl.searchParams.get("status");
-    const format = requestUrl.searchParams.get("format") === "pdf" ? "pdf" : "csv";
+    const format = requestUrl.searchParams.get("format") === "pdf" ? "pdf" : "xlsx";
     const period = normalizePeriod(requestUrl.searchParams.get("period"));
     const periodRange = getPeriodRange(period);
     const dateFrom = requestUrl.searchParams.get("dateFrom") ?? periodRange.from;
@@ -235,79 +236,183 @@ export async function GET(request: Request) {
       const boldFont = await pdf.embedFont(StandardFonts.HelveticaBold);
       const regularFont = await pdf.embedFont(StandardFonts.Helvetica);
       
-      const gold = rgb(0.78, 0.62, 0.29);
-      const white = rgb(0.95, 0.95, 0.97);
-      const soft = rgb(0.60, 0.63, 0.70);
-      const dark = rgb(0.06, 0.07, 0.10);
-      const cardBg = rgb(0.11, 0.13, 0.18);
-      const border = rgb(0.20, 0.22, 0.28);
+      const primaryDark = rgb(0.1, 0.1, 0.1);
+      const secondaryDark = rgb(0.25, 0.25, 0.25);
+      const mutedText = rgb(0.45, 0.45, 0.45);
+      const brandGold = rgb(0.78, 0.62, 0.29);
+      const brandBlue = rgb(0.08, 0.18, 0.36);
+      const lightBg = rgb(0.96, 0.96, 0.97);
+      const borderCol = rgb(0.85, 0.85, 0.85);
+      const white = rgb(1, 1, 1);
 
-      page.drawRectangle({ x: 0, y: 0, width: 595.28, height: 841.89, color: dark });
+      // 1. Kop Surat (Header)
+      page.drawRectangle({
+        x: 42,
+        y: 745,
+        width: 45,
+        height: 45,
+        color: brandGold,
+      });
+      page.drawText("A", {
+        x: 54,
+        y: 757,
+        size: 24,
+        font: boldFont,
+        color: white,
+      });
+
+      page.drawText("AURA HOTEL JAKARTA", {
+        x: 95,
+        y: 775,
+        size: 16,
+        font: boldFont,
+        color: brandBlue,
+      });
+      page.drawText("Jl. Jenderal Sudirman Kav. 21, Jakarta Pusat 10220, Indonesia", {
+        x: 95,
+        y: 762,
+        size: 8,
+        font: regularFont,
+        color: secondaryDark,
+      });
+      page.drawText("Telp: (021) 555-8888  |  Email: info@aurahoteljakarta.com  |  Website: www.aurahoteljakarta.com", {
+        x: 95,
+        y: 749,
+        size: 8,
+        font: regularFont,
+        color: secondaryDark,
+      });
+
+      page.drawLine({
+        start: { x: 42, y: 735 },
+        end: { x: 553, y: 735 },
+        thickness: 1.5,
+        color: brandBlue,
+      });
+      page.drawLine({
+        start: { x: 42, y: 731 },
+        end: { x: 553, y: 731 },
+        thickness: 0.5,
+        color: borderCol,
+      });
+
+      // 2. Report Title & Metadata
+      page.drawText("LAPORAN OPERASIONAL & RESERVASI", {
+        x: 42,
+        y: 705,
+        size: 12,
+        font: boldFont,
+        color: brandBlue,
+      });
       
-      // 1. Header Block
-      page.drawRectangle({ x: 42, y: 700, width: 6, height: 80, color: gold });
-      page.drawText("Aura Hotel Jakarta", { x: 60, y: 755, size: 24, font: boldFont, color: gold });
-      page.drawText("Laporan Operasional & Reservasi", { x: 60, y: 735, size: 12, font: boldFont, color: white });
-      page.drawText(`Dicetak pada: ${formatDateTime(new Date())}`, { x: 60, y: 715, size: 9, font: regularFont, color: soft });
+      page.drawText(`Periode: ${formatDate(dateFrom)} s/d ${formatDate(dateTo)}`, {
+        x: 42,
+        y: 690,
+        size: 8.5,
+        font: regularFont,
+        color: primaryDark,
+      });
+      page.drawText(`Filter Status: ${status && status !== "ALL" ? status : "SEMUA"}`, {
+        x: 42,
+        y: 678,
+        size: 8.5,
+        font: regularFont,
+        color: primaryDark,
+      });
+      page.drawText(`Dicetak pada: ${formatDateTime(new Date())}`, {
+        x: 350,
+        y: 690,
+        size: 8.5,
+        font: regularFont,
+        color: mutedText,
+      });
+      page.drawText(`Total Data: ${totalBookings} Reservasi`, {
+        x: 350,
+        y: 678,
+        size: 8.5,
+        font: regularFont,
+        color: primaryDark,
+      });
 
-      // 2. Metadata Horizontal Strip
-      page.drawLine({ start: { x: 42, y: 685 }, end: { x: 553, y: 685 }, thickness: 1, color: border });
-      page.drawText(`Periode: ${formatDate(dateFrom)} - ${formatDate(dateTo)}`, { x: 42, y: 670, size: 9, font: boldFont, color: white });
-      page.drawText(`Filter Status: ${status && status !== "ALL" ? status : "SEMUA"}`, { x: 260, y: 670, size: 9, font: boldFont, color: gold });
-      page.drawText(`Total Data: ${totalBookings} Reservasi`, { x: 440, y: 670, size: 9, font: boldFont, color: white });
-      page.drawLine({ start: { x: 42, y: 655 }, end: { x: 553, y: 655 }, thickness: 1, color: border });
+      page.drawLine({
+        start: { x: 42, y: 665 },
+        end: { x: 553, y: 665 },
+        thickness: 0.8,
+        color: borderCol,
+      });
 
       // 3. KPI Cards (3 Columns)
-      // Card 1: Total Bookings
-      page.drawRectangle({ x: 42, y: 575, width: 159, height: 65, color: cardBg, borderColor: border, borderWidth: 1 });
-      page.drawText("TOTAL RESERVASI", { x: 52, y: 622, size: 8, font: boldFont, color: soft });
-      page.drawText(String(totalBookings), { x: 52, y: 590, size: 20, font: boldFont, color: white });
+      const cardW = 163.76;
+      const cardH = 50;
+      const cardY = 605;
 
-      // Card 2: Gross Value
-      page.drawRectangle({ x: 217, y: 575, width: 159, height: 65, color: cardBg, borderColor: border, borderWidth: 1 });
-      page.drawText("GROSS BOOKING VALUE", { x: 227, y: 622, size: 8, font: boldFont, color: soft });
-      page.drawText(formatCurrency(grossValue), { x: 227, y: 590, size: 12.5, font: boldFont, color: gold });
+      page.drawRectangle({
+        x: 42,
+        y: cardY,
+        width: cardW,
+        height: cardH,
+        color: lightBg,
+        borderColor: borderCol,
+        borderWidth: 1,
+      });
+      page.drawText("TOTAL RESERVASI", { x: 50, y: cardY + 38, size: 7.5, font: boldFont, color: mutedText });
+      page.drawText(String(totalBookings), { x: 50, y: cardY + 12, size: 18, font: boldFont, color: primaryDark });
 
-      // Card 3: Realized Revenue
-      page.drawRectangle({ x: 392, y: 575, width: 161, height: 65, color: cardBg, borderColor: border, borderWidth: 1 });
-      page.drawText("REALIZED REVENUE", { x: 402, y: 622, size: 8, font: boldFont, color: soft });
-      page.drawText(formatCurrency(realizedRevenue), { x: 402, y: 590, size: 12.5, font: boldFont, color: rgb(0.2, 0.75, 0.4) });
+      page.drawRectangle({
+        x: 215.76,
+        y: cardY,
+        width: cardW,
+        height: cardH,
+        color: lightBg,
+        borderColor: borderCol,
+        borderWidth: 1,
+      });
+      page.drawText("GROSS BOOKING VALUE", { x: 223.76, y: cardY + 38, size: 7.5, font: boldFont, color: mutedText });
+      page.drawText(formatCurrency(grossValue), { x: 223.76, y: cardY + 12, size: 11.5, font: boldFont, color: brandBlue });
+
+      page.drawRectangle({
+        x: 389.52,
+        y: cardY,
+        width: cardW,
+        height: cardH,
+        color: lightBg,
+        borderColor: borderCol,
+        borderWidth: 1,
+      });
+      page.drawText("REALIZED REVENUE", { x: 397.52, y: cardY + 38, size: 7.5, font: boldFont, color: mutedText });
+      page.drawText(formatCurrency(realizedRevenue), { x: 397.52, y: cardY + 12, size: 11.5, font: boldFont, color: rgb(0.1, 0.5, 0.2) });
 
       // 4. Status Summary Table & Horizontal Bar Chart
-      page.drawText("ANALISIS STATUS RESERVASI", { x: 42, y: 540, size: 11, font: boldFont, color: gold });
-      page.drawLine({ start: { x: 42, y: 532 }, end: { x: 553, y: 532 }, thickness: 1, color: border });
+      page.drawText("ANALISIS STATUS RESERVASI", { x: 42, y: 575, size: 10, font: boldFont, color: brandBlue });
+      page.drawLine({ start: { x: 42, y: 567 }, end: { x: 553, y: 567 }, thickness: 0.8, color: borderCol });
 
-      // Left Column: Table Headers
-      page.drawText("STATUS", { x: 48, y: 515, size: 8.5, font: boldFont, color: soft });
-      page.drawText("QTY", { x: 148, y: 515, size: 8.5, font: boldFont, color: soft });
-      page.drawText("TOTAL BIAYA", { x: 198, y: 515, size: 8.5, font: boldFont, color: soft });
-      page.drawLine({ start: { x: 42, y: 507 }, end: { x: 290, y: 507 }, thickness: 0.8, color: border });
+      page.drawText("STATUS", { x: 48, y: 550, size: 8, font: boldFont, color: mutedText });
+      page.drawText("QTY", { x: 135, y: 550, size: 8, font: boldFont, color: mutedText });
+      page.drawText("TOTAL BIAYA", { x: 185, y: 550, size: 8, font: boldFont, color: mutedText });
+      page.drawLine({ start: { x: 42, y: 542 }, end: { x: 280, y: 542 }, thickness: 0.8, color: borderCol });
 
-      let rowY = 492;
+      let rowY = 527;
       const statusEntries = Array.from(statusMap.entries());
       statusEntries.forEach(([bookingStatus, value], idx) => {
         if (idx % 2 === 0) {
-          page.drawRectangle({ x: 42, y: rowY - 4, width: 248, height: 18, color: cardBg });
+          page.drawRectangle({ x: 42, y: rowY - 4, width: 238, height: 18, color: lightBg });
         }
-        page.drawText(bookingStatus, { x: 48, y: rowY, size: 8, font: boldFont, color: white });
-        page.drawText(`${value.count}x`, { x: 148, y: rowY, size: 8, font: regularFont, color: white });
-        page.drawText(formatCurrency(value.amount), { x: 198, y: rowY, size: 8, font: regularFont, color: white });
+        page.drawText(bookingStatus, { x: 48, y: rowY, size: 8, font: boldFont, color: primaryDark });
+        page.drawText(`${value.count}x`, { x: 135, y: rowY, size: 8, font: regularFont, color: secondaryDark });
+        page.drawText(formatCurrency(value.amount), { x: 185, y: rowY, size: 8, font: regularFont, color: secondaryDark });
         rowY -= 20;
       });
 
-      // Right Column: Bar Chart
-      let chartY = 515;
+      let chartY = 550;
       statusEntries.forEach(([bookingStatus, value]) => {
         const percentage = totalBookings > 0 ? (value.count / totalBookings) : 0;
-        page.drawText(bookingStatus, { x: 312, y: chartY, size: 8, font: boldFont, color: soft });
-        page.drawText(`${Math.round(percentage * 100)}%`, { x: 520, y: chartY, size: 8, font: boldFont, color: white });
+        page.drawText(bookingStatus, { x: 310, y: chartY, size: 8, font: boldFont, color: mutedText });
+        page.drawText(`${Math.round(percentage * 100)}%`, { x: 520, y: chartY, size: 8, font: boldFont, color: primaryDark });
         
-        // Background bar
-        page.drawRectangle({ x: 312, y: chartY - 10, width: 200, height: 6, color: cardBg });
-        // Filled bar
-        const fillBarColor = bookingStatus === "PAID" ? rgb(0.2, 0.7, 0.3) : rgb(0.8, 0.5, 0.1);
+        page.drawRectangle({ x: 310, y: chartY - 10, width: 200, height: 6, color: lightBg });
+        const fillBarColor = bookingStatus === "PAID" ? rgb(0.1, 0.5, 0.2) : rgb(0.78, 0.62, 0.29);
         if (percentage > 0) {
-          page.drawRectangle({ x: 312, y: chartY - 10, width: 200 * percentage, height: 6, color: fillBarColor });
+          page.drawRectangle({ x: 310, y: chartY - 10, width: 200 * percentage, height: 6, color: fillBarColor });
         }
         chartY -= 20;
       });
@@ -315,17 +420,17 @@ export async function GET(request: Request) {
       let y = Math.min(rowY, chartY) - 15;
 
       // 5. Recent Bookings Section
-      page.drawText("DAFTAR TRANSAKSI RESERVASI", { x: 42, y, size: 11, font: boldFont, color: gold });
-      page.drawLine({ start: { x: 42, y: y - 8 }, end: { x: 553, y: y - 8 }, thickness: 1, color: border });
+      page.drawText("DAFTAR TRANSAKSI RESERVASI", { x: 42, y, size: 10, font: boldFont, color: brandBlue });
+      page.drawLine({ start: { x: 42, y: y - 8 }, end: { x: 553, y: y - 8 }, thickness: 0.8, color: borderCol });
       y -= 25;
 
-      page.drawText("BOOKING ID", { x: 48, y, size: 8.5, font: boldFont, color: soft });
-      page.drawText("TAMU / EMAIL", { x: 118, y, size: 8.5, font: boldFont, color: soft });
-      page.drawText("KAMAR", { x: 218, y, size: 8.5, font: boldFont, color: soft });
-      page.drawText("PERIODE IN - OUT", { x: 318, y, size: 8.5, font: boldFont, color: soft });
-      page.drawText("STATUS", { x: 438, y, size: 8.5, font: boldFont, color: soft });
-      page.drawText("TOTAL BIAYA", { x: 503, y, size: 8.5, font: boldFont, color: soft });
-      page.drawLine({ start: { x: 42, y: y - 5 }, end: { x: 553, y: y - 5 }, thickness: 0.8, color: border });
+      page.drawText("BOOKING ID", { x: 48, y, size: 8, font: boldFont, color: mutedText });
+      page.drawText("TAMU / EMAIL", { x: 118, y, size: 8, font: boldFont, color: mutedText });
+      page.drawText("KAMAR", { x: 218, y, size: 8, font: boldFont, color: mutedText });
+      page.drawText("PERIODE IN - OUT", { x: 318, y, size: 8, font: boldFont, color: mutedText });
+      page.drawText("STATUS", { x: 438, y, size: 8, font: boldFont, color: mutedText });
+      page.drawText("TOTAL BIAYA", { x: 503, y, size: 8, font: boldFont, color: mutedText });
+      page.drawLine({ start: { x: 42, y: y - 5 }, end: { x: 553, y: y - 5 }, thickness: 0.8, color: borderCol });
       y -= 22;
 
       let currentPage = page;
@@ -334,20 +439,23 @@ export async function GET(request: Request) {
 
       const createNewPage = () => {
         const newPage = pdf.addPage([595.28, 841.89]);
-        newPage.drawRectangle({ x: 0, y: 0, width: 595.28, height: 841.89, color: dark });
         
-        // Draw simplified header
-        newPage.drawText("Aura Hotel Jakarta — Booking Report (Cont.)", { x: 42, y: 800, size: 10, font: boldFont, color: gold });
-        newPage.drawLine({ start: { x: 42, y: 792 }, end: { x: 553, y: 792 }, thickness: 1, color: border });
+        newPage.drawText("Aura Hotel Jakarta — Laporan Reservasi (Lanjutan)", {
+          x: 42,
+          y: 800,
+          size: 10,
+          font: boldFont,
+          color: brandBlue,
+        });
+        newPage.drawLine({ start: { x: 42, y: 792 }, end: { x: 553, y: 792 }, thickness: 0.8, color: borderCol });
 
-        // Draw table headers
-        newPage.drawText("BOOKING ID", { x: 48, y: 775, size: 8.5, font: boldFont, color: soft });
-        newPage.drawText("TAMU / EMAIL", { x: 118, y: 775, size: 8.5, font: boldFont, color: soft });
-        newPage.drawText("KAMAR", { x: 218, y: 775, size: 8.5, font: boldFont, color: soft });
-        newPage.drawText("PERIODE IN - OUT", { x: 318, y: 775, size: 8.5, font: boldFont, color: soft });
-        newPage.drawText("STATUS", { x: 438, y: 775, size: 8.5, font: boldFont, color: soft });
-        newPage.drawText("TOTAL BIAYA", { x: 503, y: 775, size: 8.5, font: boldFont, color: soft });
-        newPage.drawLine({ start: { x: 42, y: 767 }, end: { x: 553, y: 767 }, thickness: 0.8, color: border });
+        newPage.drawText("BOOKING ID", { x: 48, y: 775, size: 8, font: boldFont, color: mutedText });
+        newPage.drawText("TAMU / EMAIL", { x: 118, y: 775, size: 8, font: boldFont, color: mutedText });
+        newPage.drawText("KAMAR", { x: 218, y: 775, size: 8, font: boldFont, color: mutedText });
+        newPage.drawText("PERIODE IN - OUT", { x: 318, y: 775, size: 8, font: boldFont, color: mutedText });
+        newPage.drawText("STATUS", { x: 438, y: 775, size: 8, font: boldFont, color: mutedText });
+        newPage.drawText("TOTAL BIAYA", { x: 503, y: 775, size: 8, font: boldFont, color: mutedText });
+        newPage.drawLine({ start: { x: 42, y: 767 }, end: { x: 553, y: 767 }, thickness: 0.8, color: borderCol });
 
         pages.push(newPage);
         pageNumber += 1;
@@ -378,29 +486,36 @@ export async function GET(request: Request) {
             y: y - 5,
             width: 511.28,
             height: 22,
-            color: cardBg
+            color: lightBg
           });
         }
 
-        // Column 1: ID
-        currentPage.drawText(`#${bookingId.slice(0, 8)}`, { x: 48, y: y + 2, size: 8, font: boldFont, color: white });
+        currentPage.drawText(`#${bookingId.slice(0, 8)}`, { x: 48, y: y + 2, size: 8, font: boldFont, color: primaryDark });
 
-        // Column 2: Guest / Email
         const truncatedGuest = guestName.length > 18 ? guestName.slice(0, 16) + ".." : guestName;
         const truncatedEmail = email.length > 20 ? email.slice(0, 18) + ".." : email;
-        currentPage.drawText(truncatedGuest || "-", { x: 118, y: y + 5, size: 8, font: boldFont, color: white });
-        currentPage.drawText(truncatedEmail || "-", { x: 118, y: y - 3, size: 7, font: regularFont, color: soft });
+        currentPage.drawText(truncatedGuest || "-", { x: 118, y: y + 5, size: 8, font: boldFont, color: primaryDark });
+        currentPage.drawText(truncatedEmail || "-", { x: 118, y: y - 3, size: 7, font: regularFont, color: mutedText });
 
-        // Column 3: Room Name
         const truncatedRoom = roomName.length > 20 ? roomName.slice(0, 18) + ".." : roomName;
-        currentPage.drawText(truncatedRoom || "-", { x: 218, y: y + 2, size: 8, font: regularFont, color: white });
+        currentPage.drawText(truncatedRoom || "-", { x: 218, y: y + 2, size: 8, font: regularFont, color: primaryDark });
 
-        // Column 4: Stay Period & Payment Type
-        currentPage.drawText(`${formatDate(checkIn)} - ${formatDate(checkOut)}`, { x: 318, y: y + 5, size: 7.5, font: regularFont, color: white });
-        currentPage.drawText(paymentType || "-", { x: 318, y: y - 3, size: 7, font: regularFont, color: soft });
+        currentPage.drawText(`${formatDate(checkIn)} - ${formatDate(checkOut)}`, { x: 318, y: y + 5, size: 7.5, font: regularFont, color: primaryDark });
+        currentPage.drawText(paymentType || "-", { x: 318, y: y - 3, size: 7, font: regularFont, color: mutedText });
 
-        // Column 5: Status Badge
-        const badgeColor = bookingStatus === "PAID" ? rgb(0.1, 0.45, 0.2) : rgb(0.55, 0.35, 0.05);
+        let badgeColor = rgb(0.9, 0.9, 0.9);
+        let textColor = rgb(0.2, 0.2, 0.2);
+        if (bookingStatus === "PAID") {
+          badgeColor = rgb(0.85, 0.95, 0.88);
+          textColor = rgb(0.1, 0.45, 0.2);
+        } else if (bookingStatus === "UNPAID") {
+          badgeColor = rgb(0.99, 0.94, 0.85);
+          textColor = rgb(0.65, 0.4, 0.05);
+        } else if (bookingStatus === "EXPIRED") {
+          badgeColor = rgb(0.98, 0.88, 0.88);
+          textColor = rgb(0.75, 0.1, 0.1);
+        }
+
         currentPage.drawRectangle({
           x: 438,
           y: y - 2,
@@ -413,11 +528,10 @@ export async function GET(request: Request) {
           y: y + 1,
           size: 6.5,
           font: boldFont,
-          color: white
+          color: textColor
         });
 
-        // Column 6: Total Price
-        currentPage.drawText(formatCurrency(totalPrice), { x: 503, y: y + 2, size: 8, font: boldFont, color: white });
+        currentPage.drawText(formatCurrency(totalPrice), { x: 503, y: y + 2, size: 8, font: boldFont, color: primaryDark });
 
         y -= 25;
       }
@@ -425,20 +539,20 @@ export async function GET(request: Request) {
       const totalPages = pages.length;
       for (let i = 0; i < totalPages; i++) {
         const p = pages[i];
-        p.drawLine({ start: { x: 42, y: 40 }, end: { x: 553, y: 40 }, thickness: 0.8, color: border });
+        p.drawLine({ start: { x: 42, y: 40 }, end: { x: 553, y: 40 }, thickness: 0.8, color: borderCol });
         p.drawText(`Halaman ${i + 1} dari ${totalPages}`, {
           x: 553 - regularFont.widthOfTextAtSize(`Halaman ${i + 1} dari ${totalPages}`, 8),
           y: 26,
           size: 8,
           font: regularFont,
-          color: soft
+          color: mutedText
         });
-        p.drawText("Aura Hotel Jakarta — Laporan Keuangan & Reservasi", {
+        p.drawText("Aura Hotel Jakarta — Laporan Operasional & Reservasi", {
           x: 42,
           y: 26,
           size: 8,
           font: regularFont,
-          color: soft
+          color: mutedText
         });
       }
 
@@ -447,20 +561,40 @@ export async function GET(request: Request) {
         status: 200,
         headers: {
           "Content-Type": "application/pdf",
-          "Content-Disposition": `attachment; filename="bookings-report-${new Date().toISOString().slice(0, 10)}.pdf"`,
+          "Content-Disposition": `inline; filename="bookings-report-${new Date().toISOString().slice(0, 10)}.pdf"`,
         },
       });
     }
 
-    const csv = [header, ...rows]
-      .map((row) => row.map((value) => escapeCsvValue(value)).join(","))
-      .join("\n");
+    // Format XLSX Export
+    const wsData = [header, ...rows];
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-    return new NextResponse(csv, {
+    const colWidths = [
+      { wch: 15 }, // booking_id
+      { wch: 25 }, // created_at
+      { wch: 15 }, // room_id
+      { wch: 25 }, // room_name
+      { wch: 25 }, // guest_name
+      { wch: 25 }, // email
+      { wch: 15 }, // check_in
+      { wch: 15 }, // check_out
+      { wch: 15 }, // total_price
+      { wch: 12 }, // status
+      { wch: 15 }, // payment_type
+    ];
+    ws["!cols"] = colWidths;
+
+    XLSX.utils.book_append_sheet(wb, ws, "Bookings Report");
+
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "buffer" });
+
+    return new NextResponse(excelBuffer, {
       status: 200,
       headers: {
-        "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="bookings-report-${new Date().toISOString().slice(0, 10)}.csv"`,
+        "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "Content-Disposition": `attachment; filename="bookings-report-${new Date().toISOString().slice(0, 10)}.xlsx"`,
       },
     });
   } catch (error) {
